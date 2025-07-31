@@ -31,11 +31,17 @@ class BaseCharacter(ABC):
         # Final stats (after all modifiers)
         self.stats = self.base_stats.copy()
         
+        # Apply class modifiers during initialization
+        self._apply_initial_class_modifiers()
+        
         # Derived stats calculated from base stats
         self.max_hp = 0
         self.current_hp = 0
         self.armor_class = 10  # Base AC is 10
         self.base_attack_bonus = 0
+        
+        # Calculate initial derived stats after class modifiers are applied
+        self.calculate_derived_stats()
         
         # Game state
         self.current_area = None
@@ -46,6 +52,18 @@ class BaseCharacter(ABC):
         # Character creation tracking
         self.unallocated_stats = 10  # Points to spend during creation
         self.creation_complete = False
+        
+    def _apply_initial_class_modifiers(self):
+        """Apply class modifiers during character initialization"""
+        try:
+            from core.save_manager import SaveManager
+            save_manager = SaveManager()
+            class_definitions = save_manager.load_class_definitions()
+            if self.character_class in class_definitions:
+                class_data = class_definitions[self.character_class]
+                self.apply_class_modifiers(class_data)
+        except (ImportError, Exception):
+            pass
         
     def apply_class_modifiers(self, class_data: Dict[str, Any]):
         """Apply class-specific stat modifiers to base stats"""

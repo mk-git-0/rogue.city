@@ -21,9 +21,10 @@ class Mage(BaseCharacter):
     
     def __init__(self, name: str):
         """Initialize Mage character"""
-        super().__init__(name, 'mage')
+        # Initialize mana attributes before calling parent __init__
         self.max_mana = 0
         self.current_mana = 0
+        super().__init__(name, 'mage')
         
     def get_hit_die_value(self) -> int:
         """Mages use d4 hit die (lowest HP per level)"""
