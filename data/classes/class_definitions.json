@@ -1,0 +1,106 @@
+{
+  "rogue": {
+    "name": "Rogue",
+    "difficulty": 11,
+    "description": "Masters of stealth and precision. High difficulty class that rewards skilled play with devastating critical strikes and unmatched mobility.",
+    "stat_modifiers": {
+      "strength": -2,
+      "dexterity": 3,
+      "constitution": -2,
+      "intelligence": 2,
+      "wisdom": -1,
+      "charisma": -1
+    },
+    "hit_die": "d6",
+    "base_attack_speed": 2.0,
+    "critical_hit_range": 19,
+    "special_abilities": {
+      "sneak_attack": true,
+      "skill_bonus": 2,
+      "evasion_bonus": 1,
+      "improved_critical": true
+    },
+    "equipment_restrictions": {
+      "armor_types": ["light"],
+      "weapon_types": ["finesse", "ranged"]
+    }
+  },
+  "knight": {
+    "name": "Knight",
+    "difficulty": 3,
+    "description": "Stalwart defenders and front-line fighters. Easy to play with excellent survivability and straightforward combat mechanics.",
+    "stat_modifiers": {
+      "strength": 3,
+      "dexterity": 1,
+      "constitution": 2,
+      "intelligence": -1,
+      "wisdom": -1,
+      "charisma": 1
+    },
+    "hit_die": "d10",
+    "base_attack_speed": 4.0,
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "damage_resistance": 1,
+      "heavy_armor_proficiency": true,
+      "leadership_bonus": 1,
+      "defensive_stance": true
+    },
+    "equipment_restrictions": {
+      "armor_types": ["light", "medium", "heavy"],
+      "weapon_types": ["martial", "simple"]
+    }
+  },
+  "mage": {
+    "name": "Mage",
+    "difficulty": 9,
+    "description": "Wielders of arcane power with devastating magical abilities. High difficulty glass cannons with complex resource management.",
+    "stat_modifiers": {
+      "strength": -2,
+      "dexterity": 0,
+      "constitution": -3,
+      "intelligence": 3,
+      "wisdom": 2,
+      "charisma": 0
+    },
+    "hit_die": "d4",
+    "base_attack_speed": 6.0,
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "mana_system": true,
+      "spell_power_bonus": 2,
+      "mana_regeneration": 5,
+      "arcane_knowledge": true
+    },
+    "equipment_restrictions": {
+      "armor_types": ["robes"],
+      "weapon_types": ["staves", "daggers"]
+    }
+  },
+  "mystic": {
+    "name": "Mystic",
+    "difficulty": 6,
+    "description": "Balanced warriors who blend physical and spiritual training. Moderate difficulty with unique evasion abilities and versatile combat options.",
+    "stat_modifiers": {
+      "strength": -1,
+      "dexterity": 4,
+      "constitution": -1,
+      "intelligence": -2,
+      "wisdom": 2,
+      "charisma": 1
+    },
+    "hit_die": "d8",
+    "base_attack_speed": 3.0,
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "evasion_chance": 15,
+      "unarmed_bonus": 2,
+      "meditation": true,
+      "spiritual_awareness": true
+    },
+    "equipment_restrictions": {
+      "armor_types": ["light", "medium"],
+      "weapon_types": ["simple", "unarmed"]
+    }
+  }
+}

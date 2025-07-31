@@ -12,11 +12,14 @@ from enum import Enum
 from .ui_manager import UIManager
 from .dice_system import DiceSystem
 from .timer_system import TimerSystem
+from .save_manager import SaveManager
 
 
 class GameState(Enum):
     """Enumeration of possible game states."""
     MENU = "menu"
+    CHARACTER_CREATION = "character_creation"
+    CHARACTER_SELECTION = "character_selection"
     PLAYING = "playing"
     PAUSED = "paused"
     COMBAT = "combat"
@@ -45,6 +48,11 @@ class GameEngine:
         self.ui_manager = UIManager()
         self.dice_system = DiceSystem(show_rolls=True)
         self.timer_system = TimerSystem()
+        self.save_manager = SaveManager()
+        
+        # Character system
+        self.current_character = None
+        self.character_creation_state = None
         
         # Game loop timing
         self.last_frame_time = 0.0
@@ -142,14 +150,36 @@ class GameEngine:
             context_lines.append("No obvious exits.")
         context_lines.append("")
         
-        # Player status
-        player = self.game_data.get('player', {})
-        context_lines.append("=== CHARACTER STATUS ===")
-        context_lines.append(f"Name: {player.get('name', 'Unknown')}")
-        context_lines.append(f"Level: {player.get('level', 1)}")
-        context_lines.append(f"Health: {player.get('health', 0)}/{player.get('max_health', 0)}")
-        context_lines.append(f"Mana: {player.get('mana', 0)}/{player.get('max_mana', 0)}")
-        context_lines.append("")
+        # Character status
+        if self.current_character:
+            character = self.current_character
+            context_lines.append("=== CHARACTER STATUS ===")
+            context_lines.append(f"Name: {character.name}")
+            context_lines.append(f"Class: {character.character_class.title()}")
+            context_lines.append(f"Level: {character.level}")
+            context_lines.append(f"Health: {character.current_hp}/{character.max_hp}")
+            
+            # Show mana for mages
+            if hasattr(character, 'current_mana'):
+                context_lines.append(f"Mana: {character.current_mana}/{character.max_mana}")
+                
+            context_lines.append(f"AC: {character.armor_class}")
+            context_lines.append("")
+            context_lines.append("Stats:")
+            for stat, value in character.stats.items():
+                modifier = character.get_stat_modifier(stat)
+                mod_str = f"({modifier:+d})" if modifier != 0 else "(+0)"
+                context_lines.append(f"  {stat.title()}: {value} {mod_str}")
+            context_lines.append("")
+        else:
+            # Fallback to old player data
+            player = self.game_data.get('player', {})
+            context_lines.append("=== CHARACTER STATUS ===")
+            context_lines.append(f"Name: {player.get('name', 'Unknown')}")
+            context_lines.append(f"Level: {player.get('level', 1)}")
+            context_lines.append(f"Health: {player.get('health', 0)}/{player.get('max_health', 0)}")
+            context_lines.append(f"Mana: {player.get('mana', 0)}/{player.get('max_mana', 0)}")
+            context_lines.append("")
         
         # Game state info
         if self.current_state != GameState.PLAYING:
@@ -188,6 +218,10 @@ class GameEngine:
         # Handle commands based on current state
         if self.current_state == GameState.MENU:
             self._handle_menu_command(cmd, args)
+        elif self.current_state == GameState.CHARACTER_CREATION:
+            self._handle_character_creation_command(cmd, args)
+        elif self.current_state == GameState.CHARACTER_SELECTION:
+            self._handle_character_selection_command(cmd, args)
         elif self.current_state == GameState.PLAYING:
             self._handle_game_command(cmd, args)
         elif self.current_state == GameState.PAUSED:
@@ -197,14 +231,17 @@ class GameEngine:
             
     def _handle_menu_command(self, cmd: str, args: List[str]) -> None:
         """Handle commands in menu state."""
-        if cmd in ['start', 'play', 'begin']:
-            self.current_state = GameState.PLAYING
-            self.ui_manager.log_success("Game started! Adventure awaits...")
-            self._update_context_display()
+        if cmd in ['new', 'create', 'n']:
+            self.current_state = GameState.CHARACTER_CREATION
+            self.character_creation_state = {'step': 'class_selection'}
+            self._start_character_creation()
+        elif cmd in ['load', 'l']:
+            self.current_state = GameState.CHARACTER_SELECTION
+            self._show_character_selection()
         elif cmd in ['quit', 'exit', 'q']:
             self.shutdown()
         else:
-            self.ui_manager.log_info("Menu commands: start, quit")
+            self.ui_manager.log_info("Menu commands: new (create character), load (load character), quit")
             
     def _handle_game_command(self, cmd: str, args: List[str]) -> None:
         """Handle commands during gameplay."""
@@ -243,6 +280,379 @@ class GameEngine:
             self.shutdown()
         else:
             self.ui_manager.log_info("Paused. Commands: resume, quit")
+            
+    def _handle_character_creation_command(self, cmd: str, args: List[str]) -> None:
+        """Handle commands during character creation."""
+        if cmd in ['quit', 'exit', 'q']:
+            self.current_state = GameState.MENU
+            self.character_creation_state = None
+            self.ui_manager.log_system("Character creation canceled.")
+            self._show_main_menu()
+            return
+            
+        step = self.character_creation_state.get('step')
+        
+        if step == 'class_selection':
+            self._handle_class_selection(cmd, args)
+        elif step == 'name_entry':
+            self._handle_name_entry(cmd, args)
+        elif step == 'name_confirmation':
+            self._handle_name_confirmation(cmd, args)
+        elif step == 'stat_allocation':
+            self._handle_stat_allocation(cmd, args)
+        elif step == 'stat_confirmation':
+            self._handle_stat_confirmation(cmd, args)
+        else:
+            self.ui_manager.log_error(f"Unknown character creation step: {step}")
+            
+    def _handle_character_selection_command(self, cmd: str, args: List[str]) -> None:
+        """Handle commands during character selection."""
+        if cmd in ['quit', 'exit', 'q', 'back']:
+            self.current_state = GameState.MENU
+            self._show_main_menu()
+            return
+            
+        # Try to parse as character selection number
+        try:
+            choice = int(cmd)
+            saved_characters = self.save_manager.list_saved_characters()
+            
+            if 1 <= choice <= len(saved_characters):
+                character_info = saved_characters[choice - 1]
+                character = self.save_manager.load_character(character_info['name'])
+                
+                if character:
+                    self.current_character = character
+                    self.current_state = GameState.PLAYING
+                    self.ui_manager.log_success(f"Loaded {character.name} the {character.character_class.title()}!")
+                    self._update_context_display()
+                else:
+                    self.ui_manager.log_error(f"Failed to load character: {character_info['name']}")
+            else:
+                self.ui_manager.log_error("Invalid selection. Enter a number from the list.")
+                
+        except ValueError:
+            self.ui_manager.log_error("Enter a number to select a character, or 'back' to return to menu.")
+            
+    # Character Creation Implementation Methods
+    
+    def _show_main_menu(self) -> None:
+        """Show the main menu."""
+        context_lines = [
+            "=== ROGUE CITY ===",
+            "",
+            "A MajorMUD-style text RPG",
+            "",
+            "Commands:",
+            "  new  - Create a new character",
+            "  load - Load an existing character", 
+            "  quit - Exit the game",
+            ""
+        ]
+        self.ui_manager.set_context(context_lines)
+        self.ui_manager.log_system("Welcome to Rogue City!")
+        self.ui_manager.log_info("Enter a command to begin.")
+        
+    def _start_character_creation(self) -> None:
+        """Start the character creation process."""
+        self.ui_manager.log_system("Starting character creation...")
+        self._show_class_selection()
+        
+    def _show_class_selection(self) -> None:
+        """Show class selection interface."""
+        class_data = self.save_manager.load_class_definitions()
+        
+        context_lines = [
+            "=== CHARACTER CREATION ===",
+            "",
+            "Step 1: Choose Your Class",
+            "",
+            "Available Classes:",
+            ""
+        ]
+        
+        class_list = []
+        for i, (class_id, class_info) in enumerate(class_data.items(), 1):
+            name = class_info['name']
+            difficulty = class_info['difficulty']
+            description = class_info['description']
+            
+            context_lines.append(f"{i}. {name} (Difficulty: {difficulty})")
+            context_lines.append(f"   {description}")
+            context_lines.append("")
+            class_list.append(class_id)
+            
+        context_lines.append("Enter the number of your choice (1-4):")
+        
+        self.ui_manager.set_context(context_lines)
+        self.character_creation_state['class_list'] = class_list
+        
+    def _handle_class_selection(self, cmd: str, args: List[str]) -> None:
+        """Handle class selection input."""
+        try:
+            choice = int(cmd)
+            class_list = self.character_creation_state.get('class_list', [])
+            
+            if 1 <= choice <= len(class_list):
+                selected_class = class_list[choice - 1]
+                class_data = self.save_manager.load_class_definitions()
+                selected_info = class_data[selected_class]
+                
+                # Show confirmation
+                context_lines = [
+                    "=== CHARACTER CREATION ===",
+                    "",
+                    f"Selected Class: {selected_info['name']}",
+                    f"Difficulty: {selected_info['difficulty']}",
+                    "",
+                    f"Description: {selected_info['description']}",
+                    "",
+                    "Stat Modifiers:"
+                ]
+                
+                for stat, modifier in selected_info['stat_modifiers'].items():
+                    sign = "+" if modifier >= 0 else ""
+                    context_lines.append(f"  {stat.title()}: {sign}{modifier}")
+                
+                context_lines.extend([
+                    "",
+                    f"Hit Die: {selected_info['hit_die']}",
+                    f"Attack Speed: {selected_info['base_attack_speed']} seconds",
+                    "",
+                    "Confirm this choice? (y/n):"
+                ])
+                
+                self.ui_manager.set_context(context_lines)
+                self.character_creation_state['selected_class'] = selected_class
+                self.character_creation_state['step'] = 'class_confirmation'
+                
+            else:
+                self.ui_manager.log_error("Invalid choice. Enter a number 1-4.")
+                
+        except ValueError:
+            if cmd.lower() in ['y', 'yes'] and self.character_creation_state.get('selected_class'):
+                # Confirmed class selection
+                self.character_creation_state['step'] = 'name_entry'
+                self._show_name_entry()
+            elif cmd.lower() in ['n', 'no']:
+                # Go back to class selection
+                self.character_creation_state['step'] = 'class_selection'
+                self._show_class_selection()
+            else:
+                self.ui_manager.log_error("Enter a number 1-4 to select a class.")
+                
+    def _show_name_entry(self) -> None:
+        """Show name entry interface."""
+        context_lines = [
+            "=== CHARACTER CREATION ===",
+            "",
+            "Step 2: Choose Your Name",
+            "",
+            "Enter your character's name:",
+            "(Must be unique and 1-20 characters)",
+            ""
+        ]
+        self.ui_manager.set_context(context_lines)
+        
+    def _handle_name_entry(self, cmd: str, args: List[str]) -> None:
+        """Handle name entry input."""
+        name = cmd.strip()
+        
+        if not name:
+            self.ui_manager.log_error("Name cannot be empty.")
+            return
+            
+        if len(name) > 20:
+            self.ui_manager.log_error("Name too long (max 20 characters).")
+            return
+            
+        if self.save_manager.character_name_exists(name):
+            self.ui_manager.log_error("That name is already taken. Choose another.")
+            return
+            
+        # Name is valid, confirm it
+        context_lines = [
+            "=== CHARACTER CREATION ===",
+            "",
+            f"Character Name: {name}",
+            "",
+            "Confirm this name? (y/n):"
+        ]
+        self.ui_manager.set_context(context_lines)
+        self.character_creation_state['character_name'] = name
+        self.character_creation_state['step'] = 'name_confirmation'
+        
+    def _handle_name_confirmation(self, cmd: str, args: List[str]) -> None:
+        """Handle name confirmation input."""
+        if cmd.lower() in ['y', 'yes']:
+            # Create character instance and apply class modifiers
+            selected_class = self.character_creation_state['selected_class']
+            character_name = self.character_creation_state['character_name']
+            
+            character = self._create_character_instance(character_name, selected_class)
+            
+            # Apply class modifiers
+            class_data = self.save_manager.load_class_definitions()
+            class_info = class_data[selected_class]
+            character.apply_class_modifiers(class_info)
+            character.calculate_derived_stats()
+            
+            self.character_creation_state['character'] = character
+            self.character_creation_state['step'] = 'stat_allocation'
+            self._show_stat_allocation()
+            
+        elif cmd.lower() in ['n', 'no']:
+            # Go back to name entry
+            self.character_creation_state['step'] = 'name_entry'
+            self._show_name_entry()
+        else:
+            self.ui_manager.log_error("Enter 'y' for yes or 'n' for no.")
+            
+    def _handle_stat_confirmation(self, cmd: str, args: List[str]) -> None:
+        """Handle stat allocation confirmation."""
+        if cmd.lower() in ['y', 'yes']:
+            self._finalize_character()
+        elif cmd.lower() in ['n', 'no']:
+            # Go back to stat allocation
+            self.character_creation_state['step'] = 'stat_allocation'
+            self._show_stat_allocation()
+        else:
+            self.ui_manager.log_error("Enter 'y' for yes or 'n' for no.")
+        
+    def _show_stat_allocation(self) -> None:
+        """Show stat allocation interface."""
+        character = self.character_creation_state['character']
+        
+        context_lines = [
+            "=== CHARACTER CREATION ===",
+            "",
+            "Step 3: Allocate Stat Points",
+            "",
+            f"Character: {character.name} the {character.character_class.title()}",
+            f"Points Remaining: {character.unallocated_stats}",
+            "",
+            "Current Stats (after class modifiers):"
+        ]
+        
+        for stat, value in character.stats.items():
+            context_lines.append(f"  {stat.title()}: {value}")
+            
+        context_lines.extend([
+            "",
+            "Enter stat name to increase (str/dex/con/int/wis/cha)",
+            "or 'done' when finished:"
+        ])
+        
+        self.ui_manager.set_context(context_lines)
+        
+    def _handle_stat_allocation(self, cmd: str, args: List[str]) -> None:
+        """Handle stat allocation input."""
+        character = self.character_creation_state['character']
+        
+        if cmd.lower() == 'done':
+            if character.unallocated_stats > 0:
+                self.ui_manager.log_info(f"You still have {character.unallocated_stats} points to allocate. Continue anyway? (y/n)")
+                self.character_creation_state['step'] = 'stat_confirmation'
+                return
+            else:
+                self._finalize_character()
+                return
+                
+        # Handle stat abbreviations
+        stat_mapping = {
+            'str': 'strength',
+            'dex': 'dexterity', 
+            'con': 'constitution',
+            'int': 'intelligence',
+            'wis': 'wisdom',
+            'cha': 'charisma'
+        }
+        
+        full_stat = stat_mapping.get(cmd.lower(), cmd.lower())
+        
+        if character.allocate_stat_point(full_stat):
+            self.ui_manager.log_success(f"Increased {full_stat.title()} to {character.stats[full_stat]}")
+            self._show_stat_allocation()  # Refresh display
+        else:
+            if character.unallocated_stats <= 0:
+                self.ui_manager.log_error("No stat points remaining. Type 'done' to finish.")
+            else:
+                self.ui_manager.log_error("Invalid stat name. Use: str, dex, con, int, wis, cha")
+                
+    def _create_character_instance(self, name: str, class_type: str):
+        """Create appropriate character class instance."""
+        if class_type == 'rogue':
+            from characters.class_rogue import Rogue
+            return Rogue(name)
+        elif class_type == 'knight':
+            from characters.class_knight import Knight
+            return Knight(name)
+        elif class_type == 'mage':
+            from characters.class_mage import Mage
+            return Mage(name)
+        elif class_type == 'mystic':
+            from characters.class_mystic import Mystic
+            return Mystic(name)
+        else:
+            raise ValueError(f"Unknown class type: {class_type}")
+            
+    def _finalize_character(self) -> None:
+        """Finalize character creation and save."""
+        character = self.character_creation_state['character']
+        
+        # Mark character creation as complete
+        character.creation_complete = True
+        character.calculate_derived_stats()
+        
+        # Save character
+        if self.save_manager.save_character(character):
+            self.current_character = character
+            self.current_state = GameState.PLAYING
+            self.character_creation_state = None
+            
+            self.ui_manager.log_success(f"Character {character.name} created and saved!")
+            self.ui_manager.log_success("Welcome to Rogue City! Your adventure begins...")
+            self._update_context_display()
+        else:
+            self.ui_manager.log_error("Failed to save character. Please try again.")
+            
+    def _show_character_selection(self) -> None:
+        """Show character selection interface."""
+        saved_characters = self.save_manager.list_saved_characters()
+        
+        if not saved_characters:
+            context_lines = [
+                "=== LOAD CHARACTER ===",
+                "",
+                "No saved characters found.",
+                "",
+                "Create a new character first.",
+                ""
+            ]
+            self.ui_manager.set_context(context_lines)
+            self.ui_manager.log_info("No characters to load. Type 'back' to return to menu.")
+            return
+            
+        context_lines = [
+            "=== LOAD CHARACTER ===",
+            "",
+            "Saved Characters:",
+            ""
+        ]
+        
+        for i, char_info in enumerate(saved_characters, 1):
+            name = char_info['name']
+            char_class = char_info['class'].title()
+            level = char_info['level']
+            context_lines.append(f"{i}. {name} the {char_class} (Level {level})")
+            
+        context_lines.extend([
+            "",
+            "Enter the number of the character to load:",
+            "or 'back' to return to main menu."
+        ])
+        
+        self.ui_manager.set_context(context_lines)
             
     def _show_help(self) -> None:
         """Show available commands."""
@@ -367,8 +777,7 @@ class GameEngine:
         self.last_frame_time = time.time()
         
         # Show initial menu
-        self.ui_manager.log_system("Welcome to Rogue City!")
-        self.ui_manager.log_info("Type 'start' to begin your adventure, or 'quit' to exit.")
+        self._show_main_menu()
         
         try:
             while self.running:
