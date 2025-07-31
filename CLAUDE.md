@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ```bash
 python3 main.py
 ```
-The game requires Python 3.6+ and a terminal that supports curses (60x20 minimum).
+The game requires Python 3.6+ and a standard terminal (cross-platform compatible).
 
 ### Dependencies
 ```bash
@@ -25,7 +25,7 @@ This is a Python-based text RPG (Rogue City) inspired by MajorMUD, built with a 
 
 ### Core Systems (`core/`)
 - **GameEngine** (`game_engine.py`): Central coordinator running at 60 FPS, manages game state and system interactions
-- **UIManager** (`ui_manager.py`): Split-screen curses interface (60% context window, 40% scrolling log)
+- **SimpleUIManager** (`simple_ui_manager.py`): Traditional MajorMUD-style single-terminal interface
 - **DiceSystem** (`dice_system.py`): D&D-style dice mechanics for combat and skill checks
 - **TimerSystem** (`timer_system.py`): Handles timer-based combat with weapon speed differences
 
@@ -49,16 +49,19 @@ Four classes with D&D-style stat modifiers and difficulty ratings:
 - **Mystic** (Difficulty 6): DEX/WIS hybrid, unarmed combat, evasion
 
 ### UI Layout Requirements
-The terminal interface uses curses with strict layout requirements:
-- Context window (top 60%): Room descriptions, character stats, maps
-- Log window (bottom 40%): Scrolling command history and responses
-- Input line at bottom with command history navigation
+The terminal interface uses a simplified MajorMUD-style approach:
+- Single scrolling terminal output for all game content
+- Traditional command prompt (>) at bottom for user input
+- Simple text output without complex windowing
+- Cross-platform compatibility using standard terminal features
+- Command history navigation with up/down arrows
 
 ### Integration Points
-- UI ↔ Combat: Combat messages in log, status in context
+- UI ↔ Combat: Combat messages displayed in single scrolling output
 - Dice ↔ Combat: All calculations use dice system
 - Timer ↔ Combat: Attack speeds create action delays
 - Character ↔ Equipment: Stats affect combat bonuses
+- UI ↔ Character Creation: Step-by-step prompts in traditional terminal style
 
 ## File Structure Patterns
 
@@ -79,8 +82,9 @@ All game content stored as human-readable JSON:
 
 ### Error Handling
 - Graceful error messages for invalid commands ("Attack what?", "You can't go that way.")
-- Terminal compatibility checks on startup
+- Cross-platform terminal compatibility (no curses dependency)
 - Clean shutdown handling for Ctrl+C interrupts
+- Fallback to simple input() for maximum compatibility
 
 ### Game Loop
 - 60 FPS main loop for smooth timer processing
