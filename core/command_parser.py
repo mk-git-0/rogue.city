@@ -124,10 +124,10 @@ class CommandParser:
             try:
                 return self.commands[command](args)
             except Exception as e:
-                self.game.ui.display_message(f"Error executing command: {e}")
+                self.game.ui_manager.log_error(f"Error executing command: {e}")
                 return True
         else:
-            self.game.ui.display_message(f"Unknown command: '{command}'. Type 'help' for available commands.")
+            self.game.ui_manager.log_error(f"Unknown command: '{command}'. Type 'help' for available commands.")
             return True
     
     # Movement Commands
@@ -152,39 +152,27 @@ class CommandParser:
     def _move_direction(self, direction: str) -> bool:
         """Handle directional movement."""
         if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
+            self.game.ui_manager.log_error("No character loaded.")
             return True
         
         if self.game.state == self.game.GameState.COMBAT:
-            self.game.ui.display_message("You cannot move while in combat! Use 'flee' to escape.")
+            self.game.ui_manager.log_error("You cannot move while in combat! Use 'flee' to escape.")
             return True
         
-        current_area = self.game.current_player.current_area
-        if not current_area:
-            self.game.ui.display_message("You are not in any area.")
-            return True
-        
-        if current_area.move_player(direction):
-            # Movement successful - area handles display
-            return True
-        else:
-            self.game.ui.display_message("You can't go that way.")
-            return True
+        # Use the game engine's move command instead
+        self.game._move_command(direction)
+        return True
     
     # Examination Commands
     def cmd_look(self, args: List[str]) -> bool:
         """Look at room or specific target."""
         if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
+            self.game.ui_manager.log_error("No character loaded.")
             return True
         
         if not args:
-            # Look at room
-            current_area = self.game.current_player.current_area
-            if current_area:
-                current_area.display_room_info()
-            else:
-                self.game.ui.display_message("You are floating in a void.")
+            # Use the game engine's look command
+            self.game._look_command()
         else:
             # Look at specific target
             target = ' '.join(args).lower()
@@ -241,80 +229,41 @@ class CommandParser:
     
     def cmd_exits(self, args: List[str]) -> bool:
         """Show available exits."""
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        current_area = self.game.current_player.current_area
-        if current_area and hasattr(current_area, 'exits'):
-            if current_area.exits:
-                exits = list(current_area.exits.keys())
-                self.game.ui.display_message(f"Exits: {', '.join(exits)}")
-            else:
-                self.game.ui.display_message("There are no exits here.")
-        else:
-            self.game.ui.display_message("You are not in any area.")
-        
+        # Use the game engine's exits command
+        self.game._exits_command()
         return True
     
     def cmd_map(self, args: List[str]) -> bool:
         """Display area map if available."""
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        current_area = self.game.current_player.current_area
-        if current_area and hasattr(current_area, 'show_map'):
-            current_area.show_map()
-        else:
-            self.game.ui.display_message("No map available for this area.")
-        
+        # Use the game engine's map command  
+        self.game._map_command()
         return True
     
     # Inventory Commands
     def cmd_inventory(self, args: List[str]) -> bool:
         """Display player inventory."""
         if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
+            self.game.ui_manager.log_error("No character loaded.")
             return True
         
-        self.game.current_player.inventory_system.display_inventory()
+        # Use the game engine's inventory command
+        self.game._inventory_command()
         return True
     
     def cmd_get(self, args: List[str]) -> bool:
         """Get an item from the current area."""
         if not args:
-            self.game.ui.display_message("Get what?")
+            self.game.ui_manager.log_error("Get what?")
             return True
         
         if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
+            self.game.ui_manager.log_error("No character loaded.")
             return True
         
-        item_name = ' '.join(args).lower()
-        current_area = self.game.current_player.current_area
-        
-        if not current_area or not hasattr(current_area, 'items'):
-            self.game.ui.display_message("There are no items here.")
-            return True
-        
-        # Find matching item
-        item_to_get = None
-        for item in current_area.items[:]:  # Copy list to avoid modification issues
-            if item_name in item.name.lower():
-                item_to_get = item
-                break
-        
-        if item_to_get:
-            if self.game.current_player.inventory_system.add_item(item_to_get):
-                current_area.items.remove(item_to_get)
-                self.game.ui.display_message(f"You get the {item_to_get.name}.")
-            else:
-                self.game.ui.display_message("You cannot carry that item.")
-        else:
-            self.game.ui.display_message(f"There is no '{item_name}' here.")
-        
+        # Use the game engine's get command
+        self.game._get_command(args)
         return True
+        
     
     def cmd_drop(self, args: List[str]) -> bool:
         """Drop an item from inventory."""
@@ -357,191 +306,51 @@ class CommandParser:
     
     def cmd_equip(self, args: List[str]) -> bool:
         """Equip an item."""
-        if not args:
-            self.game.ui.display_message("Equip what?")
-            return True
-        
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        if not hasattr(self.game.current_player, 'equipment_system'):
-            self.game.ui.display_message("Equipment system not available.")
-            return True
-        
-        item_name = ' '.join(args).lower()
-        
-        # Find item in inventory
-        item_to_equip = None
-        for item in self.game.current_player.inventory_system.items:
-            if item_name in item.name.lower():
-                item_to_equip = item
-                break
-        
-        if item_to_equip:
-            if self.game.current_player.equipment_system.equip_item(item_to_equip):
-                self.game.ui.display_message(f"You equip the {item_to_equip.name}.")
-            else:
-                self.game.ui.display_message(f"You cannot equip the {item_to_equip.name}.")
-        else:
-            self.game.ui.display_message(f"You don't have '{item_name}'.")
-        
+        # Use the game engine's equip command
+        self.game._equip_command(args)
         return True
     
     def cmd_unequip(self, args: List[str]) -> bool:
         """Unequip an item."""
-        if not args:
-            self.game.ui.display_message("Unequip what?")
-            return True
-        
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        if not hasattr(self.game.current_player, 'equipment_system'):
-            self.game.ui.display_message("Equipment system not available.")
-            return True
-        
-        item_name = ' '.join(args).lower()
-        
-        # Find equipped item
-        equipped_items = self.game.current_player.equipment_system.get_all_equipped()
-        item_to_unequip = None
-        
-        for slot, item in equipped_items.items():
-            if item and item_name in item.name.lower():
-                item_to_unequip = item
-                break
-        
-        if item_to_unequip:
-            if self.game.current_player.equipment_system.unequip_item(item_to_unequip):
-                self.game.ui.display_message(f"You unequip the {item_to_unequip.name}.")
-            else:
-                self.game.ui.display_message(f"You cannot unequip the {item_to_unequip.name}.")
-        else:
-            self.game.ui.display_message(f"You don't have '{item_name}' equipped.")
-        
+        # Use the game engine's unequip command
+        self.game._unequip_command(args)
         return True
     
     def cmd_use(self, args: List[str]) -> bool:
         """Use a consumable item."""
-        if not args:
-            self.game.ui.display_message("Use what?")
-            return True
-        
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        item_name = ' '.join(args).lower()
-        
-        # Find item in inventory
-        item_to_use = None
-        for item in self.game.current_player.inventory_system.items:
-            if item_name in item.name.lower():
-                item_to_use = item
-                break
-        
-        if item_to_use:
-            if hasattr(item_to_use, 'use'):
-                item_to_use.use(self.game.current_player)
-            else:
-                self.game.ui.display_message(f"You cannot use the {item_to_use.name}.")
-        else:
-            self.game.ui.display_message(f"You don't have '{item_name}'.")
-        
+        # Use the game engine's use command
+        self.game._use_command(args)
         return True
     
     def cmd_equipment(self, args: List[str]) -> bool:
         """Display equipped items."""
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        if hasattr(self.game.current_player, 'equipment_system'):
-            self.game.current_player.equipment_system.display_equipment()
-        else:
-            self.game.ui.display_message("Equipment system not available.")
-        
+        # Use the game engine's equipment command
+        self.game._equipment_command()
         return True
     
     # Combat Commands
     def cmd_attack(self, args: List[str]) -> bool:
         """Attack an enemy."""
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        if not args:
-            if self.game.state == self.game.GameState.COMBAT:
-                # Attack current target
-                self.game.combat_system.player_attack()
-            else:
-                self.game.ui.display_message("Attack what?")
-            return True
-        
-        target_name = ' '.join(args).lower()
-        current_area = self.game.current_player.current_area
-        
-        if not current_area or not hasattr(current_area, 'enemies'):
-            self.game.ui.display_message("There are no enemies here.")
-            return True
-        
-        # Find matching enemy
-        target_enemy = None
-        for enemy in current_area.enemies:
-            if target_name in enemy.name.lower():
-                target_enemy = enemy
-                break
-        
-        if target_enemy:
-            # Start combat
-            self.game.start_combat(target_enemy)
-        else:
-            self.game.ui.display_message(f"There is no '{target_name}' here.")
-        
+        # Use the game engine's attack command
+        self.game._attack_command(args)
         return True
     
     def cmd_auto(self, args: List[str]) -> bool:
         """Toggle auto-combat mode."""
-        if self.game.state != self.game.GameState.COMBAT:
-            self.game.ui.display_message("You are not in combat.")
-            return True
-        
-        if hasattr(self.game.combat_system, 'toggle_auto_combat'):
-            self.game.combat_system.toggle_auto_combat()
-        else:
-            self.game.ui.display_message("Auto-combat not available.")
-        
+        # Use the game engine's auto command
+        self.game._auto_combat_command()
         return True
     
     def cmd_flee(self, args: List[str]) -> bool:
         """Flee from combat."""
-        if self.game.state != self.game.GameState.COMBAT:
-            self.game.ui.display_message("You are not in combat.")
-            return True
-        
-        if hasattr(self.game.combat_system, 'flee_combat'):
-            self.game.combat_system.flee_combat()
-        else:
-            self.game.ui.display_message("Cannot flee.")
-        
+        # Use the game engine's flee command
+        self.game._flee_command()
         return True
     
     def cmd_status(self, args: List[str]) -> bool:
         """Show combat status."""
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        if self.game.state == self.game.GameState.COMBAT:
-            if hasattr(self.game.combat_system, 'display_combat_status'):
-                self.game.combat_system.display_combat_status()
-            else:
-                self._display_basic_status()
-        else:
-            self._display_basic_status()
-        
+        # Use the game engine's status command
+        self.game._status_command()
         return True
     
     def _display_basic_status(self):
