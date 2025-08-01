@@ -238,7 +238,6 @@ class CombatSystem:
         
         # Schedule the attack
         attack_speed = self.current_character.get_attack_speed()
-        self.ui_manager.log_system(f"DEBUG: Scheduling player attack with 0.1s delay")
         self.timer_system.schedule_action(
             actor_id=self.current_character.name,
             action_type="attack",
@@ -325,28 +324,24 @@ class CombatSystem:
         action = action_data.get("action")
         
         if not action or not self.is_active():
-            self.ui_manager.log_system(f"DEBUG: Player action skipped - action: {action is not None}, active: {self.is_active()}")
             return
             
         if action.action_type == "attack":
-            self.ui_manager.log_system(f"DEBUG: Executing player attack")
             self._execute_player_attack(action)
             
     def _execute_player_attack(self, action: CombatAction) -> None:
         """Execute a player attack action."""
         target_enemy = action.action_data.get("target_enemy")
         if not target_enemy or not target_enemy.is_alive():
-            self.ui_manager.log_system(f"DEBUG: Attack target invalid - enemy: {target_enemy is not None}, alive: {target_enemy.is_alive() if target_enemy else False}")
             return
-        
-        self.ui_manager.log_system(f"DEBUG: Player attacking {target_enemy.name} (HP: {target_enemy.current_hp}/{target_enemy.max_hp})")
             
         # Calculate attack roll with equipment bonuses
         attack_bonus = self.current_character.base_attack_bonus
         crit_range = self.current_character.get_critical_range()
         
         # Add equipment attack bonus
-        if (self.current_character.equipment_system and 
+        if (hasattr(self.current_character, 'equipment_system') and 
+            self.current_character.equipment_system and 
             self.current_character.equipment_system.get_equipped_weapon()):
             weapon = self.current_character.equipment_system.get_equipped_weapon()
             attack_bonus += weapon.attack_bonus
@@ -360,16 +355,17 @@ class CombatSystem:
         # Check if attack hits
         if attack_roll >= target_enemy.armor_class:
             # Attack hits - calculate damage using equipped weapon
-            if (self.current_character.equipment_system and 
+            if (hasattr(self.current_character, 'equipment_system') and 
+                self.current_character.equipment_system and 
                 self.current_character.equipment_system.get_equipped_weapon()):
                 # Use equipped weapon damage
                 weapon = self.current_character.equipment_system.get_equipped_weapon()
                 base_damage = weapon.damage_dice
                 weapon_bonus = weapon.damage_bonus
             else:
-                # Use unarmed damage
-                base_damage = "1d2"  # Unarmed damage
-                weapon_bonus = 0
+                # Use unarmed damage 1d4 with -2 penalty (handled later)
+                base_damage = "1d4"  # Unarmed damage
+                weapon_bonus = -2
             
             # Add strength modifier (or dex for finesse weapons like rogues)
             stat_modifier = self.current_character.get_stat_modifier('strength')
@@ -387,6 +383,9 @@ class CombatSystem:
                 damage_notation = base_damage
                 
             damage = self.dice_system.roll(damage_notation)
+            
+            # Ensure minimum damage of 1
+            damage = max(1, damage)
             
             # Apply critical hit multiplier
             if is_critical:
@@ -574,6 +573,12 @@ def _test_combat_system():
     
     # Test attack
     assert combat_system.attack_enemy("testgoblin")
+    
+    # Process timer to execute the attack
+    import time
+    time.sleep(0.2)  # Wait for attack to be ready
+    ready_actions = timer_system.process_ready_actions()
+    print(f"Processed {len(ready_actions)} actions")
     
     print("Combat system tests passed!")
 
