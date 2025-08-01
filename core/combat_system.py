@@ -225,7 +225,10 @@ class CombatSystem:
         # Check if character can act
         if not self.timer_system.is_actor_ready(self.current_character.name):
             delay = self.timer_system.get_actor_action_delay(self.current_character.name)
-            self.ui_manager.log_error(f"You must wait {delay:.1f} seconds before attacking again.")
+            if delay is not None:
+                self.ui_manager.log_error(f"You must wait {delay:.1f} seconds before attacking again.")
+            else:
+                self.ui_manager.log_error("You cannot attack yet.")
             return False
             
         # Create attack action
