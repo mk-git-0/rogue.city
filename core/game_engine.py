@@ -233,6 +233,18 @@ class GameEngine:
             self._exits_command()
         elif cmd in ['get', 'take']:
             self._get_command(args)
+        elif cmd in ['inventory', 'i']:
+            self._inventory_command()
+        elif cmd in ['equip', 'wear', 'wield']:
+            self._equip_command(args)
+        elif cmd in ['unequip', 'remove']:
+            self._unequip_command(args)
+        elif cmd in ['use', 'drink']:
+            self._use_command(args)
+        elif cmd in ['drop']:
+            self._drop_command(args)
+        elif cmd in ['equipment', 'eq']:
+            self._equipment_command()
         elif cmd in ['tutorial']:
             self._tutorial_command(args)
         else:
@@ -518,7 +530,9 @@ class GameEngine:
         """Show available commands."""
         help_text = [
             "Movement: north (n), south (s), east (e), west (w), up, down",
-            "World: look (l), exits, map, get <item>",
+            "World: look (l), exits, map, get <item>, drop <item>",
+            "Items: inventory (i), equipment (eq), equip <item>, unequip <slot>",
+            "Consumables: use <item>, drink <potion>",
             "Combat: attack <enemy>, auto, flee",
             "Tutorial: tutorial on/off",
             "Game: status, pause, help, quit",
@@ -931,19 +945,34 @@ class GameEngine:
                     self.ui_manager.log_error(f"You cannot take the {item.name}.")
                     return
                     
-                # Remove item from room
-                taken_item = room.remove_item(item_id)
-                if taken_item:
-                    self.ui_manager.log_success(f"You take the {taken_item.name}.")
-                    
-                    # Trigger tutorial and area events
-                    self.tutorial_system.on_player_action('take_item', item_name=item.name)
-                    
-                    if hasattr(self.current_area, 'on_item_taken'):
-                        messages = self.current_area.on_item_taken(item_id, self.current_room)
-                        for message in messages:
-                            self.ui_manager.log_info(message)
-                            
+                # Initialize inventory system if not done
+                if not self.current_character.inventory_system:
+                    self.current_character.initialize_item_systems()
+                
+                # Check if character can carry the item
+                from core.item_factory import ItemFactory
+                item_factory = ItemFactory()
+                actual_item = item_factory.create_item(item_id)
+                
+                if actual_item and self.current_character.inventory_system.can_add_item(actual_item):
+                    # Remove item from room
+                    taken_item = room.remove_item(item_id)
+                    if taken_item:
+                        # Add to character inventory
+                        self.current_character.inventory_system.add_item(actual_item)
+                        self.ui_manager.log_success(f"You take the {taken_item.name}.")
+                        
+                        # Trigger tutorial and area events
+                        self.tutorial_system.on_player_action('take_item', item_name=taken_item.name)
+                        
+                        if hasattr(self.current_area, 'on_item_taken'):
+                            messages = self.current_area.on_item_taken(item_id, self.current_room)
+                            for message in messages:
+                                self.ui_manager.log_info(message)
+                                
+                        return
+                else:
+                    self.ui_manager.log_error("You can't carry that much weight.")
                     return
                     
         self.ui_manager.log_error(f"There is no {item_name} here to take.")
@@ -966,6 +995,162 @@ class GameEngine:
             self.tutorial_system.toggle_tutorial()
         else:
             self.ui_manager.log_error("Usage: tutorial [on/off/toggle]")
+    
+    def _inventory_command(self) -> None:
+        """Display character inventory."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character selected.")
+            return
+            
+        # Initialize inventory system if not done
+        if not self.current_character.inventory_system:
+            self.current_character.initialize_item_systems()
+            
+        inventory_display = self.current_character.inventory_system.get_inventory_display()
+        self.ui_manager.log_info(inventory_display)
+    
+    def _equipment_command(self) -> None:
+        """Display equipped items."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character selected.")
+            return
+            
+        # Initialize equipment system if not done
+        if not self.current_character.equipment_system:
+            self.current_character.initialize_item_systems()
+            
+        equipment_display = self.current_character.equipment_system.get_equipment_display()
+        self.ui_manager.log_info(equipment_display)
+    
+    def _equip_command(self, args: List[str]) -> None:
+        """Equip an item from inventory."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character selected.")
+            return
+            
+        if not args:
+            self.ui_manager.log_error("Equip what? Usage: equip <item>")
+            return
+            
+        # Initialize systems if not done
+        if not self.current_character.equipment_system:
+            self.current_character.initialize_item_systems()
+            
+        item_name = ' '.join(args).lower()
+        
+        # Find item by name
+        item_id = self.current_character.inventory_system.find_item_by_name(item_name)
+        if not item_id:
+            self.ui_manager.log_error(f"You don't have '{item_name}' in your inventory.")
+            return
+            
+        # Try to equip the item
+        result = self.current_character.equipment_system.equip_item(item_id)
+        self.ui_manager.log_info(result)
+    
+    def _unequip_command(self, args: List[str]) -> None:
+        """Unequip an item to inventory."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character selected.")
+            return
+            
+        if not args:
+            self.ui_manager.log_error("Unequip what? Usage: unequip <slot> (weapon/armor/accessory)")
+            return
+            
+        # Initialize systems if not done
+        if not self.current_character.equipment_system:
+            self.current_character.initialize_item_systems()
+            
+        slot_name = args[0].lower()
+        result = self.current_character.equipment_system.unequip_item(slot_name)
+        self.ui_manager.log_info(result)
+    
+    def _use_command(self, args: List[str]) -> None:
+        """Use a consumable item."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character selected.")
+            return
+            
+        if not args:
+            self.ui_manager.log_error("Use what? Usage: use <item>")
+            return
+            
+        # Initialize systems if not done
+        if not self.current_character.inventory_system:
+            self.current_character.initialize_item_systems()
+            
+        item_name = ' '.join(args).lower()
+        
+        # Find item by name
+        item_id = self.current_character.inventory_system.find_item_by_name(item_name)
+        if not item_id:
+            self.ui_manager.log_error(f"You don't have '{item_name}' in your inventory.")
+            return
+            
+        inv_item = self.current_character.inventory_system.get_item(item_id)
+        if not inv_item:
+            self.ui_manager.log_error(f"You don't have '{item_name}' in your inventory.")   
+            return
+            
+        # Check if it's a consumable
+        from items.base_item import ItemType
+        from items.consumables import Consumable
+        
+        if inv_item.item.item_type != ItemType.CONSUMABLE:
+            self.ui_manager.log_error(f"You can't use {inv_item.item.name}.")
+            return
+            
+        # Use the item
+        if isinstance(inv_item.item, Consumable):
+            result = inv_item.item.use(self.current_character)
+            self.ui_manager.log_info(result)
+            
+            # Remove one from inventory
+            self.current_character.inventory_system.remove_item(item_id, 1)
+        else:
+            self.ui_manager.log_error(f"You can't use {inv_item.item.name}.")
+    
+    def _drop_command(self, args: List[str]) -> None:
+        """Drop an item from inventory."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character selected.")
+            return
+            
+        if not args:
+            self.ui_manager.log_error("Drop what? Usage: drop <item>")
+            return
+            
+        # Initialize systems if not done
+        if not self.current_character.inventory_system:
+            self.current_character.initialize_item_systems()
+            
+        item_name = ' '.join(args).lower()
+        
+        # Find item by name
+        item_id = self.current_character.inventory_system.find_item_by_name(item_name)
+        if not item_id:
+            self.ui_manager.log_error(f"You don't have '{item_name}' in your inventory.")
+            return
+            
+        inv_item = self.current_character.inventory_system.get_item(item_id)
+        if not inv_item:
+            self.ui_manager.log_error(f"You don't have '{item_name}' in your inventory.")
+            return
+            
+        # Check if item is equipped
+        if inv_item.equipped:
+            self.ui_manager.log_error(f"You must unequip {inv_item.item.name} before dropping it.")
+            return
+            
+        # Remove from inventory and add to room
+        self.current_character.inventory_system.remove_item(item_id, 1)
+        
+        # Add item to current room
+        if self.current_area and hasattr(self.current_area, 'add_item_to_room'):
+            self.current_area.add_item_to_room(self.current_room, inv_item.item)
+            
+        self.ui_manager.log_info(f"You drop the {inv_item.item.name}.")
             
     def update(self, delta_time: float) -> None:
         """
