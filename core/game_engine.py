@@ -14,6 +14,7 @@ from .dice_system import DiceSystem
 from .timer_system import TimerSystem
 from .save_manager import SaveManager
 from .combat_system import CombatSystem
+from .tutorial_system import TutorialSystem
 
 
 class GameState(Enum):
@@ -56,6 +57,12 @@ class GameEngine:
         from enemies.enemy_factory import EnemyFactory
         self.enemy_factory = EnemyFactory()
         
+        # World system
+        self.tutorial_system = TutorialSystem(self.ui_manager)
+        self.current_area = None
+        self.current_room = None
+        self.world_areas = {}
+        
         # Character system
         self.current_character = None
         self.character_creation_state = None
@@ -90,6 +97,7 @@ class GameEngine:
             
             # Initialize other systems
             self._initialize_game_data()
+            self._initialize_world_areas()
             
             # Show initial game state
             self._update_context_display()
@@ -219,6 +227,14 @@ class GameEngine:
             self._flee_command()
         elif cmd in ['spawn', 'summon']:  # Debug command for testing
             self._spawn_enemy_command(args)
+        elif cmd == 'map':
+            self._map_command()
+        elif cmd == 'exits':
+            self._exits_command()
+        elif cmd in ['get', 'take']:
+            self._get_command(args)
+        elif cmd in ['tutorial']:
+            self._tutorial_command(args)
         else:
             self.ui_manager.log_error(f"Unknown command: {cmd}. Type 'help' for available commands.")
             
@@ -280,6 +296,10 @@ class GameEngine:
                     self.current_character = character
                     self.current_state = GameState.PLAYING
                     self.ui_manager.log_success(f"Loaded {character.name} the {character.character_class.title()}!")
+                    
+                    # Start world exploration
+                    self.start_world_exploration(character)
+                    
                     self._update_context_display()
                 else:
                     self.ui_manager.log_error(f"Failed to load character: {character_info['name']}")
@@ -478,6 +498,10 @@ class GameEngine:
             
             self.ui_manager.log_success(f"Character {character.name} created and saved!")
             self.ui_manager.log_success("Welcome to Rogue City! Your adventure begins...")
+            
+            # Start world exploration
+            self.start_world_exploration(character)
+            
             self._update_context_display()
         else:
             self.ui_manager.log_error("Failed to save character. Please try again.")
@@ -493,10 +517,11 @@ class GameEngine:
     def _show_help(self) -> None:
         """Show available commands."""
         help_text = [
-            "Movement: north (n), south (s), east (e), west (w)",
-            "Actions: look (l), status",
+            "Movement: north (n), south (s), east (e), west (w), up, down",
+            "World: look (l), exits, map, get <item>",
             "Combat: attack <enemy>, auto, flee",
-            "Game: pause, help, quit",
+            "Tutorial: tutorial on/off",
+            "Game: status, pause, help, quit",
             "Debug: debug, roll <dice>, time, spawn <enemy>"
         ]
         for line in help_text:
@@ -504,36 +529,132 @@ class GameEngine:
             
     def _look_command(self) -> None:
         """Handle the look command."""
-        area = self.game_data.get('current_area', {})
+        if not self.current_area or not self.current_room:
+            # Fallback to old system if world not loaded
+            area = self.game_data.get('current_area', {})
+            self.ui_manager.show_room(
+                area.get('name', 'Unknown Location'),
+                area.get('description', 'You see nothing special.'),
+                area.get('exits', []),
+                area.get('items', []),
+                area.get('enemies', [])
+            )
+            return
+            
+        room = self.current_area.get_room(self.current_room)
+        if not room:
+            self.ui_manager.log_error("Current room not found.")
+            return
+            
+        # Show full room description
+        description = room.get_full_description()
+        self.ui_manager.log_info(description)
         
-        # Show room information using the UI manager's room display method
-        self.ui_manager.show_room(
-            area.get('name', 'Unknown Location'),
-            area.get('description', 'You see nothing special.'),
-            area.get('exits', []),
-            area.get('items', []),
-            area.get('enemies', [])
+        # Trigger tutorial
+        self.tutorial_system.on_player_action('look', 
+            items_in_room=len(room.get_visible_items()),
+            enemies_in_room=len(room.get_active_enemies())
         )
         
-        # Show character status if we have a character
-        if self.current_character:
-            self.ui_manager.show_character_status(self.current_character)
+        # Update tutorial system
+        self.tutorial_system.update()
             
     def _move_command(self, direction: str) -> None:
         """Handle movement commands."""
-        # Normalize direction
-        direction_map = {'n': 'north', 's': 'south', 'e': 'east', 'w': 'west'}
-        full_direction = direction_map.get(direction, direction)
-        
-        area = self.game_data.get('current_area', {})
-        exits = area.get('exits', [])
-        
-        if full_direction in exits:
-            self.ui_manager.log_success(f"You move {full_direction}.")
-            # In a full implementation, this would change the current area
-            # For now, just acknowledge the movement
+        if not self.current_area or not self.current_room:
+            self.ui_manager.log_error("No current location.")
+            return
+            
+        # Parse direction
+        from areas.base_area import parse_direction
+        direction_enum = parse_direction(direction)
+        if not direction_enum:
+            self.ui_manager.log_error(f"Invalid direction: {direction}")
+            return
+            
+        room = self.current_area.get_room(self.current_room)
+        if not room:
+            self.ui_manager.log_error("Current room not found.")
+            return
+            
+        # Check if exit exists
+        exit_obj = room.get_exit(direction_enum)
+        if not exit_obj:
+            self.ui_manager.log_error(f"You cannot go {direction} from here.")
+            return
+            
+        if exit_obj.is_locked:
+            self.ui_manager.log_error(exit_obj.lock_message)
+            return
+            
+        # Handle inter-area movement
+        if exit_obj.destination_area:
+            target_area = self.world_areas.get(exit_obj.destination_area)
+            if not target_area:
+                self.ui_manager.log_error(f"Cannot access area: {exit_obj.destination_area}")
+                return
+                
+            # Change area
+            self.current_area = target_area
+            self.current_area_id = exit_obj.destination_area
+            self.current_room = exit_obj.destination_room
+            
+            # Update character location
+            if self.current_character:
+                self.current_character.current_area = self.current_area_id
+                self.current_character.current_room = self.current_room
+                
         else:
-            self.ui_manager.log_error(f"You cannot go {full_direction} from here.")
+            # Same area movement
+            self.current_room = exit_obj.destination_room
+            
+            # Update character location
+            if self.current_character:
+                self.current_character.current_room = self.current_room
+                
+        # Handle room entry events
+        new_room = self.current_area.get_room(self.current_room)
+        if new_room:
+            # Mark as visited
+            self.current_area.visit_room(self.current_room)
+            
+            # Trigger area events
+            if hasattr(self.current_area, 'on_room_enter'):
+                messages = self.current_area.on_room_enter(self.current_room, self.current_character)
+                for message in messages:
+                    self.ui_manager.log_info(message)
+                    
+            # Show new room
+            self._look_command()
+            
+            # Trigger tutorial
+            self.tutorial_system.on_player_action('move')
+            self.tutorial_system.on_player_action('enter_room', 
+                room_name=new_room.name,
+                items_in_room=len(new_room.get_visible_items()),
+                enemies_in_room=len(new_room.get_active_enemies())
+            )
+            
+            # Check for combat encounters
+            active_enemies = new_room.get_active_enemies()
+            if active_enemies and not new_room.is_safe:
+                # Create enemies for combat
+                combat_enemies = []
+                for room_enemy in active_enemies:
+                    for _ in range(room_enemy.quantity):
+                        enemy = self.enemy_factory.create_enemy(room_enemy.enemy_type)
+                        if enemy:
+                            combat_enemies.append(enemy)
+                            
+                if combat_enemies:
+                    # Start combat
+                    if self.combat_system.start_combat(self.current_character, combat_enemies):
+                        # Mark encounter as triggered
+                        for room_enemy in active_enemies:
+                            room_enemy.triggered = True
+                            
+        else:
+            self.ui_manager.log_error("Destination room not found.")
             
     def _status_command(self) -> None:
         """Show detailed player status."""
@@ -696,6 +817,156 @@ class GameEngine:
         else:
             self.ui_manager.log_error("Failed to start combat.")
             
+    def _initialize_world_areas(self) -> None:
+        """Initialize world areas."""
+        try:
+            # Import area classes
+            from areas.area_tutorial_cave import TutorialCaveArea
+            from areas.area_forest_path import ForestPathArea
+            
+            # Create area instances
+            tutorial_cave = TutorialCaveArea()
+            forest_path = ForestPathArea()
+            
+            # Store areas
+            self.world_areas = {
+                'tutorial_cave': tutorial_cave,
+                'forest_path': forest_path
+            }
+            
+            self.ui_manager.log_info("World areas loaded successfully.")
+            
+        except Exception as e:
+            self.ui_manager.log_error(f"Failed to load world areas: {e}")
+            
+    def start_world_exploration(self, character) -> None:
+        """Start world exploration with a character."""
+        if not character:
+            return
+            
+        # Set character location or start in tutorial cave
+        start_area_id = "tutorial_cave"
+        start_room_id = "cave_entrance"
+        
+        # Check character's saved location
+        if hasattr(character, 'current_area') and character.current_area:
+            start_area_id = character.current_area
+            start_room_id = character.current_room or self.world_areas[start_area_id].get_starting_room()
+        else:
+            # New character starts in tutorial cave
+            character.current_area = start_area_id
+            character.current_room = start_room_id
+            
+        # Set current location
+        self.current_area_id = start_area_id
+        self.current_area = self.world_areas.get(start_area_id)
+        self.current_room = start_room_id
+        
+        if self.current_area:
+            # Mark room as visited and trigger events
+            room = self.current_area.get_room(start_room_id)
+            if room:
+                self.current_area.visit_room(start_room_id)
+                
+            # Start tutorial if needed
+            if start_area_id == "tutorial_cave" and not room.visited:
+                self.tutorial_system.start_tutorial()
+                
+            # Show current room
+            self._look_command()
+        else:
+            self.ui_manager.log_error(f"Could not load area: {start_area_id}")
+            
+    def _map_command(self) -> None:
+        """Show ASCII map of current area."""
+        if not self.current_area:
+            self.ui_manager.log_error("No area loaded.")
+            return
+            
+        map_display = self.current_area.get_map_display(self.current_room)
+        self.ui_manager.log_info(map_display)
+        
+    def _exits_command(self) -> None:
+        """Show available exits from current room."""
+        if not self.current_area or not self.current_room:
+            self.ui_manager.log_error("No current location.")
+            return
+            
+        room = self.current_area.get_room(self.current_room)
+        if not room:
+            self.ui_manager.log_error("Current room not found.")
+            return
+            
+        available_exits = room.get_available_exits()
+        if not available_exits:
+            self.ui_manager.log_info("There are no obvious exits.")
+            return
+            
+        self.ui_manager.log_info("Available exits:")
+        for direction, exit_obj in available_exits.items():
+            dest_desc = exit_obj.destination_room.replace('_', ' ').title()
+            self.ui_manager.log_info(f"  {direction.value} - {dest_desc}")
+            
+    def _get_command(self, args: List[str]) -> None:
+        """Handle get/take item command."""
+        if not args:
+            self.ui_manager.log_error("Get what? Usage: get <item>")
+            return
+            
+        if not self.current_area or not self.current_room:
+            self.ui_manager.log_error("No current location.")
+            return
+            
+        room = self.current_area.get_room(self.current_room)
+        if not room:
+            self.ui_manager.log_error("Current room not found.")
+            return
+            
+        item_name = ' '.join(args).lower()
+        
+        # Find matching item
+        for item_id, item in room.items.items():
+            if item_name in item.name.lower() and item.quantity > 0:
+                if not item.can_take:
+                    self.ui_manager.log_error(f"You cannot take the {item.name}.")
+                    return
+                    
+                # Remove item from room
+                taken_item = room.remove_item(item_id)
+                if taken_item:
+                    self.ui_manager.log_success(f"You take the {taken_item.name}.")
+                    
+                    # Trigger tutorial and area events
+                    self.tutorial_system.on_player_action('take_item', item_name=item.name)
+                    
+                    if hasattr(self.current_area, 'on_item_taken'):
+                        messages = self.current_area.on_item_taken(item_id, self.current_room)
+                        for message in messages:
+                            self.ui_manager.log_info(message)
+                            
+                    return
+                    
+        self.ui_manager.log_error(f"There is no {item_name} here to take.")
+        
+    def _tutorial_command(self, args: List[str]) -> None:
+        """Handle tutorial commands."""
+        if not args:
+            progress = self.tutorial_system.get_tutorial_progress()
+            self.ui_manager.log_info(f"Tutorial: {'Enabled' if progress['enabled'] else 'Disabled'}")
+            self.ui_manager.log_info(f"Messages shown: {progress['messages_shown']}/{progress['total_messages']}")
+            return
+            
+        command = args[0].lower()
+        
+        if command in ['on', 'enable']:
+            self.tutorial_system.enable_tutorial()
+        elif command in ['off', 'disable']:
+            self.tutorial_system.disable_tutorial()
+        elif command == 'toggle':
+            self.tutorial_system.toggle_tutorial()
+        else:
+            self.ui_manager.log_error("Usage: tutorial [on/off/toggle]")
+            
     def update(self, delta_time: float) -> None:
         """
         Update game systems.
@@ -712,6 +983,10 @@ class GameEngine:
         # Process combat system
         if self.combat_system.is_active():
             self.combat_system.process_combat_update()
+            
+        # Process tutorial system
+        if self.tutorial_system.enabled:
+            self.tutorial_system.update()
             
         # Update context display periodically
         if self.frame_count % 60 == 0:  # Update once per second at 60 FPS
