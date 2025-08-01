@@ -21,19 +21,50 @@
   },
   "derived_stats": {
     "max_hp": 6,
-    "current_hp": 5,
+    "current_hp": 0,
     "armor_class": 14,
     "base_attack_bonus": 4
   },
   "current_location": {
-    "area_id": null,
-    "room_id": null
+    "area_id": "tutorial_cave",
+    "room_id": "main_chamber"
   },
   "unallocated_stats": 0,
   "creation_complete": true,
-  "save_timestamp": "2025-07-31T23:50:18.474704",
+  "save_timestamp": "2025-08-01T00:05:50.501597",
   "inventory": {
-    "items": {},
+    "items": {
+      "rusty_dagger": {
+        "item": {
+          "item_id": "rusty_dagger",
+          "name": "Rusty Dagger",
+          "description": "A small, rusty blade that has seen better days. Despite its worn appearance, it's still sharp enough to be deadly in the right hands.",
+          "item_type": "weapon",
+          "weight": 1.0,
+          "value": 5,
+          "rarity": "common",
+          "class_restrictions": [
+            "rogue"
+          ],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "damage_dice": "1d4",
+          "attack_speed": 2.0,
+          "crit_range": 19,
+          "attack_bonus": 0,
+          "damage_bonus": 0
+        },
+        "quantity": 1,
+        "equipped": true
+      }
+    },
     "max_weight": 50.0
   },
   "equipment": {
@@ -42,20 +73,24 @@
       "armor": "leather_scraps",
       "accessory": null
     },
-    "applied_bonuses": {}
+    "applied_bonuses": {
+      "weapon": {}
+    }
   },
   "statistics": {
     "start_time": 1754031010.337603,
     "enemies_defeated": 0,
-    "areas_explored": 0,
+    "areas_explored": 1,
     "items_found": 0,
     "levels_gained": 0,
     "total_damage_dealt": 0,
     "total_damage_taken": 0,
-    "commands_entered": 2,
+    "commands_entered": 17,
     "times_died": 0,
     "items_equipped": 0,
-    "areas_discovered": [],
+    "areas_discovered": [
+      "Tutorial Cave"
+    ],
     "enemies_defeated_list": [],
     "items_found_list": []
   },
@@ -63,7 +98,7 @@
     "tutorial_complete": {
       "name": "Tutorial Master",
       "description": "Complete the tutorial cave",
-      "condition_met": false,
+      "condition_met": true,
       "hidden": false
     },
     "first_combat": {
