@@ -1,0 +1,420 @@
+{
+  "sewer_rat": {
+    "name": "sewer rat",
+    "enemy_type": "rat",
+    "level": 1,
+    "max_hp": 3,
+    "armor_class": 12,
+    "attack_bonus": 0,
+    "damage_dice": "1d2",
+    "attack_speed": 2.0,
+    "experience_value": 15,
+    "difficulty_rating": 1,
+    "loot_table": [
+      {
+        "name": "Rat Tail",
+        "type": "misc",
+        "chance": 40,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 0,
+    "gold_max": 1,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": false
+    },
+    "description": "A mangy sewer rat with yellowed teeth and matted fur."
+  },
+  
+  "cave_rat": {
+    "name": "cave rat",
+    "enemy_type": "rat", 
+    "level": 1,
+    "max_hp": 4,
+    "armor_class": 13,
+    "attack_bonus": 1,
+    "damage_dice": "1d3",
+    "attack_speed": 2.0,
+    "experience_value": 20,
+    "difficulty_rating": 1,
+    "loot_table": [
+      {
+        "name": "Rat Tail",
+        "type": "misc",
+        "chance": 50,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 0,
+    "gold_max": 1,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": true
+    },
+    "description": "A sleek cave rat with sharp claws adapted for climbing rocky walls."
+  },
+  
+  "giant_rat": {
+    "name": "giant rat",
+    "enemy_type": "rat",
+    "level": 2,
+    "max_hp": 6,
+    "armor_class": 13,
+    "attack_bonus": 2,
+    "damage_dice": "1d4",
+    "attack_speed": 2.5,
+    "experience_value": 35,
+    "difficulty_rating": 2,
+    "loot_table": [
+      {
+        "name": "Large Rat Pelt",
+        "type": "misc",
+        "chance": 60,
+        "quantity": 1
+      },
+      {
+        "name": "Sharp Rat Tooth",
+        "type": "misc",
+        "chance": 30,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 0,
+    "gold_max": 2,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": false
+    },
+    "description": "An unusually large rat, nearly the size of a small dog, with vicious-looking fangs."
+  },
+  
+  "goblin_scout": {
+    "name": "goblin scout",
+    "enemy_type": "goblin",
+    "level": 1,
+    "max_hp": 6,
+    "armor_class": 13,
+    "attack_bonus": 2,
+    "damage_dice": "1d4",
+    "attack_speed": 2.5,
+    "experience_value": 40,
+    "difficulty_rating": 1,
+    "loot_table": [
+      {
+        "name": "Crude Dagger",
+        "type": "weapon",
+        "chance": 35,
+        "quantity": 1
+      },
+      {
+        "name": "Goblin Ear",
+        "type": "misc",
+        "chance": 75,
+        "quantity": 1
+      },
+      {
+        "name": "Leather Scraps",
+        "type": "misc",
+        "chance": 50,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 1,
+    "gold_max": 4,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": true
+    },
+    "description": "A small, wiry goblin wearing tattered leather armor and wielding a rusty blade."
+  },
+  
+  "goblin_warrior": {
+    "name": "goblin warrior",
+    "enemy_type": "goblin",
+    "level": 2,
+    "max_hp": 10,
+    "armor_class": 14,
+    "attack_bonus": 3,
+    "damage_dice": "1d6+1",
+    "attack_speed": 3.0,
+    "experience_value": 65,
+    "difficulty_rating": 2,
+    "loot_table": [
+      {
+        "name": "Goblin Sword",
+        "type": "weapon",
+        "chance": 50,
+        "quantity": 1
+      },
+      {
+        "name": "Studded Leather Armor",
+        "type": "armor",
+        "chance": 25,
+        "quantity": 1
+      },
+      {
+        "name": "Goblin Ear",
+        "type": "misc",
+        "chance": 85,
+        "quantity": 1
+      },
+      {
+        "name": "Iron Arrowhead",
+        "type": "misc",
+        "chance": 40,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 2,
+    "gold_max": 8,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": true
+    },
+    "description": "A battle-scarred goblin warrior wearing studded leather and carrying a notched sword."
+  },
+  
+  "goblin_shaman": {
+    "name": "goblin shaman",
+    "enemy_type": "goblin",
+    "level": 3,
+    "max_hp": 12,
+    "armor_class": 12,
+    "attack_bonus": 2,
+    "damage_dice": "1d4+1",
+    "attack_speed": 4.0,
+    "experience_value": 85,
+    "difficulty_rating": 3,
+    "loot_table": [
+      {
+        "name": "Bone Staff",
+        "type": "weapon",
+        "chance": 70,
+        "quantity": 1
+      },
+      {
+        "name": "Healing Herb",
+        "type": "consumable",
+        "chance": 60,
+        "quantity": 1
+      },
+      {
+        "name": "Mystical Trinket",
+        "type": "misc",
+        "chance": 45,
+        "quantity": 1
+      },
+      {
+        "name": "Goblin Ear",
+        "type": "misc",
+        "chance": 90,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 3,
+    "gold_max": 12,
+    "ai_flags": {
+      "aggressive": false,
+      "intelligent": true,
+      "pack_hunter": false
+    },
+    "special_abilities": [
+      "heal_ally",
+      "magic_missile"
+    ],
+    "description": "A hunched goblin adorned with bone trinkets and feathers, clutching a gnarled staff."
+  },
+  
+  "orc_grunt": {
+    "name": "orc grunt",
+    "enemy_type": "orc",
+    "level": 3,
+    "max_hp": 18,
+    "armor_class": 13,
+    "attack_bonus": 3,
+    "damage_dice": "1d8+2",
+    "attack_speed": 4.0,
+    "experience_value": 100,
+    "difficulty_rating": 3,
+    "loot_table": [
+      {
+        "name": "Orcish Axe",
+        "type": "weapon",
+        "chance": 60,
+        "quantity": 1
+      },
+      {
+        "name": "Chain Mail Shirt",
+        "type": "armor",
+        "chance": 40,
+        "quantity": 1
+      },
+      {
+        "name": "Orcish Tusk",
+        "type": "misc",
+        "chance": 70,
+        "quantity": 1
+      },
+      {
+        "name": "Iron Ration",
+        "type": "consumable",
+        "chance": 30,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 5,
+    "gold_max": 15,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": false
+    },
+    "description": "A brutish orc wielding a crude axe, with tusks protruding from its lower jaw."
+  },
+  
+  "orc_berserker": {
+    "name": "orc berserker",
+    "enemy_type": "orc",
+    "level": 4,
+    "max_hp": 28,
+    "armor_class": 12,
+    "attack_bonus": 5,
+    "damage_dice": "2d6+3",
+    "attack_speed": 3.5,
+    "experience_value": 150,
+    "difficulty_rating": 4,
+    "loot_table": [
+      {
+        "name": "Berserker's Axe",
+        "type": "weapon",
+        "chance": 80,
+        "quantity": 1
+      },
+      {
+        "name": "Fury Potion",
+        "type": "consumable",
+        "chance": 50,
+        "quantity": 1
+      },
+      {
+        "name": "Orcish Tusk",
+        "type": "misc",
+        "chance": 85,
+        "quantity": 1
+      },
+      {
+        "name": "Bloodstone",
+        "type": "misc",
+        "chance": 25,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 8,
+    "gold_max": 20,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": false
+    },
+    "special_abilities": [
+      "berserker_rage"
+    ],
+    "description": "A massive orc covered in ritual scars, eyes bloodshot with battle fury."
+  },
+  
+  "shadow_spider": {
+    "name": "shadow spider",
+    "enemy_type": "spider",
+    "level": 2,
+    "max_hp": 8,
+    "armor_class": 15,
+    "attack_bonus": 4,
+    "damage_dice": "1d4+2",
+    "attack_speed": 2.5,
+    "experience_value": 75,
+    "difficulty_rating": 2,
+    "loot_table": [
+      {
+        "name": "Spider Silk",
+        "type": "misc",
+        "chance": 80,
+        "quantity": 1
+      },
+      {
+        "name": "Venom Sac",
+        "type": "misc",
+        "chance": 40,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 0,
+    "gold_max": 3,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": false
+    },
+    "special_abilities": [
+      "poison_bite",
+      "web_trap"
+    ],
+    "description": "A black spider the size of a house cat, with malevolent red eyes that gleam in the darkness."
+  },
+  
+  "cave_troll": {
+    "name": "cave troll", 
+    "enemy_type": "troll",
+    "level": 5,
+    "max_hp": 45,
+    "armor_class": 14,
+    "attack_bonus": 6,
+    "damage_dice": "2d8+4",
+    "attack_speed": 5.0,
+    "experience_value": 300,
+    "difficulty_rating": 5,
+    "loot_table": [
+      {
+        "name": "Troll Club",
+        "type": "weapon",
+        "chance": 90,
+        "quantity": 1
+      },
+      {
+        "name": "Troll Hide",
+        "type": "misc",
+        "chance": 70,
+        "quantity": 1
+      },
+      {
+        "name": "Regeneration Potion",
+        "type": "consumable",
+        "chance": 30,
+        "quantity": 1
+      },
+      {
+        "name": "Precious Gem",
+        "type": "misc",
+        "chance": 20,
+        "quantity": 1
+      }
+    ],
+    "gold_min": 15,
+    "gold_max": 40,
+    "ai_flags": {
+      "aggressive": true,
+      "intelligent": false,
+      "pack_hunter": false
+    },
+    "special_abilities": [
+      "regeneration",
+      "club_smash"
+    ],
+    "description": "A hulking cave troll with moss-covered hide and arms like tree trunks, wielding a massive club."
+  }
+}
