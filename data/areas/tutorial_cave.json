@@ -70,9 +70,9 @@
       "description": "A narrow passage winds eastward, the walls closing in on both sides. Strange markings cover the rock surface - perhaps ancient carvings or natural formations. The passage ends in a small chamber.",
       "ambient_sound": "Wind whistling through narrow spaces",
       "items": {
-        "healing_herb": {
-          "name": "healing herb",
-          "description": "A small herb with healing properties grows from a crack in the wall.",
+        "minor_health_potion": {
+          "name": "minor health potion",
+          "description": "A small vial of red liquid sits on a natural stone shelf.",
           "can_take": true,
           "quantity": 1
         }
@@ -105,9 +105,9 @@
           "can_take": false,
           "quantity": 1
         },
-        "silver_coin": {
-          "name": "silver coin",
-          "description": "A tarnished silver coin glints among the bones.",
+        "leather_scraps": {
+          "name": "leather scraps",
+          "description": "Pieces of old leather armor lie among the bones.",
           "can_take": true,
           "quantity": 1
         }
@@ -149,9 +149,9 @@
         }
       },
       "items": {
-        "crystal_gem": {
-          "name": "crystal gem",
-          "description": "A beautiful crystal gem sits beside the spring, glowing with inner light.",
+        "rations": {
+          "name": "travel rations",
+          "description": "A small pack of preserved food left by a previous adventurer.",
           "can_take": true,
           "quantity": 1
         }

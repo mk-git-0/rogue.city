@@ -35,11 +35,11 @@
       "ambient_sound": "Gentle stream, buzzing insects, bird calls",
       "is_safe": true,
       "items": {
-        "wildflowers": {
-          "name": "wildflowers",
-          "description": "Beautiful wildflowers grow throughout the clearing.",
+        "herbal_remedy": {
+          "name": "herbal remedy",
+          "description": "A small pouch containing healing herbs sits beside the stream.",
           "can_take": true,
-          "quantity": 3
+          "quantity": 1
         },
         "stream_water": {
           "name": "fresh water",
@@ -144,11 +144,11 @@
         }
       },
       "items": {
-        "forest_berries": {
-          "name": "forest berries",
-          "description": "Clusters of edible berries hang from thorny bushes.",
+        "leather_armor": {
+          "name": "leather armor",
+          "description": "A set of well-crafted leather armor hangs from a tree branch, left by a previous traveler.",
           "can_take": true,
-          "quantity": 5
+          "quantity": 1
         }
       },
       "exits": {
@@ -209,11 +209,11 @@
       "ambient_sound": "Cheerful bird songs, distant running water",
       "is_safe": true,
       "items": {
-        "colored_feathers": {
-          "name": "colorful feathers",
-          "description": "Bright feathers from exotic birds litter the ground.",
+        "iron_sword": {
+          "name": "iron sword",
+          "description": "A sturdy iron sword rests against a fallen log, apparently dropped by a passing warrior.",
           "can_take": true,
-          "quantity": 3
+          "quantity": 1
         }
       },
       "exits": {
@@ -265,11 +265,11 @@
           "can_take": true,
           "quantity": 1
         },
-        "rare_herbs": {
-          "name": "rare herbs",
-          "description": "Valuable magical herbs grow only in this enchanted grove.",
+        "steel_dagger": {
+          "name": "steel dagger",
+          "description": "A finely crafted steel dagger lies hidden beneath the magical herbs.",
           "can_take": true,
-          "quantity": 3
+          "quantity": 1
         }
       },
       "exits": {
