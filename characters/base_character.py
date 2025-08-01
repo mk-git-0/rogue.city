@@ -15,7 +15,7 @@ class BaseCharacter(ABC):
         """Initialize base character with name and class"""
         self.name = name
         self.character_class = character_class
-        self.level = 0
+        self.level = 1  # Start at level 1
         self.experience = 0
         
         # Base stats (3-18 range, 10 is average human)
@@ -90,7 +90,7 @@ class BaseCharacter(ABC):
         base_ac = 10 + dex_modifier
         
         # Add equipment bonuses if available
-        if self.equipment_system:
+        if hasattr(self, 'equipment_system') and self.equipment_system:
             armor_bonus = self.equipment_system.get_armor_class_bonus()
             max_dex = self.equipment_system.get_max_dex_bonus()
             if max_dex is not None:
@@ -116,7 +116,7 @@ class BaseCharacter(ABC):
     @abstractmethod
     def get_attack_speed(self) -> float:
         """Return attack speed in seconds (considering equipped weapon)"""
-        if self.equipment_system:
+        if hasattr(self, 'equipment_system') and self.equipment_system:
             return self.equipment_system.get_attack_speed_modifier()
         return self.get_base_attack_speed()
     

@@ -136,7 +136,8 @@ class EquipmentSystem:
         for stat, bonus in item.stat_bonuses.items():
             if bonus != 0:
                 bonuses[stat] = bonus
-                setattr(self.character, stat, getattr(self.character, stat) + bonus)
+                if stat in self.character.stats:
+                    self.character.stats[stat] += bonus
         
         # Store applied bonuses for removal
         self.applied_bonuses[slot_name] = bonuses
@@ -148,7 +149,8 @@ class EquipmentSystem:
             
             # Remove stat bonuses
             for stat, bonus in bonuses.items():
-                setattr(self.character, stat, getattr(self.character, stat) - bonus)
+                if stat in self.character.stats:
+                    self.character.stats[stat] -= bonus
             
             # Clear stored bonuses
             del self.applied_bonuses[slot_name]

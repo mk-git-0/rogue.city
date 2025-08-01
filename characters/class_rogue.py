@@ -32,7 +32,7 @@ class Rogue(BaseCharacter):
         
     def get_attack_speed(self) -> float:
         """Return attack speed in seconds (considering equipped weapon)"""
-        if self.equipment_system:
+        if hasattr(self, 'equipment_system') and self.equipment_system:
             return self.equipment_system.get_attack_speed_modifier()
         return self.get_base_attack_speed()
     

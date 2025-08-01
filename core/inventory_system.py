@@ -12,7 +12,7 @@ class InventorySystem:
     def _calculate_carrying_capacity(self):
         """Calculate carrying capacity based on STR modifier."""
         base_capacity = 50.0  # base 50 lbs
-        str_bonus = (self.character.strength - 10) // 2
+        str_bonus = (self.character.stats['strength'] - 10) // 2
         self.max_weight = base_capacity + (str_bonus * 5)
     
     def get_current_weight(self) -> float:
