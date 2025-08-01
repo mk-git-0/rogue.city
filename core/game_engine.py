@@ -13,6 +13,7 @@ from .simple_ui_manager import SimpleUIManager
 from .dice_system import DiceSystem
 from .timer_system import TimerSystem
 from .save_manager import SaveManager
+from .combat_system import CombatSystem
 
 
 class GameState(Enum):
@@ -49,6 +50,11 @@ class GameEngine:
         self.dice_system = DiceSystem(show_rolls=True)
         self.timer_system = TimerSystem()
         self.save_manager = SaveManager()
+        self.combat_system = CombatSystem(self.timer_system, self.dice_system, self.ui_manager)
+        
+        # Enemy system
+        from enemies.enemy_factory import EnemyFactory
+        self.enemy_factory = EnemyFactory()
         
         # Character system
         self.current_character = None
@@ -205,6 +211,14 @@ class GameEngine:
             self._roll_command(args)
         elif cmd == 'time':
             self._time_command()
+        elif cmd in ['attack', 'a']:
+            self._attack_command(args)
+        elif cmd == 'auto':
+            self._auto_combat_command()
+        elif cmd == 'flee':
+            self._flee_command()
+        elif cmd in ['spawn', 'summon']:  # Debug command for testing
+            self._spawn_enemy_command(args)
         else:
             self.ui_manager.log_error(f"Unknown command: {cmd}. Type 'help' for available commands.")
             
@@ -481,8 +495,9 @@ class GameEngine:
         help_text = [
             "Movement: north (n), south (s), east (e), west (w)",
             "Actions: look (l), status",
+            "Combat: attack <enemy>, auto, flee",
             "Game: pause, help, quit",
-            "Debug: debug, roll <dice>, time"
+            "Debug: debug, roll <dice>, time, spawn <enemy>"
         ]
         for line in help_text:
             self.ui_manager.log_info(line)
@@ -522,21 +537,38 @@ class GameEngine:
             
     def _status_command(self) -> None:
         """Show detailed player status."""
-        player = self.game_data.get('player', {})
-        stats = self.game_data.get('game_stats', {})
-        
-        status_lines = [
-            f"Character: {player.get('name', 'Unknown')}",
-            f"Level: {player.get('level', 1)}",
-            f"Health: {player.get('health', 0)}/{player.get('max_health', 0)}",
-            f"Mana: {player.get('mana', 0)}/{player.get('max_mana', 0)}",
-            f"Location: {player.get('location', 'unknown')}",
-            f"Commands entered: {stats.get('commands_entered', 0)}",
-            f"Areas visited: {stats.get('areas_visited', 0)}"
-        ]
-        
-        for line in status_lines:
-            self.ui_manager.log_info(line)
+        if self.current_character:
+            # Show character status
+            self.ui_manager.show_character_status(self.current_character)
+            
+            # Show combat status if in combat
+            if self.combat_system.is_active():
+                combat_status = self.combat_system.get_combat_status()
+                self.ui_manager.log_info("--- Combat Status ---")
+                self.ui_manager.log_info(f"Round: {combat_status['round']}")
+                self.ui_manager.log_info(f"Auto-combat: {'On' if combat_status['auto_combat'] else 'Off'}")
+                self.ui_manager.log_info(f"Enemies remaining: {combat_status['living_enemies']}")
+                
+                for enemy_info in combat_status['enemies']:
+                    status = "alive" if enemy_info['alive'] else "dead"
+                    self.ui_manager.log_info(f"  {enemy_info['name']}: {enemy_info['hp']} ({status})")
+        else:
+            # Fallback to old system
+            player = self.game_data.get('player', {})
+            stats = self.game_data.get('game_stats', {})
+            
+            status_lines = [
+                f"Character: {player.get('name', 'Unknown')}",
+                f"Level: {player.get('level', 1)}",
+                f"Health: {player.get('health', 0)}/{player.get('max_health', 0)}",
+                f"Mana: {player.get('mana', 0)}/{player.get('max_mana', 0)}",
+                f"Location: {player.get('location', 'unknown')}",
+                f"Commands entered: {stats.get('commands_entered', 0)}",
+                f"Areas visited: {stats.get('areas_visited', 0)}"
+            ]
+            
+            for line in status_lines:
+                self.ui_manager.log_info(line)
             
     def _toggle_debug(self) -> None:
         """Toggle debug information display."""
@@ -574,6 +606,96 @@ class GameEngine:
         else:
             self.ui_manager.log_info("No pending actions.")
             
+    def _attack_command(self, args: List[str]) -> None:
+        """Handle attack command."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character loaded.")
+            return
+            
+        if not self.combat_system.is_active():
+            self.ui_manager.log_error("You are not in combat. Use 'spawn <enemy>' to start a test fight.")
+            return
+            
+        # Parse target from arguments
+        target_name = None
+        if args:
+            target_name = ' '.join(args).lower()
+            
+        success = self.combat_system.attack_enemy(target_name)
+        if not success:
+            # Error message already displayed by combat system
+            pass
+            
+    def _auto_combat_command(self) -> None:
+        """Handle auto-combat toggle command."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character loaded.")
+            return
+            
+        if not self.combat_system.is_active():
+            self.ui_manager.log_error("You are not in combat.")
+            return
+            
+        self.combat_system.toggle_auto_combat()
+        
+    def _flee_command(self) -> None:
+        """Handle flee command."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character loaded.")
+            return
+            
+        if not self.combat_system.is_active():
+            self.ui_manager.log_error("You are not in combat.")
+            return
+            
+        self.combat_system.flee_combat()
+        
+    def _spawn_enemy_command(self, args: List[str]) -> None:
+        """Handle spawn enemy debug command."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character loaded.")
+            return
+            
+        if self.combat_system.is_active():
+            self.ui_manager.log_error("Already in combat. End current combat first.")
+            return
+            
+        if not args:
+            # List available enemies
+            enemies = self.enemy_factory.list_available_enemies()
+            encounters = self.enemy_factory.list_available_encounters()
+            
+            self.ui_manager.log_info("Available enemies:")
+            for enemy_type in enemies[:10]:  # Show first 10
+                info = self.enemy_factory.get_enemy_info(enemy_type)
+                if info:
+                    self.ui_manager.log_info(f"  {enemy_type} - Level {info.get('level', 1)}, HP {info.get('hp', 10)}")
+                    
+            self.ui_manager.log_info("Available encounters:")
+            for encounter in encounters:
+                self.ui_manager.log_info(f"  {encounter}")
+                
+            return
+            
+        enemy_or_encounter = args[0].lower()
+        
+        # Try as encounter first
+        enemies = self.enemy_factory.create_encounter(enemy_or_encounter)
+        if not enemies:
+            # Try as single enemy
+            enemy = self.enemy_factory.create_enemy(enemy_or_encounter)
+            if enemy:
+                enemies = [enemy]
+            else:
+                self.ui_manager.log_error(f"Unknown enemy or encounter: {enemy_or_encounter}")
+                return
+                
+        # Start combat
+        if self.combat_system.start_combat(self.current_character, enemies):
+            self.ui_manager.log_success("Combat started! Use 'attack' to fight or 'auto' for auto-combat.")
+        else:
+            self.ui_manager.log_error("Failed to start combat.")
+            
     def update(self, delta_time: float) -> None:
         """
         Update game systems.
@@ -587,6 +709,10 @@ class GameEngine:
             for action in ready_actions:
                 self._handle_timed_action(action)
                 
+        # Process combat system
+        if self.combat_system.is_active():
+            self.combat_system.process_combat_update()
+            
         # Update context display periodically
         if self.frame_count % 60 == 0:  # Update once per second at 60 FPS
             self._update_context_display()

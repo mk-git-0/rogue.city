@@ -95,6 +95,10 @@ class SimpleUIManager:
         # Commands are echoed as part of input, no need to log separately
         pass
         
+    def log_combat(self, message: str) -> None:
+        """Log a combat message with distinctive formatting."""
+        self.output(message)
+        
     def show_room(self, name: str, description: str, exits: list, items: list = None, enemies: list = None) -> None:
         """
         Display room information in MajorMUD style.
