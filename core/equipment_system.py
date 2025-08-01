@@ -1,0 +1,284 @@
+from typing import Dict, Optional, Any
+from items.base_item import BaseItem, ItemType
+from items.weapons import Weapon
+from items.armor import Armor
+from core.inventory_system import InventorySystem
+
+class EquipmentSlot:
+    def __init__(self, slot_name: str, allowed_types: list):
+        self.slot_name = slot_name
+        self.allowed_types = allowed_types
+        self.equipped_item: Optional[BaseItem] = None
+    
+    def can_equip(self, item: BaseItem) -> bool:
+        """Check if item can be equipped in this slot."""
+        return item.item_type in self.allowed_types
+    
+    def equip(self, item: BaseItem) -> bool:
+        """Equip item in this slot."""
+        if self.can_equip(item):
+            self.equipped_item = item
+            return True
+        return False
+    
+    def unequip(self) -> Optional[BaseItem]:
+        """Remove equipped item and return it."""
+        item = self.equipped_item
+        self.equipped_item = None
+        return item
+
+class EquipmentSystem:
+    def __init__(self, character, inventory_system: InventorySystem):
+        self.character = character
+        self.inventory_system = inventory_system
+        
+        # Define equipment slots
+        self.slots = {
+            'weapon': EquipmentSlot('weapon', [ItemType.WEAPON]),
+            'armor': EquipmentSlot('armor', [ItemType.ARMOR]),
+            'accessory': EquipmentSlot('accessory', [ItemType.ACCESSORY])
+        }
+        
+        # Track applied bonuses for removal
+        self.applied_bonuses = {}
+    
+    def can_equip_item(self, item: BaseItem) -> tuple[bool, str]:
+        """Check if item can be equipped by this character."""
+        # Check class restrictions
+        if not item.can_be_used_by_class(self.character.character_class):
+            return False, f"Only {', '.join(item.class_restrictions)} can use this item."
+        
+        # Check level requirements
+        if not item.can_be_used_by_level(self.character.level):
+            return False, f"You need to be level {item.level_requirement} to use this item."
+        
+        # Check if appropriate slot exists
+        slot = self._get_slot_for_item(item)
+        if not slot:
+            return False, "This item cannot be equipped."
+        
+        return True, "OK"
+    
+    def _get_slot_for_item(self, item: BaseItem) -> Optional[str]:
+        """Get the appropriate equipment slot for an item."""
+        for slot_name, slot in self.slots.items():
+            if slot.can_equip(item):
+                return slot_name
+        return None
+    
+    def equip_item(self, item_id: str) -> str:
+        """Equip item from inventory."""
+        # Find item in inventory
+        inv_item = self.inventory_system.get_item(item_id)
+        if not inv_item:
+            return "You don't have that item."
+        
+        item = inv_item.item
+        
+        # Check if item can be equipped
+        can_equip, message = self.can_equip_item(item)
+        if not can_equip:
+            return message
+        
+        # Get appropriate slot
+        slot_name = self._get_slot_for_item(item)
+        if not slot_name:
+            return "This item cannot be equipped."
+        
+        slot = self.slots[slot_name]
+        
+        # Unequip current item if any
+        if slot.equipped_item:
+            self.unequip_item(slot_name)
+        
+        # Equip new item
+        slot.equip(item)
+        inv_item.equipped = True
+        
+        # Apply item bonuses
+        self._apply_item_bonuses(item, slot_name)
+        
+        # Recalculate character stats
+        self.character.recalculate_stats()
+        
+        return f"You equip the {item.name}."
+    
+    def unequip_item(self, slot_name: str) -> str:
+        """Unequip item from specified slot."""
+        if slot_name not in self.slots:
+            return "Invalid equipment slot."
+        
+        slot = self.slots[slot_name]
+        if not slot.equipped_item:
+            return f"You don't have anything equipped in your {slot_name} slot."
+        
+        item = slot.unequip()
+        
+        # Find item in inventory and mark as unequipped
+        for inv_item in self.inventory_system.items.values():
+            if inv_item.item.item_id == item.item_id and inv_item.equipped:
+                inv_item.equipped = False
+                break
+        
+        # Remove item bonuses
+        self._remove_item_bonuses(item, slot_name)
+        
+        # Recalculate character stats
+        self.character.recalculate_stats()
+        
+        return f"You unequip the {item.name}."
+    
+    def _apply_item_bonuses(self, item: BaseItem, slot_name: str):
+        """Apply stat bonuses from equipped item."""
+        bonuses = {}
+        
+        # Apply stat bonuses
+        for stat, bonus in item.stat_bonuses.items():
+            if bonus != 0:
+                bonuses[stat] = bonus
+                setattr(self.character, stat, getattr(self.character, stat) + bonus)
+        
+        # Store applied bonuses for removal
+        self.applied_bonuses[slot_name] = bonuses
+    
+    def _remove_item_bonuses(self, item: BaseItem, slot_name: str):
+        """Remove stat bonuses from unequipped item."""
+        if slot_name in self.applied_bonuses:
+            bonuses = self.applied_bonuses[slot_name]
+            
+            # Remove stat bonuses
+            for stat, bonus in bonuses.items():
+                setattr(self.character, stat, getattr(self.character, stat) - bonus)
+            
+            # Clear stored bonuses
+            del self.applied_bonuses[slot_name]
+    
+    def get_equipped_weapon(self) -> Optional[Weapon]:
+        """Get currently equipped weapon."""
+        weapon_slot = self.slots.get('weapon')
+        if weapon_slot and weapon_slot.equipped_item:
+            return weapon_slot.equipped_item
+        return None
+    
+    def get_equipped_armor(self) -> Optional[Armor]:
+        """Get currently equipped armor."""
+        armor_slot = self.slots.get('armor')
+        if armor_slot and armor_slot.equipped_item:
+            return armor_slot.equipped_item
+        return None
+    
+    def get_armor_class_bonus(self) -> int:
+        """Get AC bonus from equipped armor."""
+        armor = self.get_equipped_armor()
+        if armor:
+            return armor.ac_bonus
+        return 0
+    
+    def get_max_dex_bonus(self) -> Optional[int]:
+        """Get max DEX bonus from equipped armor."""
+        armor = self.get_equipped_armor()
+        if armor:
+            return armor.max_dex_bonus
+        return None
+    
+    def get_attack_speed_modifier(self) -> float:
+        """Get attack speed from equipped weapon."""
+        weapon = self.get_equipped_weapon()
+        if weapon:
+            return weapon.attack_speed
+        return 6.0  # Default unarmed speed
+    
+    def get_damage_dice(self) -> str:
+        """Get damage dice from equipped weapon."""
+        weapon = self.get_equipped_weapon()
+        if weapon:
+            return weapon.damage_dice
+        return "1d2"  # Default unarmed damage
+    
+    def get_attack_bonus(self) -> int:
+        """Get attack bonus from equipped weapon."""
+        weapon = self.get_equipped_weapon()
+        if weapon:
+            return weapon.attack_bonus
+        return 0
+    
+    def get_damage_bonus(self) -> int:
+        """Get damage bonus from equipped weapon."""
+        weapon = self.get_equipped_weapon()
+        if weapon:
+            return weapon.damage_bonus
+        return 0
+    
+    def get_crit_range(self) -> int:
+        """Get critical hit range from equipped weapon."""
+        weapon = self.get_equipped_weapon()
+        if weapon:
+            return weapon.crit_range
+        return 20  # Default crit only on 20
+    
+    def get_equipment_display(self) -> str:
+        """Generate formatted equipment display."""
+        lines = []
+        lines.append("=== EQUIPMENT ===")
+        
+        for slot_name, slot in self.slots.items():
+            if slot.equipped_item:
+                lines.append(f"{slot_name.title()}: {slot.equipped_item.name}")
+            else:
+                lines.append(f"{slot_name.title()}: None")
+        
+        # Show combat stats if weapon equipped
+        weapon = self.get_equipped_weapon()
+        if weapon:
+            lines.append("")
+            lines.append("=== COMBAT STATS ===")
+            lines.append(f"Weapon: {weapon.name}")
+            lines.append(f"Damage: {weapon.damage_dice}")
+            if weapon.damage_bonus > 0:
+                lines.append(f"Damage Bonus: +{weapon.damage_bonus}")
+            lines.append(f"Attack Speed: {weapon.attack_speed}s")
+            if weapon.attack_bonus > 0:
+                lines.append(f"Attack Bonus: +{weapon.attack_bonus}")
+            lines.append(f"Critical: {weapon.crit_range}-20")
+        
+        # Show armor stats if armor equipped
+        armor = self.get_equipped_armor()
+        if armor:
+            lines.append("")
+            lines.append("=== DEFENSE STATS ===")
+            lines.append(f"Armor: {armor.name}")
+            lines.append(f"AC Bonus: +{armor.ac_bonus}")
+            if armor.max_dex_bonus is not None:
+                lines.append(f"Max DEX Bonus: +{armor.max_dex_bonus}")
+            else:
+                lines.append("Max DEX Bonus: Unlimited")
+        
+        return "\n".join(lines)
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert equipment to dictionary for serialization."""
+        equipment_data = {}
+        
+        for slot_name, slot in self.slots.items():
+            if slot.equipped_item:
+                equipment_data[slot_name] = slot.equipped_item.item_id
+            else:
+                equipment_data[slot_name] = None
+        
+        return {
+            'equipped_items': equipment_data,
+            'applied_bonuses': self.applied_bonuses
+        }
+    
+    def from_dict(self, data: Dict[str, Any]):
+        """Load equipment from dictionary."""
+        equipped_items = data.get('equipped_items', {})
+        self.applied_bonuses = data.get('applied_bonuses', {})
+        
+        # Re-equip items (this requires items to be loaded in inventory first)
+        for slot_name, item_id in equipped_items.items():
+            if item_id and slot_name in self.slots:
+                inv_item = self.inventory_system.get_item(item_id)
+                if inv_item:
+                    self.slots[slot_name].equip(inv_item.item)
+                    inv_item.equipped = True

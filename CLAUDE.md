@@ -84,8 +84,11 @@ All game content stored as human-readable JSON:
 - **CRITICAL**: Create a git commit after completing each individual step/task
 - Do NOT wait until the end to create one large commit
 - Each development session should have multiple commits showing incremental progress
-- Commit messages should be clean and professional without any tool advertisements
+- **NEVER** include Claude Code marketing, tool advertisements, or "Generated with" messages in commit messages
+- Commit messages must be clean, professional, and focus only on the code changes
 - Use conventional commit format: `feat:`, `fix:`, `refactor:`, etc.
+- Example good commit: `feat: add inventory system with weight limits and item stacking`
+- Example bad commit: `feat: add inventory system 🤖 Generated with [Claude Code](https://claude.ai/code)`
 
 ### Error Handling
 - Graceful error messages for invalid commands ("Attack what?", "You can't go that way.")

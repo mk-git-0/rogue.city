@@ -31,7 +31,13 @@ class Knight(BaseCharacter):
         return "1d10"
         
     def get_attack_speed(self) -> float:
-        """Knights attack every 4 seconds with heavy weapons"""
+        """Return attack speed in seconds (considering equipped weapon)"""
+        if self.equipment_system:
+            return self.equipment_system.get_attack_speed_modifier()
+        return self.get_base_attack_speed()
+    
+    def get_base_attack_speed(self) -> float:
+        """Knights attack every 4 seconds unarmed"""
         return 4.0
         
     def get_critical_range(self) -> int:
@@ -107,9 +113,14 @@ class Knight(BaseCharacter):
         knight.current_area = location.get('area_id')
         knight.current_room = location.get('room_id')
         
-        # Restore inventory and equipment
-        knight.inventory = data.get('inventory', [])
-        knight.equipped_items = data.get('equipped_items', {})
+        # Initialize item systems
+        knight.initialize_item_systems()
+        
+        # Restore inventory and equipment data
+        if 'inventory' in data:
+            knight.inventory_system.from_dict(data['inventory'])
+        if 'equipment' in data:
+            knight.equipment_system.from_dict(data['equipment'])
         
         # Restore character creation state
         knight.unallocated_stats = data.get('unallocated_stats', 0)

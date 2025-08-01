@@ -31,7 +31,13 @@ class Rogue(BaseCharacter):
         return "1d6"
         
     def get_attack_speed(self) -> float:
-        """Rogues attack every 2 seconds with daggers (fastest)"""
+        """Return attack speed in seconds (considering equipped weapon)"""
+        if self.equipment_system:
+            return self.equipment_system.get_attack_speed_modifier()
+        return self.get_base_attack_speed()
+    
+    def get_base_attack_speed(self) -> float:
+        """Rogues attack every 2 seconds unarmed (fastest)"""
         return 2.0
         
     def get_critical_range(self) -> int:
@@ -91,9 +97,14 @@ class Rogue(BaseCharacter):
         rogue.current_area = location.get('area_id')
         rogue.current_room = location.get('room_id')
         
-        # Restore inventory and equipment
-        rogue.inventory = data.get('inventory', [])
-        rogue.equipped_items = data.get('equipped_items', {})
+        # Initialize item systems
+        rogue.initialize_item_systems()
+        
+        # Restore inventory and equipment data
+        if 'inventory' in data:
+            rogue.inventory_system.from_dict(data['inventory'])
+        if 'equipment' in data:
+            rogue.equipment_system.from_dict(data['equipment'])
         
         # Restore character creation state
         rogue.unallocated_stats = data.get('unallocated_stats', 0)

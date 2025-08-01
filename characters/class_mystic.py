@@ -32,7 +32,13 @@ class Mystic(BaseCharacter):
         return "1d8"
         
     def get_attack_speed(self) -> float:
-        """Mystics attack every 3 seconds with unarmed/simple weapons"""
+        """Return attack speed in seconds (considering equipped weapon)"""
+        if self.equipment_system:
+            return self.equipment_system.get_attack_speed_modifier()
+        return self.get_base_attack_speed()
+    
+    def get_base_attack_speed(self) -> float:
+        """Mystics attack every 3 seconds unarmed"""
         return 3.0
         
     def get_critical_range(self) -> int:
@@ -150,9 +156,14 @@ class Mystic(BaseCharacter):
         mystic.current_area = location.get('area_id')
         mystic.current_room = location.get('room_id')
         
-        # Restore inventory and equipment
-        mystic.inventory = data.get('inventory', [])
-        mystic.equipped_items = data.get('equipped_items', {})
+        # Initialize item systems
+        mystic.initialize_item_systems()
+        
+        # Restore inventory and equipment data
+        if 'inventory' in data:
+            mystic.inventory_system.from_dict(data['inventory'])
+        if 'equipment' in data:
+            mystic.equipment_system.from_dict(data['equipment'])
         
         # Restore character creation state
         mystic.unallocated_stats = data.get('unallocated_stats', 0)

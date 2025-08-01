@@ -46,8 +46,10 @@ class BaseCharacter(ABC):
         # Game state
         self.current_area = None
         self.current_room = None
-        self.inventory = []
-        self.equipped_items = {}
+        
+        # Item systems - initialized after character creation
+        self.inventory_system = None
+        self.equipment_system = None
         
         # Character creation tracking
         self.unallocated_stats = 10  # Points to spend during creation
@@ -85,7 +87,17 @@ class BaseCharacter(ABC):
             
         # AC calculation: 10 + DEX modifier + armor bonuses
         dex_modifier = (self.stats['dexterity'] - 10) // 2
-        self.armor_class = 10 + dex_modifier  # + equipped armor bonuses
+        base_ac = 10 + dex_modifier
+        
+        # Add equipment bonuses if available
+        if self.equipment_system:
+            armor_bonus = self.equipment_system.get_armor_class_bonus()
+            max_dex = self.equipment_system.get_max_dex_bonus()
+            if max_dex is not None:
+                dex_modifier = min(dex_modifier, max_dex)
+            self.armor_class = base_ac + armor_bonus
+        else:
+            self.armor_class = base_ac
         
         # Attack bonus: level + primary stat modifier
         str_modifier = (self.stats['strength'] - 10) // 2
@@ -103,7 +115,14 @@ class BaseCharacter(ABC):
         
     @abstractmethod
     def get_attack_speed(self) -> float:
-        """Return base attack speed in seconds for this class"""
+        """Return attack speed in seconds (considering equipped weapon)"""
+        if self.equipment_system:
+            return self.equipment_system.get_attack_speed_modifier()
+        return self.get_base_attack_speed()
+    
+    @abstractmethod
+    def get_base_attack_speed(self) -> float:
+        """Return base attack speed in seconds for this class (unarmed)"""
         pass
         
     @abstractmethod
@@ -230,6 +249,29 @@ class BaseCharacter(ABC):
         if self.max_hp <= 0:
             return 0.0
         return self.current_hp / self.max_hp
+    
+    def initialize_item_systems(self):
+        """Initialize inventory and equipment systems"""
+        from core.inventory_system import InventorySystem
+        from core.equipment_system import EquipmentSystem
+        from core.item_factory import ItemFactory
+        
+        # Initialize systems
+        self.inventory_system = InventorySystem(self)
+        self.equipment_system = EquipmentSystem(self, self.inventory_system)
+        
+        # Give starting equipment for this class
+        item_factory = ItemFactory()
+        starting_equipment = item_factory.get_starting_equipment(self.character_class)
+        
+        for slot, item in starting_equipment.items():
+            self.inventory_system.add_item(item)
+            if slot in ['weapon', 'armor']:
+                self.equipment_system.equip_item(item.item_id)
+    
+    def restore_mana(self, amount: int) -> int:
+        """Restore mana (for mage classes). Override in mage subclass."""
+        return 0  # Base classes don't have mana
         
     def get_special_abilities(self) -> Dict[str, Any]:
         """Get class-specific special abilities (override in subclasses)"""
@@ -237,7 +279,7 @@ class BaseCharacter(ABC):
         
     def to_dict(self) -> Dict[str, Any]:
         """Serialize character for saving to JSON"""
-        return {
+        save_data = {
             'character_name': self.name,
             'character_class': self.character_class,
             'level': self.level,
@@ -254,12 +296,23 @@ class BaseCharacter(ABC):
                 'area_id': self.current_area,
                 'room_id': self.current_room
             },
-            'inventory': self.inventory.copy(),
-            'equipped_items': self.equipped_items.copy(),
             'unallocated_stats': self.unallocated_stats,
             'creation_complete': self.creation_complete,
             'save_timestamp': time.time()
         }
+        
+        # Add inventory and equipment data if systems are initialized
+        if self.inventory_system:
+            save_data['inventory'] = self.inventory_system.to_dict()
+        else:
+            save_data['inventory'] = {'items': {}, 'max_weight': 50.0}
+            
+        if self.equipment_system:
+            save_data['equipment'] = self.equipment_system.to_dict()
+        else:
+            save_data['equipment'] = {'equipped_items': {}, 'applied_bonuses': {}}
+        
+        return save_data
         
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'BaseCharacter':

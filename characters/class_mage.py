@@ -35,7 +35,13 @@ class Mage(BaseCharacter):
         return "1d4"
         
     def get_attack_speed(self) -> float:
-        """Mages cast fire bolt every 6 seconds (slowest attack)"""
+        """Return attack speed in seconds (considering equipped weapon)"""
+        if self.equipment_system:
+            return self.equipment_system.get_attack_speed_modifier()
+        return self.get_base_attack_speed()
+    
+    def get_base_attack_speed(self) -> float:
+        """Mages attack every 6 seconds unarmed"""
         return 6.0
         
     def get_critical_range(self) -> int:
@@ -150,9 +156,14 @@ class Mage(BaseCharacter):
         mage.current_area = location.get('area_id')
         mage.current_room = location.get('room_id')
         
-        # Restore inventory and equipment
-        mage.inventory = data.get('inventory', [])
-        mage.equipped_items = data.get('equipped_items', {})
+        # Initialize item systems
+        mage.initialize_item_systems()
+        
+        # Restore inventory and equipment data
+        if 'inventory' in data:
+            mage.inventory_system.from_dict(data['inventory'])
+        if 'equipment' in data:
+            mage.equipment_system.from_dict(data['equipment'])
         
         # Restore character creation state
         mage.unallocated_stats = data.get('unallocated_stats', 0)
