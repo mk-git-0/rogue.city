@@ -1,0 +1,122 @@
+{
+  "game": {
+    "title": "Rogue City",
+    "version": "1.0.0",
+    "frame_rate": 60,
+    "auto_save_interval": 300,
+    "debug_mode": false
+  },
+  "combat": {
+    "timer_based": true,
+    "weapon_speeds": {
+      "dagger": 2.0,
+      "sword": 4.0,
+      "staff": 6.0,
+      "unarmed": 3.0
+    },
+    "class_speed_modifiers": {
+      "rogue": 1.0,
+      "knight": 1.2,
+      "mage": 1.5,
+      "mystic": 0.9
+    },
+    "critical_hit_chance": {
+      "base": 0.05,
+      "rogue_bonus": 0.05
+    },
+    "damage_resistance": {
+      "knight_bonus": 0.1
+    },
+    "auto_combat_enabled": true,
+    "flee_success_base": 0.7
+  },
+  "character": {
+    "starting_level": 1,
+    "starting_hp_multiplier": 1.0,
+    "stat_generation_method": "class_template",
+    "experience_curve": "standard",
+    "max_level": 20,
+    "starting_gold": 10
+  },
+  "inventory": {
+    "base_capacity": 10,
+    "base_weight_limit": 100,
+    "strength_weight_bonus": 5,
+    "stack_consumables": true,
+    "auto_pickup_gold": true
+  },
+  "ui": {
+    "display_mode": "terminal",
+    "line_wrap": true,
+    "color_enabled": false,
+    "prompt_symbol": "> ",
+    "clear_screen_on_area_change": false,
+    "show_room_description_on_movement": true,
+    "combat_message_delay": 0.5
+  },
+  "tutorial": {
+    "enabled": true,
+    "skip_for_experienced": false,
+    "hint_frequency": "moderate",
+    "guidance_level": "full",
+    "completion_required": false
+  },
+  "world": {
+    "random_encounters": false,
+    "respawn_enemies": false,
+    "respawn_items": false,
+    "dynamic_difficulty": false,
+    "exploration_rewards": true
+  },
+  "progression": {
+    "experience_multiplier": 1.0,
+    "skill_point_gain": 1,
+    "attribute_point_gain": 1,
+    "level_up_hp_gain": "class_based",
+    "equipment_durability": false
+  },
+  "balance": {
+    "enemy_scaling": "fixed",
+    "loot_rarity": "standard",
+    "gold_multiplier": 1.0,
+    "item_spawn_rate": 1.0,
+    "difficulty_modifiers": {
+      "easy": {
+        "damage_taken": 0.8,
+        "experience_gain": 1.2,
+        "gold_gain": 1.2
+      },
+      "normal": {
+        "damage_taken": 1.0,
+        "experience_gain": 1.0,
+        "gold_gain": 1.0
+      },
+      "hard": {
+        "damage_taken": 1.3,
+        "experience_gain": 1.5,
+        "gold_gain": 0.8
+      }
+    }
+  },
+  "performance": {
+    "max_message_history": 1000,
+    "gc_frequency": 100,
+    "memory_limit_mb": 256,
+    "cache_area_data": true,
+    "preload_adjacent_areas": true
+  },
+  "accessibility": {
+    "large_text_mode": false,
+    "high_contrast": false,
+    "screen_reader_support": false,
+    "keyboard_only_mode": true,
+    "simplified_interface": false
+  },
+  "development": {
+    "log_level": "INFO",
+    "log_file": "rogue_city.log",
+    "profile_performance": false,
+    "validate_data": true,
+    "strict_type_checking": false
+  }
+}

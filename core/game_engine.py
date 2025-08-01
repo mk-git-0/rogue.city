@@ -15,6 +15,9 @@ from .timer_system import TimerSystem
 from .save_manager import SaveManager
 from .combat_system import CombatSystem
 from .tutorial_system import TutorialSystem
+from .command_parser import CommandParser
+from .help_system import HelpSystem
+from .game_completion import GameCompletion
 
 
 class GameState(Enum):
@@ -53,6 +56,14 @@ class GameEngine:
         self.save_manager = SaveManager()
         self.combat_system = CombatSystem(self.timer_system, self.dice_system, self.ui_manager)
         
+        # Enhanced systems
+        self.command_parser = CommandParser(self)
+        self.help_system = HelpSystem(self.ui_manager)
+        self.game_completion = GameCompletion(self)
+        
+        # Reference for systems
+        self.ui = self.ui_manager  # Convenience reference
+        
         # Enemy system
         from enemies.enemy_factory import EnemyFactory
         self.enemy_factory = EnemyFactory()
@@ -65,6 +76,7 @@ class GameEngine:
         
         # Character system
         self.current_character = None
+        self.current_player = None  # Alias for current_character
         self.character_creation_state = None
         
         # Game loop timing
@@ -72,6 +84,14 @@ class GameEngine:
         self.frame_count = 0
         self.fps_counter_time = 0.0
         self.actual_fps = 0.0
+        self.start_time = time.time()
+        
+        # Game settings
+        self.game_settings = self._load_game_settings()
+        
+        # State tracking
+        self.GameState = GameState  # Make available to command parser
+        self.state = self.current_state  # Alias for compatibility
         
         # Signal handling for clean shutdown
         signal.signal(signal.SIGINT, self._signal_handler)
@@ -114,6 +134,16 @@ class GameEngine:
             else:
                 print(f"Failed to initialize game: {e}")
             return False
+    
+    def _load_game_settings(self) -> Dict[str, Any]:
+        """Load game settings from configuration file."""
+        try:
+            import json
+            with open('data/config/game_settings.json', 'r') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Warning: Could not load game settings: {e}")
+            return {"game": {"frame_rate": 60}, "combat": {"timer_based": True}}
             
     def _initialize_game_data(self) -> None:
         """Initialize default game data."""
@@ -157,31 +187,49 @@ class GameEngine:
         if not command.strip():
             return
             
-        # Update game stats
-        self.game_data['game_stats']['commands_entered'] += 1
+        # Track command for statistics
+        self.game_completion.track_command_entered()
         
-        # Parse command
-        parts = command.lower().strip().split()
-        if not parts:
-            return
-            
-        cmd = parts[0]
-        args = parts[1:] if len(parts) > 1 else []
+        # Update legacy game stats
+        if 'game_stats' in self.game_data:
+            self.game_data['game_stats']['commands_entered'] += 1
         
         # Handle commands based on current state
         if self.current_state == GameState.MENU:
-            self._handle_menu_command(cmd, args)
+            self._handle_menu_command_legacy(command)
         elif self.current_state == GameState.CHARACTER_CREATION:
-            self._handle_character_creation_command(cmd, args)
+            self._handle_character_creation_command_legacy(command)
         elif self.current_state == GameState.CHARACTER_SELECTION:
-            self._handle_character_selection_command(cmd, args)
+            self._handle_character_selection_command_legacy(command)
         elif self.current_state == GameState.PLAYING:
-            self._handle_game_command(cmd, args)
+            # Use new command parser for gameplay
+            continue_game = self.command_parser.parse_command(command)
+            if not continue_game:
+                self.shutdown()
         elif self.current_state == GameState.PAUSED:
-            self._handle_pause_command(cmd, args)
+            self._handle_pause_command_legacy(command)
         else:
             self.ui_manager.log_error(f"Unknown game state: {self.current_state}")
             
+    def _handle_menu_command_legacy(self, command: str) -> None:
+        """Handle commands in menu state (legacy method)."""
+        parts = command.lower().strip().split()
+        if not parts:
+            return
+        cmd = parts[0]
+        
+        if cmd in ['new', 'create', 'n']:
+            self.current_state = GameState.CHARACTER_CREATION
+            self.character_creation_state = {'step': 'class_selection'}
+            self._start_character_creation()
+        elif cmd in ['load', 'l']:
+            self.current_state = GameState.CHARACTER_SELECTION
+            self._show_character_selection()
+        elif cmd in ['quit', 'exit', 'q']:
+            self.shutdown()
+        else:
+            self.ui_manager.log_info("Menu commands: new (create character), load (load character), quit")
+    
     def _handle_menu_command(self, cmd: str, args: List[str]) -> None:
         """Handle commands in menu state."""
         if cmd in ['new', 'create', 'n']:
@@ -250,6 +298,23 @@ class GameEngine:
         else:
             self.ui_manager.log_error(f"Unknown command: {cmd}. Type 'help' for available commands.")
             
+    def _handle_pause_command_legacy(self, command: str) -> None:
+        """Handle commands while paused (legacy method)."""
+        parts = command.lower().strip().split()
+        if not parts:
+            return
+        cmd = parts[0]
+        
+        if cmd in ['resume', 'unpause', 'continue']:
+            self.current_state = GameState.PLAYING
+            self.timer_system.resume()
+            self.ui_manager.log_system("Game resumed.")
+            self._update_context_display()
+        elif cmd in ['quit', 'exit', 'q']:
+            self.shutdown()
+        else:
+            self.ui_manager.log_info("Paused. Commands: resume, quit")
+    
     def _handle_pause_command(self, cmd: str, args: List[str]) -> None:
         """Handle commands while paused."""
         if cmd in ['resume', 'unpause', 'continue']:
@@ -262,6 +327,38 @@ class GameEngine:
         else:
             self.ui_manager.log_info("Paused. Commands: resume, quit")
             
+    def _handle_character_creation_command_legacy(self, command: str) -> None:
+        """Handle commands during character creation (legacy method)."""
+        parts = command.lower().strip().split()
+        if not parts:
+            return
+        cmd = parts[0]
+        args = parts[1:] if len(parts) > 1 else []
+        
+        if cmd in ['quit', 'exit', 'q']:
+            self.current_state = GameState.MENU
+            self.character_creation_state = None
+            self.ui_manager.log_system("Character creation canceled.")
+            self._show_main_menu()
+            return
+            
+        step = self.character_creation_state.get('step')
+        
+        if step == 'class_selection':
+            self._handle_class_selection(cmd, args)
+        elif step == 'class_confirmation':
+            self._handle_class_confirmation(cmd, args)
+        elif step == 'name_entry':
+            self._handle_name_entry(cmd, args)
+        elif step == 'name_confirmation':
+            self._handle_name_confirmation(cmd, args)
+        elif step == 'stat_allocation':
+            self._handle_stat_allocation(cmd, args)
+        elif step == 'stat_confirmation':
+            self._handle_stat_confirmation(cmd, args)
+        else:
+            self.ui_manager.log_error(f"Unknown character creation step: {step}")
+    
     def _handle_character_creation_command(self, cmd: str, args: List[str]) -> None:
         """Handle commands during character creation."""
         if cmd in ['quit', 'exit', 'q']:
@@ -288,6 +385,50 @@ class GameEngine:
         else:
             self.ui_manager.log_error(f"Unknown character creation step: {step}")
             
+    def _handle_character_selection_command_legacy(self, command: str) -> None:
+        """Handle commands during character selection (legacy method)."""
+        parts = command.lower().strip().split()
+        if not parts:
+            return
+        cmd = parts[0]
+        
+        if cmd in ['quit', 'exit', 'q', 'back']:
+            self.current_state = GameState.MENU
+            self._show_main_menu()
+            return
+            
+        # Try to parse as character selection number
+        try:
+            choice = int(cmd)
+            saved_characters = self.save_manager.list_saved_characters()
+            
+            if 1 <= choice <= len(saved_characters):
+                character_info = saved_characters[choice - 1]
+                character = self.save_manager.load_character(character_info['name'])
+                
+                if character:
+                    self.current_character = character
+                    self.current_player = character  # Set alias
+                    self.current_state = GameState.PLAYING
+                    self.ui_manager.log_success(f"Loaded {character.name} the {character.character_class.title()}!")
+                    
+                    # Load game statistics
+                    character_data = self.save_manager._load_character_data(character.name)
+                    if character_data:
+                        self.game_completion.load_statistics(character_data)
+                    
+                    # Start world exploration
+                    self.start_world_exploration(character)
+                    
+                    self._update_context_display()
+                else:
+                    self.ui_manager.log_error(f"Failed to load character: {character_info['name']}")
+            else:
+                self.ui_manager.log_error("Invalid selection. Enter a number from the list.")
+                
+        except ValueError:
+            self.ui_manager.log_error("Enter a number to select a character, or 'back' to return to menu.")
+    
     def _handle_character_selection_command(self, cmd: str, args: List[str]) -> None:
         """Handle commands during character selection."""
         if cmd in ['quit', 'exit', 'q', 'back']:
@@ -306,8 +447,14 @@ class GameEngine:
                 
                 if character:
                     self.current_character = character
+                    self.current_player = character  # Set alias
                     self.current_state = GameState.PLAYING
                     self.ui_manager.log_success(f"Loaded {character.name} the {character.character_class.title()}!")
+                    
+                    # Load game statistics
+                    character_data = self.save_manager._load_character_data(character.name)
+                    if character_data:
+                        self.game_completion.load_statistics(character_data)
                     
                     # Start world exploration
                     self.start_world_exploration(character)
@@ -502,9 +649,13 @@ class GameEngine:
         character.creation_complete = True
         character.calculate_derived_stats()
         
+        # Initialize game completion tracking
+        self.game_completion.track_game_start()
+        
         # Save character
         if self.save_manager.save_character(character):
             self.current_character = character
+            self.current_player = character  # Set alias
             self.current_state = GameState.PLAYING
             self.character_creation_state = None
             
@@ -527,19 +678,8 @@ class GameEngine:
             self.ui_manager.log_info("No characters to load. Type 'back' to return to menu.")
             
     def _show_help(self) -> None:
-        """Show available commands."""
-        help_text = [
-            "Movement: north (n), south (s), east (e), west (w), up, down",
-            "World: look (l), exits, map, get <item>, drop <item>",
-            "Items: inventory (i), equipment (eq), equip <item>, unequip <slot>",
-            "Consumables: use <item>, drink <potion>",
-            "Combat: attack <enemy>, auto, flee",
-            "Tutorial: tutorial on/off",
-            "Game: status, pause, help, quit",
-            "Debug: debug, roll <dice>, time, spawn <enemy>"
-        ]
-        for line in help_text:
-            self.ui_manager.log_info(line)
+        """Show available commands using help system."""
+        self.help_system.show_general_help()
             
     def _look_command(self) -> None:
         """Handle the look command."""
@@ -886,6 +1026,9 @@ class GameEngine:
             if start_area_id == "tutorial_cave" and not room.visited:
                 self.tutorial_system.start_tutorial()
                 
+            # Track area discovery
+            self.game_completion.track_area_discovery(self.current_area.name)
+                
             # Show current room
             self._look_command()
         else:
@@ -1231,9 +1374,45 @@ class GameEngine:
         finally:
             self.shutdown()
             
+    def start_combat(self, enemy) -> None:
+        """Start combat with an enemy."""
+        if self.combat_system.start_combat(self.current_character, [enemy]):
+            self.current_state = GameState.COMBAT
+            self.state = self.current_state
+            self.ui_manager.log_success("Combat started! Use 'attack' to fight or 'auto' for auto-combat.")
+    
+    def end_combat(self, victory: bool = True) -> None:
+        """End combat and return to normal gameplay."""
+        self.current_state = GameState.PLAYING
+        self.state = self.current_state
+        
+        if victory:
+            # Track combat victory for statistics
+            # This would be called by combat system with enemy info
+            pass
+    
+    def complete_game(self) -> None:
+        """Complete the game and show completion screen."""
+        if not self.game_completion.game_completed:
+            self.game_completion.complete_game()
+            
+            # Save final character state with completion data
+            if self.current_character:
+                character_data = self.save_manager._create_character_data(self.current_character)
+                completion_data = self.game_completion.save_statistics()
+                character_data.update(completion_data)
+                self.save_manager._save_character_data(self.current_character.name, character_data)
+    
     def shutdown(self) -> None:
         """Shutdown the game engine and clean up resources."""
         self.running = False
+        
+        # Save character if one is loaded
+        if self.current_character:
+            character_data = self.save_manager._create_character_data(self.current_character)
+            completion_data = self.game_completion.save_statistics()
+            character_data.update(completion_data)
+            self.save_manager._save_character_data(self.current_character.name, character_data)
         
         if hasattr(self.ui_manager, 'stdscr') and self.ui_manager.stdscr:
             self.ui_manager.log_system("Shutting down game engine...")
