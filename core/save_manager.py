@@ -300,6 +300,21 @@ class SaveManager:
         """Create character data dictionary from character object"""
         return character.to_dict()
         
+    def _load_character_data(self, character_name: str) -> Optional[Dict[str, Any]]:
+        """Load character data dictionary from file"""
+        try:
+            save_path = self.save_directory / f"{character_name}.json"
+            
+            if not save_path.exists():
+                return None
+                
+            with open(save_path, 'r', encoding='utf-8') as f:
+                return json.load(f)
+                
+        except Exception as e:
+            print(f"Error loading character data for '{character_name}': {e}")
+            return None
+        
     def _save_character_data(self, character_name: str, character_data: Dict[str, Any]) -> bool:
         """Save character data dictionary to file"""
         try:

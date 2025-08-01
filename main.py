@@ -163,41 +163,9 @@ def check_terminal_support() -> bool:
     """Check if terminal supports the features we need."""
     print(f"🖥️  Checking terminal compatibility... ", end="")
     
-    try:
-        # Test basic curses functionality
-        import curses
-        stdscr = curses.initscr()
-        height, width = stdscr.getmaxyx()
-        curses.endwin()
-        
-        print(f"✅ ({width}x{height})")
-        
-        # Check minimum terminal size
-        min_width, min_height = MIN_TERMINAL_SIZE
-        if height < min_height or width < min_width:
-            print(f"\n⚠️  Warning: Terminal size ({width}x{height}) is smaller than recommended.")
-            print(f"   For best experience, use a terminal at least {min_width}x{min_height}.")
-            
-            try:
-                print("\n🤔 Continue anyway? (y/N): ", end="")
-                response = input().strip().lower()
-                if response not in ['y', 'yes']:
-                    print("Exiting. Please resize your terminal and try again.")
-                    return False
-            except KeyboardInterrupt:
-                print("\n👋 Goodbye!")
-                return False
-        
-        return True
-            
-    except Exception as e:
-        print("❌")
-        print(f"\n❌ Error: Terminal does not support required features: {e}")
-        print("\n🔧 Make sure you're running in a proper terminal:")
-        print("   • Not an IDE console (VSCode, PyCharm, etc.)")
-        print("   • Not a Windows command prompt (use PowerShell or WSL)")
-        print("   • A real terminal with curses support")
-        return False
+    # Skip curses check since we're using SimpleUIManager
+    print("✅ (Using SimpleUI - no curses required)")
+    return True
 
 
 def show_startup_sequence():
