@@ -1,0 +1,201 @@
+{
+  "area_info": {
+    "area_id": "tutorial_cave",
+    "name": "Tutorial Cave",
+    "description": "A cave system designed to teach new adventurers the basics of exploration and combat.",
+    "starting_room": "cave_entrance"
+  },
+  
+  "rooms": {
+    "cave_entrance": {
+      "name": "Cave Entrance",
+      "description": "You stand at the mouth of a dark cave. Water drips from the ceiling above, and strange sounds echo from within the depths. Sunlight filters in from behind you, casting long shadows on the rocky floor.",
+      "ambient_sound": "Water dripping, distant echoes",
+      "is_safe": true,
+      "items": {
+        "rusty_dagger": {
+          "name": "rusty dagger",
+          "description": "A rusty dagger lies abandoned on the ground, its blade dulled but still serviceable.",
+          "can_take": true,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "north": {
+          "destination": "main_chamber",
+          "description": "into the cave"
+        },
+        "south": {
+          "destination": "forest_entrance",
+          "destination_area": "forest_path",
+          "description": "back to the forest"
+        }
+      }
+    },
+    
+    "main_chamber": {
+      "name": "Main Cave Chamber",
+      "description": "The cave opens into a larger chamber. Ancient rock formations create natural pillars throughout the space. A small pool of clear water reflects the dim light filtering from the entrance. The air is cool and damp.",
+      "ambient_sound": "Soft echoes, gentle water sounds",
+      "enemies": {
+        "tutorial_goblin": {
+          "enemy_type": "tutorial_goblin",
+          "quantity": 1,
+          "encounter_name": "goblin",
+          "respawn": false
+        }
+      },
+      "exits": {
+        "south": {
+          "destination": "cave_entrance",
+          "description": "back to the entrance"
+        },
+        "east": {
+          "destination": "eastern_passage",
+          "description": "through a narrow passage"
+        },
+        "west": {
+          "destination": "western_alcove",
+          "description": "into a small alcove"
+        },
+        "north": {
+          "destination": "northern_tunnel",
+          "description": "through a dark tunnel"
+        }
+      }
+    },
+    
+    "eastern_passage": {
+      "name": "Eastern Passage",
+      "description": "A narrow passage winds eastward, the walls closing in on both sides. Strange markings cover the rock surface - perhaps ancient carvings or natural formations. The passage ends in a small chamber.",
+      "ambient_sound": "Wind whistling through narrow spaces",
+      "items": {
+        "healing_herb": {
+          "name": "healing herb",
+          "description": "A small herb with healing properties grows from a crack in the wall.",
+          "can_take": true,
+          "quantity": 1
+        }
+      },
+      "enemies": {
+        "tutorial_rat": {
+          "enemy_type": "tutorial_rat", 
+          "quantity": 1,
+          "encounter_name": "cave rat",
+          "respawn": false
+        }
+      },
+      "exits": {
+        "west": {
+          "destination": "main_chamber",
+          "description": "back to the main chamber"
+        }
+      }
+    },
+    
+    "western_alcove": {
+      "name": "Western Alcove",
+      "description": "A small alcove carved into the western wall of the cave. Ancient bones litter the floor - perhaps the remains of some long-dead creature. The alcove provides good shelter and seems safe from larger threats.",
+      "ambient_sound": "Deep silence, occasional bone crunching underfoot",
+      "is_safe": true,
+      "items": {
+        "old_bones": {
+          "name": "old bones",
+          "description": "Ancient bones scattered across the alcove floor.",
+          "can_take": false,
+          "quantity": 1
+        },
+        "silver_coin": {
+          "name": "silver coin",
+          "description": "A tarnished silver coin glints among the bones.",
+          "can_take": true,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "east": {
+          "destination": "main_chamber",
+          "description": "back to the main chamber"
+        }
+      }
+    },
+    
+    "northern_tunnel": {
+      "name": "Northern Tunnel",
+      "description": "The tunnel leads north into the deeper parts of the cave system. The walls here are different - smoother, as if worked by intelligent hands. The air grows noticeably cooler as you proceed.",
+      "ambient_sound": "Cold air currents, distant sounds",
+      "exits": {
+        "south": {
+          "destination": "main_chamber",
+          "description": "back to the main chamber"
+        },
+        "north": {
+          "destination": "boss_chamber",
+          "description": "deeper into the cave"
+        }
+      }
+    },
+    
+    "boss_chamber": {
+      "name": "Final Chamber", 
+      "description": "You emerge into the deepest chamber of the cave system. This circular room has a high, domed ceiling that disappears into darkness above. Ancient stone pillars ring the chamber, and a natural spring bubbles in the center. This feels like a place of significance.",
+      "ambient_sound": "Bubbling spring, deep echoes from above",
+      "enemies": {
+        "boss_encounter": {
+          "enemy_type": "tutorial_multi",
+          "quantity": 2,
+          "encounter_name": "goblin warriors",
+          "respawn": false
+        }
+      },
+      "items": {
+        "crystal_gem": {
+          "name": "crystal gem",
+          "description": "A beautiful crystal gem sits beside the spring, glowing with inner light.",
+          "can_take": true,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "south": {
+          "destination": "northern_tunnel",
+          "description": "back toward the entrance"
+        },
+        "up": {
+          "destination": "cave_exit",
+          "description": "up through a natural shaft"
+        }
+      }
+    },
+    
+    "cave_exit": {
+      "name": "Cave Exit",
+      "description": "You climb up through a natural shaft and emerge at the far end of the cave system. Fresh air and sunlight greet you as you step out onto a hillside overlooking a vast forest. The tutorial cave lies behind you - you have completed your first adventure!",
+      "ambient_sound": "Fresh forest air, birds singing",
+      "is_safe": true,
+      "exits": {
+        "down": {
+          "destination": "boss_chamber",
+          "description": "back down into the cave"
+        },
+        "east": {
+          "destination": "forest_clearing",
+          "destination_area": "forest_path",
+          "description": "into the forest"
+        }
+      }
+    }
+  },
+  
+  "encounters": {
+    "tutorial_goblin": "A small goblin guards this area, looking aggressive but not particularly dangerous.",
+    "tutorial_rat": "A large cave rat scurries about, its eyes gleaming in the dim light.",
+    "tutorial_multi": "Two goblin warriors have made this chamber their stronghold."
+  },
+  
+  "completion_requirements": {
+    "required_rooms": ["cave_entrance", "main_chamber", "boss_chamber", "cave_exit"],
+    "required_defeats": ["tutorial_goblin", "boss_encounter"],
+    "optional_content": ["eastern_passage", "western_alcove"]
+  }
+}

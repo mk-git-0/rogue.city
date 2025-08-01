@@ -1,0 +1,21 @@
+     [Exit]
+        |
+    [Northern]
+        |
+[West]-[Main]-[East]
+        |
+   [Entrance]
+        |
+    [Forest]
+
+Legend:
+[Exit] = Cave Exit (final room)
+[Northern] = Northern Tunnel
+[Main] = Main Chamber (first combat)
+[West] = Western Alcove (optional)
+[East] = Eastern Passage (optional)
+[Entrance] = Cave Entrance (start)
+[Forest] = Forest Path (exit to world)
+
+* = Your current location
+? = Unexplored area
