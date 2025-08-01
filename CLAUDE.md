@@ -80,6 +80,13 @@ All game content stored as human-readable JSON:
 
 ## Development Patterns
 
+### Git Workflow
+- **CRITICAL**: Create a git commit after completing each individual step/task
+- Do NOT wait until the end to create one large commit
+- Each development session should have multiple commits showing incremental progress
+- Commit messages should be clean and professional without any tool advertisements
+- Use conventional commit format: `feat:`, `fix:`, `refactor:`, etc.
+
 ### Error Handling
 - Graceful error messages for invalid commands ("Attack what?", "You can't go that way.")
 - Cross-platform terminal compatibility (no curses dependency)
