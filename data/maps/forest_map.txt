@@ -1,0 +1,26 @@
+                    [ROGUE CITY]
+                         |
+    [Ancient]--[North]--[City Approach]
+        |        |            |
+[Cave]--[Entrance]--[Clearing]--[Deep Forest]
+        |             |            |
+   [South Trail]--[Side Path]--[Hidden Grove]
+        |           |
+   [Creek Cross]----+
+
+Legend:
+[ROGUE CITY] = Rogue City Gates (final destination!)
+[City Approach] = City Approach
+[Deep Forest] = Deep Forest (forest guardian)
+[Ancient] = Ancient Grove (mystical)
+[North] = Northern Woods (wolves)
+[Clearing] = Forest Clearing (safe rest area)
+[Entrance] = Forest Entrance (start from cave)
+[Cave] = Tutorial Cave Exit
+[Side Path] = Winding Side Path (bandits)
+[Hidden Grove] = Hidden Grove (magical items)
+[South Trail] = Southern Trail (peaceful)
+[Creek Cross] = Creek Crossing (fishing)
+
+* = Your current location
+? = Unexplored area

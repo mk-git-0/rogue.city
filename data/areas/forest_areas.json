@@ -1,0 +1,364 @@
+{
+  "area_info": {
+    "area_id": "forest_path",
+    "name": "Forest Path",
+    "description": "A vast forest stretching toward the legendary city of Rogue City. Multiple paths wind through ancient trees, offering exploration and adventure.",
+    "starting_room": "forest_entrance"
+  },
+  
+  "rooms": {
+    "forest_entrance": {
+      "name": "Forest Entrance",
+      "description": "You stand at the edge of a vast forest. Tall ancient trees stretch in all directions, their canopy filtering the sunlight into dappled patterns on the forest floor. A well-worn path leads deeper into the woods, while fainter trails branch off in other directions.",
+      "ambient_sound": "Birds singing, leaves rustling in the breeze",
+      "is_safe": true,
+      "exits": {
+        "north": {
+          "destination": "cave_entrance",
+          "destination_area": "tutorial_cave",
+          "description": "back to the cave"
+        },
+        "east": {
+          "destination": "forest_clearing",
+          "description": "along the main forest path"
+        },
+        "south": {
+          "destination": "southern_trail",
+          "description": "down a narrow southern trail"
+        }
+      }
+    },
+    
+    "forest_clearing": {
+      "name": "Forest Clearing",
+      "description": "A large circular clearing opens up in the forest. Wildflowers dot the grass, and a small stream runs along the northern edge. This seems like a peaceful place where travelers might rest. Ancient stone markers suggest this was once a meeting place.",
+      "ambient_sound": "Gentle stream, buzzing insects, bird calls",
+      "is_safe": true,
+      "items": {
+        "wildflowers": {
+          "name": "wildflowers",
+          "description": "Beautiful wildflowers grow throughout the clearing.",
+          "can_take": true,
+          "quantity": 3
+        },
+        "stream_water": {
+          "name": "fresh water",
+          "description": "Crystal clear water flows in the stream.",
+          "can_take": false,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "west": {
+          "destination": "forest_entrance",
+          "description": "back toward the cave"
+        },
+        "north": {
+          "destination": "northern_woods",
+          "description": "into the northern woods"
+        },
+        "east": {
+          "destination": "deep_forest",
+          "description": "deeper into the forest"
+        },
+        "south": {
+          "destination": "side_path",
+          "description": "along a winding side path"
+        }
+      }
+    },
+    
+    "northern_woods": {
+      "name": "Northern Woods",
+      "description": "The trees grow thicker here, creating a natural canopy that blocks most of the sunlight. Moss covers the tree trunks, and the air is cool and damp. Strange sounds echo from deeper in the woods, and you notice old hunting traps scattered about.",
+      "ambient_sound": "Deep forest sounds, creaking branches, distant animal calls",
+      "enemies": {
+        "forest_wolves": {
+          "enemy_type": "goblin_pack",
+          "quantity": 2,
+          "encounter_name": "forest wolves",
+          "respawn": false
+        }
+      },
+      "items": {
+        "old_trap": {
+          "name": "old hunting trap",
+          "description": "A rusty hunting trap lies partially hidden among the leaves.",
+          "can_take": true,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "south": {
+          "destination": "forest_clearing",
+          "description": "back to the clearing"
+        },
+        "east": {
+          "destination": "ancient_grove",
+          "description": "toward an ancient grove"
+        }
+      }
+    },
+    
+    "ancient_grove": {
+      "name": "Ancient Grove",
+      "description": "You enter a grove of impossibly old trees, their trunks so wide that several people could not reach around them. Carved symbols mark some of the trees - perhaps territorial markers or ancient writing. The grove feels sacred and untouched by time.",
+      "ambient_sound": "Deep silence broken by occasional wind through ancient branches",
+      "is_safe": true,
+      "items": {
+        "ancient_symbols": {
+          "name": "carved symbols",
+          "description": "Ancient symbols carved deep into the tree bark.",
+          "can_take": false,
+          "quantity": 1
+        },
+        "mystical_herb": {
+          "name": "mystical herb",
+          "description": "A rare herb with magical properties grows at the base of the largest tree.",
+          "can_take": true,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "west": {
+          "destination": "northern_woods",
+          "description": "back to the northern woods"
+        },
+        "south": {
+          "destination": "deep_forest",
+          "description": "toward the deep forest"
+        }
+      }
+    },
+    
+    "deep_forest": {
+      "name": "Deep Forest",
+      "description": "The forest reaches its deepest point here. Massive trees tower overhead, and the undergrowth is thick with ferns and brambles. A sense of age and mystery permeates this place. Animal paths crisscross the area, leading in all directions.",
+      "ambient_sound": "Deep forest ambiance, rustling undergrowth, distant wildlife",
+      "enemies": {
+        "forest_guardian": {
+          "enemy_type": "orc",
+          "quantity": 1,
+          "encounter_name": "forest guardian",
+          "respawn": false
+        }
+      },
+      "items": {
+        "forest_berries": {
+          "name": "forest berries",
+          "description": "Clusters of edible berries hang from thorny bushes.",
+          "can_take": true,
+          "quantity": 5
+        }
+      },
+      "exits": {
+        "west": {
+          "destination": "forest_clearing",
+          "description": "back to the clearing"
+        },
+        "north": {
+          "destination": "ancient_grove",
+          "description": "to the ancient grove"
+        },
+        "east": {
+          "destination": "city_approach",
+          "description": "toward the city approach"
+        },
+        "south": {
+          "destination": "hidden_grove",
+          "description": "to a hidden grove"
+        }
+      }
+    },
+    
+    "side_path": {
+      "name": "Winding Side Path",
+      "description": "A narrow path winds through smaller trees and dense undergrowth. This route seems less traveled, with branches occasionally blocking the way. The path shows signs of animal use rather than human passage.",
+      "ambient_sound": "Branches creaking, small animals scurrying",
+      "enemies": {
+        "path_bandits": {
+          "enemy_type": "goblin_pack",
+          "quantity": 2,
+          "encounter_name": "bandits",
+          "respawn": false
+        }
+      },
+      "items": {
+        "hidden_stash": {
+          "name": "hidden stash",
+          "description": "A small cache hidden behind a fallen log contains supplies.",
+          "can_take": true,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "north": {
+          "destination": "forest_clearing",
+          "description": "back to the clearing"
+        },
+        "east": {
+          "destination": "hidden_grove",
+          "description": "to a hidden grove"
+        }
+      }
+    },
+    
+    "southern_trail": {
+      "name": "Southern Trail",
+      "description": "A quieter trail leads south through younger trees. The forest here feels different - more open, with patches of sunlight breaking through the canopy. Colorful birds flit between the branches, and the sound of running water suggests a creek nearby.",
+      "ambient_sound": "Cheerful bird songs, distant running water",
+      "is_safe": true,
+      "items": {
+        "colored_feathers": {
+          "name": "colorful feathers",
+          "description": "Bright feathers from exotic birds litter the ground.",
+          "can_take": true,
+          "quantity": 3
+        }
+      },
+      "exits": {
+        "north": {
+          "destination": "forest_entrance",
+          "description": "back to the forest entrance"
+        },
+        "east": {
+          "destination": "creek_crossing",
+          "description": "toward a creek crossing"
+        }
+      }
+    },
+    
+    "creek_crossing": {
+      "name": "Creek Crossing",
+      "description": "A cheerful creek winds through the forest here, crossed by a simple wooden bridge. The water is clear and cold, and fish can be seen swimming in the deeper pools. This would be an excellent place to rest and refill water supplies.",
+      "ambient_sound": "Babbling creek, splashing water",
+      "is_safe": true,
+      "items": {
+        "fresh_fish": {
+          "name": "fresh fish",
+          "description": "Fat fish swim in the creek pools, easily caught by hand.",
+          "can_take": true,
+          "quantity": 2
+        }
+      },
+      "exits": {
+        "west": {
+          "destination": "southern_trail",
+          "description": "back to the southern trail"
+        },
+        "north": {
+          "destination": "side_path",
+          "description": "to the winding side path"
+        }
+      }
+    },
+    
+    "hidden_grove": {
+      "name": "Hidden Grove",
+      "description": "A secret grove hidden deep in the forest. Ancient stone circles mark this as a place of power, and the air itself seems to shimmer with magical energy. Rare plants grow here that are found nowhere else in the forest.",
+      "ambient_sound": "Mystical humming, wind chimes made by hanging branches",
+      "is_safe": true,
+      "items": {
+        "power_crystal": {
+          "name": "power crystal",
+          "description": "A crystal pulsing with magical energy sits in the center of the stone circle.",
+          "can_take": true,
+          "quantity": 1
+        },
+        "rare_herbs": {
+          "name": "rare herbs",
+          "description": "Valuable magical herbs grow only in this enchanted grove.",
+          "can_take": true,
+          "quantity": 3
+        }
+      },
+      "exits": {
+        "north": {
+          "destination": "deep_forest",
+          "description": "back to the deep forest"
+        },
+        "west": {
+          "destination": "side_path",
+          "description": "to the winding path"
+        }
+      }
+    },
+    
+    "city_approach": {
+      "name": "City Approach",
+      "description": "The forest begins to thin as you approach your destination. Through the trees ahead, you can see the impressive walls and towers of Rogue City rising in the distance. The ancient road you've been following widens here, showing signs of regular use by merchants and travelers.",
+      "ambient_sound": "Distant city sounds, civilization approaching",
+      "items": {
+        "milestone": {
+          "name": "stone milestone",
+          "description": "An ancient milestone marks the distance to Rogue City: '1 Mile to the Gates'.",
+          "can_take": false,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "west": {
+          "destination": "deep_forest",
+          "description": "back to the deep forest"
+        },
+        "east": {
+          "destination": "rogue_city_gates",
+          "description": "to the gates of Rogue City"
+        }
+      }
+    },
+    
+    "rogue_city_gates": {
+      "name": "Gates of Rogue City",
+      "description": "You stand before the massive gates of the legendary Rogue City! The ancient stone walls stretch high above, covered in ivy and decorated with carved gargoyles. Guards in gleaming armor patrol the battlements, and the great iron gates stand open, welcoming travelers to the most famous city in the realm. Your journey has brought you to your destination!",
+      "ambient_sound": "City bustle, guards calling, merchants hawking wares",
+      "is_safe": true,
+      "items": {
+        "city_charter": {
+          "name": "city charter",
+          "description": "A bronze plaque by the gates proclaims the ancient charter of Rogue City.",
+          "can_take": false,
+          "quantity": 1
+        }
+      },
+      "exits": {
+        "west": {
+          "destination": "city_approach",
+          "description": "back to the forest approach"
+        },
+        "north": {
+          "destination": "city_center",
+          "description": "through the gates into Rogue City"
+        }
+      }
+    },
+    
+    "city_center": {
+      "name": "Rogue City Center",
+      "description": "You have reached the heart of the legendary Rogue City! Congratulations, adventurer - your journey is complete! The bustling city center spreads out before you, filled with merchants, fellow adventurers, and countless opportunities for future adventures. Thank you for playing this demo of Rogue City!",
+      "ambient_sound": "Bustling city life, celebration of arrival",
+      "is_safe": true,
+      "special_actions": {
+        "celebrate": "You raise your arms in triumph - you have reached Rogue City!"
+      },
+      "exits": {
+        "south": {
+          "destination": "rogue_city_gates",
+          "description": "back to the city gates"
+        }
+      }
+    }
+  },
+  
+  "encounters": {
+    "forest_wolves": "A pack of wolves emerges from the undergrowth, their eyes gleaming with hunger.",
+    "forest_guardian": "An ancient guardian of the forest blocks your path, testing your worthiness.",
+    "path_bandits": "Bandits leap from behind trees, demanding your coin or your life!"
+  },
+  
+  "completion_requirements": {
+    "required_rooms": ["forest_entrance", "forest_clearing", "deep_forest", "city_approach", "rogue_city_gates", "city_center"],
+    "optional_content": ["northern_woods", "ancient_grove", "side_path", "southern_trail", "creek_crossing", "hidden_grove"],
+    "final_destination": "city_center"
+  }
+}
