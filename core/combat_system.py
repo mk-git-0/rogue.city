@@ -338,9 +338,16 @@ class CombatSystem:
         if not target_enemy or not target_enemy.is_alive():
             return
             
-        # Calculate attack roll
+        # Calculate attack roll with equipment bonuses
         attack_bonus = self.current_character.base_attack_bonus
         crit_range = self.current_character.get_critical_range()
+        
+        # Add equipment attack bonus
+        if (self.current_character.equipment_system and 
+            self.current_character.equipment_system.get_equipped_weapon()):
+            weapon = self.current_character.equipment_system.get_equipped_weapon()
+            attack_bonus += weapon.attack_bonus
+            crit_range = weapon.crit_range
         
         attack_roll, is_critical = self.dice_system.attack_roll(
             f"1d20+{attack_bonus}", 
@@ -349,15 +356,30 @@ class CombatSystem:
         
         # Check if attack hits
         if attack_roll >= target_enemy.armor_class:
-            # Attack hits - calculate damage
-            # For now, use simple weapon damage (implement weapon system later)
-            base_damage = "1d6"  # Default weapon damage
-            str_modifier = self.current_character.get_stat_modifier('strength')
+            # Attack hits - calculate damage using equipped weapon
+            if (self.current_character.equipment_system and 
+                self.current_character.equipment_system.get_equipped_weapon()):
+                # Use equipped weapon damage
+                weapon = self.current_character.equipment_system.get_equipped_weapon()
+                base_damage = weapon.damage_dice
+                weapon_bonus = weapon.damage_bonus
+            else:
+                # Use unarmed damage
+                base_damage = "1d2"  # Unarmed damage
+                weapon_bonus = 0
             
-            if str_modifier > 0:
-                damage_notation = f"{base_damage}+{str_modifier}"
-            elif str_modifier < 0:
-                damage_notation = f"{base_damage}{str_modifier}"
+            # Add strength modifier (or dex for finesse weapons like rogues)
+            stat_modifier = self.current_character.get_stat_modifier('strength')
+            if hasattr(self.current_character, 'character_class') and self.current_character.character_class == 'rogue':
+                # Rogues use DEX for damage with finesse weapons
+                stat_modifier = self.current_character.get_stat_modifier('dexterity')
+            
+            total_bonus = stat_modifier + weapon_bonus
+            
+            if total_bonus > 0:
+                damage_notation = f"{base_damage}+{total_bonus}"
+            elif total_bonus < 0:
+                damage_notation = f"{base_damage}{total_bonus}"
             else:
                 damage_notation = base_damage
                 
