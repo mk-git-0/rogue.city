@@ -296,6 +296,33 @@ class SaveManager:
             print(f"Error restoring backup for '{character_name}': {e}")
             return False
             
+    def _create_character_data(self, character) -> Dict[str, Any]:
+        """Create character data dictionary from character object"""
+        return character.to_dict()
+        
+    def _save_character_data(self, character_name: str, character_data: Dict[str, Any]) -> bool:
+        """Save character data dictionary to file"""
+        try:
+            save_path = self.save_directory / f"{character_name}.json"
+            
+            # Create backup if file exists
+            if save_path.exists():
+                backup_path = save_path.with_suffix('.json.bak')
+                shutil.copy2(save_path, backup_path)
+                
+            # Add timestamp
+            character_data['save_timestamp'] = datetime.now().isoformat()
+            
+            # Write to file with pretty formatting
+            with open(save_path, 'w', encoding='utf-8') as f:
+                json.dump(character_data, f, indent=2, ensure_ascii=False)
+                
+            return True
+            
+        except Exception as e:
+            print(f"Error saving character data for '{character_name}': {e}")
+            return False
+            
     def validate_character_save(self, save_data: Dict[str, Any]) -> bool:
         """Validate character save data integrity"""
         try:

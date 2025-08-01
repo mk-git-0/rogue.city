@@ -286,6 +286,13 @@ class SimpleUIManager:
         except EOFError:
             return "quit"
             
+    def display_message(self, message: str) -> None:
+        """
+        Display a message to the user.
+        Compatibility method for existing code that expects this method.
+        """
+        self.output(message)
+        
     def set_context(self, content: list) -> None:
         """
         Compatibility method for existing code.
