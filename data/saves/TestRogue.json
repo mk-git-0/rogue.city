@@ -1,0 +1,37 @@
+{
+  "character_name": "TestRogue",
+  "character_class": "rogue",
+  "level": 0,
+  "experience": 0,
+  "base_stats": {
+    "strength": 10,
+    "dexterity": 10,
+    "constitution": 10,
+    "intelligence": 10,
+    "wisdom": 10,
+    "charisma": 10
+  },
+  "stats": {
+    "strength": 8,
+    "dexterity": 13,
+    "constitution": 8,
+    "intelligence": 12,
+    "wisdom": 9,
+    "charisma": 9
+  },
+  "derived_stats": {
+    "max_hp": 5,
+    "current_hp": 5,
+    "armor_class": 11,
+    "base_attack_bonus": 1
+  },
+  "current_location": {
+    "area_id": null,
+    "room_id": null
+  },
+  "inventory": [],
+  "equipped_items": {},
+  "unallocated_stats": 10,
+  "creation_complete": true,
+  "save_timestamp": "2025-07-30T22:28:53.274216"
+}

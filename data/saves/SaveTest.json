@@ -1,0 +1,37 @@
+{
+  "character_name": "SaveTest",
+  "character_class": "rogue",
+  "level": 0,
+  "experience": 0,
+  "base_stats": {
+    "strength": 10,
+    "dexterity": 10,
+    "constitution": 10,
+    "intelligence": 10,
+    "wisdom": 10,
+    "charisma": 10
+  },
+  "stats": {
+    "strength": 10,
+    "dexterity": 10,
+    "constitution": 10,
+    "intelligence": 10,
+    "wisdom": 10,
+    "charisma": 10
+  },
+  "derived_stats": {
+    "max_hp": 0,
+    "current_hp": 0,
+    "armor_class": 10,
+    "base_attack_bonus": 0
+  },
+  "current_location": {
+    "area_id": null,
+    "room_id": null
+  },
+  "inventory": [],
+  "equipped_items": {},
+  "unallocated_stats": 10,
+  "creation_complete": false,
+  "save_timestamp": "2025-07-30T22:40:34.911172"
+}

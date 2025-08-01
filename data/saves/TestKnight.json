@@ -1,0 +1,37 @@
+{
+  "character_name": "TestKnight",
+  "character_class": "knight",
+  "level": 0,
+  "experience": 0,
+  "base_stats": {
+    "strength": 10,
+    "dexterity": 10,
+    "constitution": 10,
+    "intelligence": 10,
+    "wisdom": 10,
+    "charisma": 10
+  },
+  "stats": {
+    "strength": 13,
+    "dexterity": 11,
+    "constitution": 12,
+    "intelligence": 9,
+    "wisdom": 9,
+    "charisma": 11
+  },
+  "derived_stats": {
+    "max_hp": 11,
+    "current_hp": 11,
+    "armor_class": 10,
+    "base_attack_bonus": 1
+  },
+  "current_location": {
+    "area_id": null,
+    "room_id": null
+  },
+  "inventory": [],
+  "equipped_items": {},
+  "unallocated_stats": 10,
+  "creation_complete": true,
+  "save_timestamp": "2025-07-30T22:28:53.274401"
+}
