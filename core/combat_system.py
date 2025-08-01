@@ -238,6 +238,7 @@ class CombatSystem:
         
         # Schedule the attack
         attack_speed = self.current_character.get_attack_speed()
+        self.ui_manager.log_system(f"DEBUG: Scheduling player attack with 0.1s delay")
         self.timer_system.schedule_action(
             actor_id=self.current_character.name,
             action_type="attack",
@@ -324,16 +325,21 @@ class CombatSystem:
         action = action_data.get("action")
         
         if not action or not self.is_active():
+            self.ui_manager.log_system(f"DEBUG: Player action skipped - action: {action is not None}, active: {self.is_active()}")
             return
             
         if action.action_type == "attack":
+            self.ui_manager.log_system(f"DEBUG: Executing player attack")
             self._execute_player_attack(action)
             
     def _execute_player_attack(self, action: CombatAction) -> None:
         """Execute a player attack action."""
         target_enemy = action.action_data.get("target_enemy")
         if not target_enemy or not target_enemy.is_alive():
+            self.ui_manager.log_system(f"DEBUG: Attack target invalid - enemy: {target_enemy is not None}, alive: {target_enemy.is_alive() if target_enemy else False}")
             return
+        
+        self.ui_manager.log_system(f"DEBUG: Player attacking {target_enemy.name} (HP: {target_enemy.current_hp}/{target_enemy.max_hp})")
             
         # Calculate attack roll with equipment bonuses
         attack_bonus = self.current_character.base_attack_bonus
