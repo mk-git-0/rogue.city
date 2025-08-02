@@ -414,6 +414,10 @@ class GameEngine:
                 if character:
                     self.current_character = character
                     self.current_player = character  # Set alias
+                    
+                    # Set character for status line display
+                    self.ui_manager.set_current_character(character)
+                    
                     self.current_state = GameState.PLAYING
                     self.ui_manager.log_success(f"Loaded {character.name} the {character.character_class.title()}!")
                     
@@ -453,6 +457,10 @@ class GameEngine:
                 if character:
                     self.current_character = character
                     self.current_player = character  # Set alias
+                    
+                    # Set character for status line display
+                    self.ui_manager.set_current_character(character)
+                    
                     self.current_state = GameState.PLAYING
                     self.ui_manager.log_success(f"Loaded {character.name} the {character.character_class.title()}!")
                     
@@ -661,6 +669,10 @@ class GameEngine:
         if self.save_manager.save_character(character):
             self.current_character = character
             self.current_player = character  # Set alias
+            
+            # Set character for status line display
+            self.ui_manager.set_current_character(character)
+            
             self.current_state = GameState.PLAYING
             self.character_creation_state = None
             

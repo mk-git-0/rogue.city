@@ -2,7 +2,7 @@
   "character_name": "rog1",
   "character_class": "rogue",
   "level": 1,
-  "experience": 0,
+  "experience": 75,
   "base_stats": {
     "strength": 12,
     "dexterity": 14,
@@ -21,7 +21,7 @@
   },
   "derived_stats": {
     "max_hp": 6,
-    "current_hp": 1,
+    "current_hp": 6,
     "armor_class": 14,
     "base_attack_bonus": 4
   },
@@ -31,7 +31,7 @@
   },
   "unallocated_stats": 0,
   "creation_complete": true,
-  "save_timestamp": "2025-08-02T01:20:32.045643",
+  "save_timestamp": "2025-08-02T01:42:36.084615",
   "inventory": {
     "items": {
       "rusty_dagger": {
@@ -66,7 +66,8 @@
     "equipped_items": {
       "weapon": "rusty_dagger",
       "armor": "leather_scraps",
-      "accessory": null
+      "accessory": null,
+      "offhand": null
     },
     "applied_bonuses": {
       "weapon": {}
@@ -80,7 +81,7 @@
     "levels_gained": 0,
     "total_damage_dealt": 0,
     "total_damage_taken": 0,
-    "commands_entered": 59,
+    "commands_entered": 72,
     "times_died": 0,
     "items_equipped": 0,
     "areas_discovered": [

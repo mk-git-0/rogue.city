@@ -458,6 +458,11 @@ class CombatSystem:
             # Apply damage
             actual_damage = target_enemy.take_damage(damage)
             
+            # Show enemy health after damage
+            enemy_hp_percent = int((target_enemy.current_hp / target_enemy.max_hp) * 100) if target_enemy.max_hp > 0 else 0
+            if target_enemy.is_alive():
+                self.ui_manager.log_info(f"The {enemy_colored} has {target_enemy.current_hp}/{target_enemy.max_hp} HP ({enemy_hp_percent}%)")
+            
             # Check if enemy dies
             if not target_enemy.is_alive():
                 self.ui_manager.log_success(f"*** The {enemy_colored} dies! ***")
@@ -501,6 +506,11 @@ class CombatSystem:
                 self.ui_manager.log_error(f"The {enemy_colored} hits you for {damage} damage!")
                 
             actual_damage = self.current_character.take_damage(damage)
+            
+            # Show player health after damage  
+            player_hp_percent = int((self.current_character.current_hp / self.current_character.max_hp) * 100) if self.current_character.max_hp > 0 else 0
+            if self.current_character.is_alive():
+                self.ui_manager.log_info(f"You have {self.current_character.current_hp}/{self.current_character.max_hp} HP ({player_hp_percent}%)")
             
             # Check if player dies
             if not self.current_character.is_alive():

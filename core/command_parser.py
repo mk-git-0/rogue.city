@@ -58,6 +58,7 @@ class CommandParser:
         self.commands['save'] = self.cmd_save
         self.commands['quit'] = self.cmd_quit
         self.commands['settings'] = self.cmd_settings
+        self.commands['statline'] = self.cmd_statline
         self.commands['time'] = self.cmd_time
         
         # Tutorial commands
@@ -96,7 +97,9 @@ class CommandParser:
         
         # Character aliases
         self.aliases['st'] = 'stats'
+        self.aliases['stat'] = 'status'
         self.aliases['hp'] = 'health'
+        self.aliases['hea'] = 'health'
         self.aliases['exp'] = 'experience'
         
         # Game aliases
@@ -348,18 +351,88 @@ class CommandParser:
         return True
     
     def cmd_status(self, args: List[str]) -> bool:
-        """Show combat status."""
-        # Use the game engine's status command
-        self.game._status_command()
+        """Show comprehensive character status (MajorMUD STATUS command)."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+            
+        # Show comprehensive character status
+        self._show_comprehensive_status()
         return True
     
-    def _display_basic_status(self):
-        """Display basic character status."""
+    def _show_comprehensive_status(self):
+        """Display comprehensive character status (MajorMUD STATUS command style)."""
         player = self.game.current_player
-        self.game.ui.display_message(f"{player.name} the {player.character_class}")
-        self.game.ui.display_message(f"Level: {player.level}  HP: {player.current_hp}/{player.max_hp}")
+        
+        print()
+        print("=== CHARACTER STATUS ===")
+        
+        # Character identification
+        print(f"Name: {player.name}")
+        print(f"Class: {player.character_class.title()}")
+        print(f"Level: {player.level}")
+        
+        # Experience information
+        if hasattr(player, 'experience'):
+            required_exp = player.calculate_required_experience()
+            if required_exp != float('inf'):
+                exp_needed = required_exp - player.experience
+                print(f"Experience: {player.experience} (need {exp_needed} for next level)")
+            else:
+                print(f"Experience: {player.experience} (maximum level reached)")
+        
+        # Health and combat stats
+        hp_percent = int((player.current_hp / player.max_hp) * 100)
+        print(f"Hit Points: {player.current_hp}/{player.max_hp} ({hp_percent}%)")
+        
+        # Mana for applicable classes
+        if hasattr(player, 'current_mana') and hasattr(player, 'max_mana'):
+            if player.max_mana > 0:
+                mana_percent = int((player.current_mana / player.max_mana) * 100)
+                print(f"Mana Points: {player.current_mana}/{player.max_mana} ({mana_percent}%)")
+        
+        print(f"Armor Class: {player.armor_class}")
+        print(f"Base Attack Bonus: +{player.base_attack_bonus}")
+        
+        # Abilities (stats with modifiers)
+        print("\n=== ABILITIES ===")
+        for stat, value in player.stats.items():
+            modifier = player.get_stat_modifier(stat)
+            mod_str = f"({modifier:+d})" if modifier != 0 else "(+0)"
+            print(f"{stat.title()}: {value} {mod_str}")
+        
+        # Equipment summary
+        if hasattr(player, 'equipment_system') and player.equipment_system:
+            print("\n=== EQUIPMENT SUMMARY ===")
+            weapon = player.equipment_system.get_equipped_weapon()
+            armor = player.equipment_system.get_equipped_armor()
+            
+            weapon_name = weapon.name if weapon else "None"
+            armor_name = armor.name if armor else "None"
+            
+            print(f"Weapon: {weapon_name}")
+            print(f"Armor: {armor_name}")
+            
+            # Show dual-wielding for rogues
+            if (hasattr(player, 'character_class') and player.character_class == 'rogue' and
+                hasattr(player.equipment_system, 'get_offhand_weapon')):
+                offhand = player.equipment_system.get_offhand_weapon()
+                if offhand:
+                    print(f"Off-hand: {offhand.name}")
+        
+        # Location
         if hasattr(player, 'current_area') and player.current_area:
-            self.game.ui.display_message(f"Location: {player.current_area.name}")
+            area_name = getattr(player.current_area, 'name', 'Unknown Area')
+            room_name = getattr(player.current_room, 'name', 'Unknown Room') if player.current_room else 'Unknown Room'
+            print(f"\nLocation: {area_name} - {room_name}")
+        
+        # Combat status
+        if hasattr(self.game, 'combat_system') and self.game.combat_system.is_active():
+            combat_status = self.game.combat_system.get_combat_status()
+            living_enemies = combat_status.get('living_enemies', 0)
+            print(f"\n*** IN COMBAT with {living_enemies} enemies ***")
+            
+        print()
     
     # Character Commands
     def cmd_stats(self, args: List[str]) -> bool:
@@ -404,24 +477,13 @@ class CommandParser:
         return True
     
     def cmd_health(self, args: List[str]) -> bool:
-        """Display current health."""
+        """Display current health and mana (MajorMUD HEALTH command)."""
         if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
+            self.game.ui_manager.log_error("No character loaded.")
             return True
         
-        player = self.game.current_player
-        hp_percent = int((player.current_hp / player.max_hp) * 100)
-        
-        if hp_percent >= 75:
-            status = "excellent"
-        elif hp_percent >= 50:
-            status = "good"
-        elif hp_percent >= 25:
-            status = "wounded"
-        else:
-            status = "badly wounded"
-        
-        self.game.ui.display_message(f"You are in {status} condition. ({player.current_hp}/{player.max_hp} HP)")
+        # Use the UI manager's detailed health display
+        self.game.ui_manager.show_health_status(self.game.current_player)
         return True
     
     def cmd_experience(self, args: List[str]) -> bool:
@@ -520,6 +582,27 @@ class CommandParser:
         self.game.ui.display_message("Auto-save: On character action")
         return True
     
+    def cmd_statline(self, args: List[str]) -> bool:
+        """Toggle status line display (MajorMUD STATLINE command)."""
+        if not args:
+            # Show current setting
+            status = "ON" if self.game.ui_manager.show_status_line else "OFF"
+            self.game.ui_manager.log_info(f"Status line is currently {status}")
+            self.game.ui_manager.log_info("Usage: STATLINE ON/OFF")
+            return True
+            
+        setting = args[0].lower()
+        if setting in ['on', 'true', '1', 'yes']:
+            self.game.ui_manager.show_status_line = True
+            self.game.ui_manager.log_success("Status line enabled - HP/Mana will show at prompt")
+        elif setting in ['off', 'false', '0', 'no']:
+            self.game.ui_manager.show_status_line = False
+            self.game.ui_manager.log_success("Status line disabled")
+        else:
+            self.game.ui_manager.log_error("Usage: STATLINE ON/OFF")
+            
+        return True
+    
     def cmd_time(self, args: List[str]) -> bool:
         """Display game time information."""
         if hasattr(self.game, 'start_time'):
@@ -527,9 +610,9 @@ class CommandParser:
             elapsed = time.time() - self.game.start_time
             minutes = int(elapsed // 60)
             seconds = int(elapsed % 60)
-            self.game.ui.display_message(f"Play time: {minutes}m {seconds}s")
+            self.game.ui_manager.log_info(f"Play time: {minutes}m {seconds}s")
         else:
-            self.game.ui.display_message("Time tracking not available.")
+            self.game.ui_manager.log_info("Time tracking not available.")
         return True
     
     # Tutorial Commands

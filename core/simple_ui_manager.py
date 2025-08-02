@@ -25,6 +25,10 @@ class SimpleUIManager:
         self.input_prompt = "> "
         self.color_manager = ColorManager()
         
+        # Status line settings (MajorMUD style)
+        self.show_status_line = True
+        self.current_character = None
+        
     def initialize(self) -> bool:
         """
         Initialize the simple terminal interface.
@@ -290,8 +294,9 @@ class SimpleUIManager:
             Command string if input was received, None if interrupted
         """
         try:
-            # Simple input with prompt
-            command = input(self.input_prompt).strip()
+            # Generate status line prompt (MajorMUD style)
+            prompt = self._generate_prompt()
+            command = input(prompt).strip()
             
             if command:
                 # Add to history if it's a new command
@@ -340,6 +345,90 @@ class SimpleUIManager:
             else:
                 self.log_error("Colorama not available - colors cannot be enabled")
                 return False
+    
+    def set_current_character(self, character) -> None:
+        """Set the current character for status line display."""
+        self.current_character = character
+        
+    def toggle_status_line(self) -> bool:
+        """Toggle status line display on/off."""
+        self.show_status_line = not self.show_status_line
+        if self.show_status_line:
+            self.log_system("Status line enabled")
+        else:
+            self.log_system("Status line disabled")
+        return self.show_status_line
+        
+    def _generate_prompt(self) -> str:
+        """Generate prompt with optional status line (MajorMUD style)."""
+        if not self.show_status_line or not self.current_character:
+            return self.input_prompt
+            
+        # Format: [HP: current/max] >
+        hp_text = f"HP: {self.current_character.current_hp}/{self.current_character.max_hp}"
+        
+        # Add mana for mage classes if they have it
+        status_parts = [hp_text]
+        if hasattr(self.current_character, 'current_mana') and hasattr(self.current_character, 'max_mana'):
+            if self.current_character.max_mana > 0:
+                mana_text = f"Mana: {self.current_character.current_mana}/{self.current_character.max_mana}"
+                status_parts.append(mana_text)
+                
+        status_line = "[" + ", ".join(status_parts) + "] "
+        return status_line + self.input_prompt
+        
+    def show_health_status(self, character) -> None:
+        """Display detailed health status (MajorMUD HEALTH command style)."""
+        print()
+        print(f"=== HEALTH STATUS ===")
+        
+        # Current health with percentage and condition
+        hp_percent = int((character.current_hp / character.max_hp) * 100)
+        
+        # MajorMUD-style health conditions
+        if hp_percent >= 90:
+            condition = "excellent"
+            color = "success"
+        elif hp_percent >= 75:
+            condition = "good"
+            color = "success"
+        elif hp_percent >= 50:
+            condition = "fair"
+            color = "info"
+        elif hp_percent >= 25:
+            condition = "wounded"
+            color = "warning"
+        elif hp_percent >= 10:
+            condition = "badly wounded"
+            color = "error"
+        else:
+            condition = "near death"
+            color = "error"
+            
+        health_msg = f"You are in {condition} condition."
+        if color == "success":
+            colored_msg = self.color_manager.format_success_message(health_msg)
+        elif color == "info":
+            colored_msg = self.color_manager.format_info_message(health_msg)
+        elif color == "warning":
+            colored_msg = self.color_manager.format_system_message(health_msg)
+        else:
+            colored_msg = self.color_manager.format_error_message(health_msg)
+            
+        print(colored_msg)
+        print(f"Hit Points: {character.current_hp}/{character.max_hp} ({hp_percent}%)")
+        
+        # Show mana for applicable classes
+        if hasattr(character, 'current_mana') and hasattr(character, 'max_mana'):
+            if character.max_mana > 0:
+                mana_percent = int((character.current_mana / character.max_mana) * 100)
+                print(f"Mana Points: {character.current_mana}/{character.max_mana} ({mana_percent}%)")
+                
+        # Show healing rate
+        if hp_percent < 100:
+            print("\nYou will heal naturally over time.")
+            print("Use the REST command to increase your healing rate.")
+        print()
 
 
 # Test function for the simple UI manager
