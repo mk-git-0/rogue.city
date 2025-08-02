@@ -390,7 +390,7 @@ class CombatSystem:
             # Apply critical hit multiplier
             if is_critical:
                 damage *= 2
-                self.ui_manager.log_combat(f"Critical hit! You attack the {target_enemy.name} for {damage} damage!")
+                self.ui_manager.log_critical(f"Critical hit! You attack the {target_enemy.name} for {damage} damage!")
             else:
                 self.ui_manager.log_combat(f"You attack the {target_enemy.name} for {damage} damage!")
                 
@@ -432,7 +432,7 @@ class CombatSystem:
             
             if is_critical:
                 damage *= 2
-                self.ui_manager.log_combat(f"Critical hit! The {enemy.name} attacks you for {damage} damage!")
+                self.ui_manager.log_critical(f"Critical hit! The {enemy.name} attacks you for {damage} damage!")
             else:
                 self.ui_manager.log_combat(f"The {enemy.name} attacks you for {damage} damage!")
                 

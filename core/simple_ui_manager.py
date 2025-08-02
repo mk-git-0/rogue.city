@@ -8,6 +8,7 @@ import threading
 import time
 from typing import Optional
 from collections import deque
+from .color_manager import ColorManager
 
 
 class SimpleUIManager:
@@ -22,6 +23,7 @@ class SimpleUIManager:
         self.history_index = 0
         self.current_input = ""
         self.input_prompt = "> "
+        self.color_manager = ColorManager()
         
     def initialize(self) -> bool:
         """
@@ -76,19 +78,23 @@ class SimpleUIManager:
         
     def log_error(self, message: str) -> None:
         """Log an error message."""
-        self.output(message, "ERROR:")
+        colored_message = self.color_manager.format_error_message(message)
+        self.output(colored_message, "ERROR:")
         
     def log_success(self, message: str) -> None:
         """Log a success message."""
-        self.output(message)
+        colored_message = self.color_manager.format_success_message(message)
+        self.output(colored_message)
         
     def log_info(self, message: str) -> None:
         """Log an info message."""
-        self.output(message)
+        colored_message = self.color_manager.format_info_message(message)
+        self.output(colored_message)
         
     def log_system(self, message: str) -> None:
         """Log a system message."""
-        self.output(message, "[SYSTEM]")
+        colored_message = self.color_manager.format_system_message(message)
+        self.output(colored_message, "[SYSTEM]")
         
     def log_command(self, command: str) -> None:
         """Log a command that was entered."""
@@ -97,7 +103,13 @@ class SimpleUIManager:
         
     def log_combat(self, message: str) -> None:
         """Log a combat message with distinctive formatting."""
-        self.output(message)
+        colored_message = self.color_manager.format_combat_message(message)
+        self.output(colored_message)
+        
+    def log_critical(self, message: str) -> None:
+        """Log a critical hit or important message with special formatting."""
+        colored_message = self.color_manager.format_critical_message(message)
+        self.output(colored_message)
         
     def show_room(self, name: str, description: str, exits: list, items: list = None, enemies: list = None) -> None:
         """
@@ -115,15 +127,18 @@ class SimpleUIManager:
         print(description)
         
         if exits:
-            print(f"Exits: {', '.join(exits)}")
+            colored_exits = self.color_manager.colorize_exits_list(exits)
+            print(f"Exits: {', '.join(colored_exits)}")
         else:
             print("No obvious exits.")
             
         if items:
-            print(f"Items: {', '.join(items)}")
+            colored_items = self.color_manager.colorize_items_list(items)
+            print(f"Items: {', '.join(colored_items)}")
             
         if enemies:
-            print(f"Enemies: {', '.join(enemies)}")
+            colored_enemies = self.color_manager.colorize_enemies_list(enemies)
+            print(f"Enemies: {', '.join(colored_enemies)}")
         print()
         
     def show_character_status(self, character) -> None:
@@ -301,6 +316,26 @@ class SimpleUIManager:
         # In simple UI mode, we don't maintain persistent context
         # This method exists for compatibility but does nothing
         pass
+    
+    def toggle_colors(self) -> bool:
+        """
+        Toggle color output on/off.
+        
+        Returns:
+            True if colors are now enabled, False if disabled
+        """
+        if self.color_manager.is_enabled():
+            self.color_manager.disable_colors()
+            self.log_system("Colors disabled")
+            return False
+        else:
+            self.color_manager.enable_colors()
+            if self.color_manager.is_enabled():
+                self.log_system("Colors enabled")
+                return True
+            else:
+                self.log_error("Colorama not available - colors cannot be enabled")
+                return False
 
 
 # Test function for the simple UI manager
