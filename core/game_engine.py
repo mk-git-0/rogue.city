@@ -920,14 +920,20 @@ class GameEngine:
                 # Use first available enemy
                 target_room_enemy = active_enemies[0]
                 
-            # Create enemy instance and start combat
-            enemy = self.enemy_factory.create_enemy(target_room_enemy.enemy_type)
-            if not enemy:
-                self.ui_manager.log_error(f"Failed to create enemy: {target_room_enemy.enemy_type}")
-                return
+            # Create enemy instance(s) and start combat
+            # Try as encounter first, then as single enemy
+            enemies = self.enemy_factory.create_encounter(target_room_enemy.enemy_type)
+            if not enemies:
+                # Try as single enemy
+                enemy = self.enemy_factory.create_enemy(target_room_enemy.enemy_type)
+                if enemy:
+                    enemies = [enemy]
+                else:
+                    self.ui_manager.log_error(f"Failed to create enemy: {target_room_enemy.enemy_type}")
+                    return
                 
             # Start combat
-            if self.combat_system.start_combat(self.current_character, [enemy]):
+            if self.combat_system.start_combat(self.current_character, enemies):
                 self.current_state = GameState.COMBAT
                 self.state = self.current_state
                 self.ui_manager.log_success("Combat started!")
