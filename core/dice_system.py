@@ -22,7 +22,7 @@ class DiceSystem:
             show_rolls: Whether to show individual roll results to the player
         """
         self.show_rolls = show_rolls
-        self.valid_dice = [4, 6, 8, 10, 12, 20, 100]
+        self.valid_dice = [3, 4, 6, 8, 10, 12, 20, 100]
         
     def set_visibility(self, show_rolls: bool) -> None:
         """Toggle visibility of dice roll results."""

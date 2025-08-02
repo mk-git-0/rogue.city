@@ -206,6 +206,11 @@ class GameEngine:
             continue_game = self.command_parser.parse_command(command)
             if not continue_game:
                 self.shutdown()
+        elif self.current_state == GameState.COMBAT:
+            # Use command parser for combat commands too
+            continue_game = self.command_parser.parse_command(command)
+            if not continue_game:
+                self.shutdown()
         elif self.current_state == GameState.PAUSED:
             self._handle_pause_command_legacy(command)
         else:

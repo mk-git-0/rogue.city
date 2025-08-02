@@ -201,12 +201,16 @@ class CombatSystem:
         target_id = None
         
         if target_name:
-            # Look for enemy by name
+            # Look for enemy by name (allow partial matches)
             for enemy_id, enemy in self.enemies.items():
-                if enemy.is_alive() and enemy.name.lower() == target_name.lower():
-                    target_enemy = enemy
-                    target_id = enemy_id
-                    break
+                if enemy.is_alive():
+                    enemy_name = enemy.name.lower()
+                    target_lower = target_name.lower()
+                    # Check for exact match first, then partial matches
+                    if enemy_name == target_lower or target_lower in enemy_name or enemy_name in target_lower:
+                        target_enemy = enemy
+                        target_id = enemy_id
+                        break
         else:
             # Attack first living enemy
             for enemy_id, enemy in self.enemies.items():
