@@ -111,6 +111,10 @@ class SimpleUIManager:
         colored_message = self.color_manager.format_critical_message(message)
         self.output(colored_message)
         
+    def colorize_enemy(self, enemy_name: str) -> str:
+        """Colorize enemy name for combat messages."""
+        return self.color_manager.colorize(enemy_name, 'enemy')
+        
     def show_room(self, name: str, description: str, exits: list, items: list = None, enemies: list = None) -> None:
         """
         Display room information in MajorMUD style.

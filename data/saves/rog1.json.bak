@@ -21,7 +21,7 @@
   },
   "derived_stats": {
     "max_hp": 6,
-    "current_hp": 1,
+    "current_hp": 0,
     "armor_class": 14,
     "base_attack_bonus": 4
   },
@@ -31,7 +31,7 @@
   },
   "unallocated_stats": 0,
   "creation_complete": true,
-  "save_timestamp": "2025-08-02T00:56:41.599408",
+  "save_timestamp": "2025-08-02T01:00:53.542070",
   "inventory": {
     "items": {
       "rusty_dagger": {
@@ -80,7 +80,7 @@
     "levels_gained": 0,
     "total_damage_dealt": 0,
     "total_damage_taken": 0,
-    "commands_entered": 43,
+    "commands_entered": 48,
     "times_died": 0,
     "items_equipped": 0,
     "areas_discovered": [

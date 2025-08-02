@@ -186,7 +186,7 @@ class EquipmentSystem:
     def get_attack_speed_modifier(self) -> float:
         """Get attack speed from equipped weapon."""
         weapon = self.get_equipped_weapon()
-        if weapon:
+        if weapon and hasattr(weapon, 'attack_speed'):
             return weapon.attack_speed
         return 6.0  # Default unarmed speed
     

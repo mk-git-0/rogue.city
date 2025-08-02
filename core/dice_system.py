@@ -110,6 +110,46 @@ class DiceSystem:
             
         return total
         
+    def roll_with_context(self, notation: str, actor: str = "", purpose: str = "") -> int:
+        """
+        Roll dice with contextual message for clarity.
+        
+        Args:
+            notation: Dice notation like '1d20+5'
+            actor: Who is rolling (e.g., "You", "The goblin")
+            purpose: What the roll is for (e.g., "attack", "damage")
+            
+        Returns:
+            Total result of the roll
+        """
+        num_dice, die_sides, modifier = self.parse_dice_notation(notation)
+        
+        rolls = []
+        for _ in range(num_dice):
+            roll_result = self.roll_single_die(die_sides)
+            rolls.append(roll_result)
+            
+        total = sum(rolls) + modifier
+        
+        if self.show_rolls:
+            context = ""
+            if actor and purpose:
+                context = f"{actor} {purpose} roll "
+            elif actor:
+                context = f"{actor} rolls "
+            elif purpose:
+                context = f"{purpose.title()} roll "
+                
+            if len(rolls) > 1:
+                rolls_str = '+'.join(map(str, rolls))
+                modifier_str = f"{modifier:+d}" if modifier != 0 else ""
+                print(f"{context}{notation}: [{rolls_str}]{modifier_str} = {total}")
+            else:
+                modifier_str = f"{modifier:+d}" if modifier != 0 else ""
+                print(f"{context}{notation}: {rolls[0]}{modifier_str} = {total}")
+                
+        return total
+        
     def attack_roll(self, notation: str, critical_threshold: int = 20) -> Tuple[int, bool]:
         """
         Roll for an attack, checking for critical hits.

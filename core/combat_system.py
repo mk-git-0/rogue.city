@@ -351,6 +351,10 @@ class CombatSystem:
             attack_bonus += weapon.attack_bonus
             crit_range = weapon.crit_range
         
+        # Display attack attempt  
+        enemy_colored = self.ui_manager.colorize_enemy(target_enemy.name)
+        self.ui_manager.log_info(f"You swing at the {enemy_colored}!")
+        
         attack_roll, is_critical = self.dice_system.attack_roll(
             f"1d20+{attack_bonus}", 
             critical_threshold=crit_range
@@ -386,7 +390,7 @@ class CombatSystem:
             else:
                 damage_notation = base_damage
                 
-            damage = self.dice_system.roll(damage_notation)
+            damage = self.dice_system.roll_with_context(damage_notation, "You", "damage")
             
             # Ensure minimum damage of 1
             damage = max(1, damage)
@@ -394,16 +398,16 @@ class CombatSystem:
             # Apply critical hit multiplier
             if is_critical:
                 damage *= 2
-                self.ui_manager.log_critical(f"Critical hit! You attack the {target_enemy.name} for {damage} damage!")
+                self.ui_manager.log_critical(f"*** CRITICAL HIT! *** You strike the {enemy_colored} for {damage} damage!")
             else:
-                self.ui_manager.log_combat(f"You attack the {target_enemy.name} for {damage} damage!")
+                self.ui_manager.log_success(f"You hit the {enemy_colored} for {damage} damage!")
                 
             # Apply damage
             actual_damage = target_enemy.take_damage(damage)
             
             # Check if enemy dies
             if not target_enemy.is_alive():
-                self.ui_manager.log_combat(f"The {target_enemy.name} dies!")
+                self.ui_manager.log_success(f"*** The {enemy_colored} dies! ***")
                 self.experience_gained += target_enemy.experience_value
                 
                 # Add loot if any
@@ -416,7 +420,7 @@ class CombatSystem:
                     self.end_combat(victory=True)
                     return
         else:
-            self.ui_manager.log_combat(f"You miss the {target_enemy.name}!")
+            self.ui_manager.log_info(f"You miss the {enemy_colored}!")
             
     def _execute_enemy_action(self, timed_action) -> None:
         """Execute an enemy combat action."""
@@ -425,6 +429,10 @@ class CombatSystem:
             return
             
         # Enemy attacks player
+        # Display enemy attack attempt
+        enemy_colored = self.ui_manager.colorize_enemy(enemy.name)
+        self.ui_manager.log_info(f"The {enemy_colored} attacks you!")
+        
         attack_roll, is_critical = self.dice_system.attack_roll(
             f"1d20+{enemy.attack_bonus}",
             critical_threshold=20
@@ -432,23 +440,23 @@ class CombatSystem:
         
         if attack_roll >= self.current_character.armor_class:
             # Attack hits
-            damage = self.dice_system.roll(enemy.damage_dice)
+            damage = self.dice_system.roll_with_context(enemy.damage_dice, f"The {enemy.name}", "damage")
             
             if is_critical:
                 damage *= 2
-                self.ui_manager.log_critical(f"Critical hit! The {enemy.name} attacks you for {damage} damage!")
+                self.ui_manager.log_critical(f"*** CRITICAL HIT! *** The {enemy_colored} strikes you for {damage} damage!")
             else:
-                self.ui_manager.log_combat(f"The {enemy.name} attacks you for {damage} damage!")
+                self.ui_manager.log_error(f"The {enemy_colored} hits you for {damage} damage!")
                 
             actual_damage = self.current_character.take_damage(damage)
             
             # Check if player dies
             if not self.current_character.is_alive():
-                self.ui_manager.log_combat("You have been defeated!")
+                self.ui_manager.log_critical("*** YOU HAVE BEEN DEFEATED! ***")
                 self.end_combat(victory=False)
                 return
         else:
-            self.ui_manager.log_combat(f"The {enemy.name} misses you!")
+            self.ui_manager.log_info(f"The {enemy_colored} misses you!")
             
         # Schedule next enemy action if combat is still active
         if self.is_active() and enemy.is_alive():
