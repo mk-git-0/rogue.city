@@ -887,15 +887,60 @@ class GameEngine:
             self.ui_manager.log_error("No character loaded.")
             return
             
-        if not self.combat_system.is_active():
-            self.ui_manager.log_error("You are not in combat. Use 'spawn <enemy>' to start a test fight.")
-            return
-            
         # Parse target from arguments
         target_name = None
         if args:
             target_name = ' '.join(args).lower()
             
+        # If not in combat, check for enemies in current room and start combat
+        if not self.combat_system.is_active():
+            room = self.current_area.get_room(self.current_room)
+            if not room:
+                self.ui_manager.log_error("You are not in combat. Use 'spawn <enemy>' to start a test fight.")
+                return
+                
+            active_enemies = room.get_active_enemies()
+            if not active_enemies:
+                self.ui_manager.log_error("There are no enemies here to attack.")
+                return
+                
+            # Find the target enemy
+            target_room_enemy = None
+            if target_name:
+                # Look for enemy by name
+                for room_enemy in active_enemies:
+                    enemy_name = room_enemy.get_display_name().lower()
+                    if target_name in enemy_name or enemy_name in target_name:
+                        target_room_enemy = room_enemy
+                        break
+                if not target_room_enemy:
+                    self.ui_manager.log_error(f"No enemy named '{target_name}' found here.")
+                    return
+            else:
+                # Use first available enemy
+                target_room_enemy = active_enemies[0]
+                
+            # Create enemy instance and start combat
+            enemy = self.enemy_factory.create_enemy(target_room_enemy.enemy_type)
+            if not enemy:
+                self.ui_manager.log_error(f"Failed to create enemy: {target_room_enemy.enemy_type}")
+                return
+                
+            # Start combat
+            if self.combat_system.start_combat(self.current_character, [enemy]):
+                self.current_state = GameState.COMBAT
+                self.state = self.current_state
+                self.ui_manager.log_success("Combat started!")
+                # Mark the room enemy as triggered
+                for enemy_id, room_enemy in room.enemies.items():
+                    if room_enemy == target_room_enemy:
+                        room_enemy.triggered = True
+                        break
+            else:
+                self.ui_manager.log_error("Failed to start combat.")
+                return
+            
+        # Now attack the enemy
         success = self.combat_system.attack_enemy(target_name)
         if not success:
             # Error message already displayed by combat system
