@@ -203,7 +203,7 @@ class Room:
         active_enemies = self.get_active_enemies()
         if active_enemies:
             for enemy in active_enemies:
-                desc_lines.append(f"A {enemy.enemy_type} is here!")
+                desc_lines.append(f"A {enemy.get_display_name()} is here!")
         
         # Add exits
         available_exits = self.get_available_exits()
