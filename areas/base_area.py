@@ -76,6 +76,10 @@ class RoomEnemy:
         """String representation of enemy."""
         name = self.encounter_name or self.enemy_type
         return f"{name}" + (f" (x{self.quantity})" if self.quantity > 1 else "")
+    
+    def get_display_name(self) -> str:
+        """Get display name for enemy encounters."""
+        return self.encounter_name or self.enemy_type
 
 
 class Room:

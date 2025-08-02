@@ -27,11 +27,11 @@
   },
   "current_location": {
     "area_id": "tutorial_cave",
-    "room_id": "main_chamber"
+    "room_id": "boss_chamber"
   },
   "unallocated_stats": 0,
   "creation_complete": true,
-  "save_timestamp": "2025-08-01T00:20:07.244259",
+  "save_timestamp": "2025-08-02T00:47:21.078719",
   "inventory": {
     "items": {
       "rusty_dagger": {
@@ -80,7 +80,7 @@
     "levels_gained": 0,
     "total_damage_dealt": 0,
     "total_damage_taken": 0,
-    "commands_entered": 28,
+    "commands_entered": 37,
     "times_died": 0,
     "items_equipped": 0,
     "areas_discovered": [
