@@ -4,12 +4,14 @@ from .base_item import BaseItem, ItemType, ItemRarity
 class Weapon(BaseItem):
     def __init__(self, item_id: str, name: str, description: str, 
                  damage_dice: str, attack_speed: float, crit_range: int = 20,
-                 weight: float = 0.0, value: int = 0, rarity: ItemRarity = ItemRarity.COMMON):
+                 attacks_per_turn: int = 1, weight: float = 0.0, value: int = 0, 
+                 rarity: ItemRarity = ItemRarity.COMMON):
         super().__init__(item_id, name, description, ItemType.WEAPON, weight, value, rarity)
         
         # Combat properties
         self.damage_dice = damage_dice  # e.g., "1d4", "1d6+1", "2d4"
-        self.attack_speed = attack_speed  # seconds between attacks
+        self.attack_speed = attack_speed  # seconds between attacks (legacy)
+        self.attacks_per_turn = attacks_per_turn  # number of attacks per turn
         self.crit_range = crit_range  # critical hit on this roll or higher (20 = only nat 20)
         
         # Combat bonuses
@@ -24,7 +26,7 @@ class Weapon(BaseItem):
         lines.append(f"Damage: {self.damage_dice}")
         if self.damage_bonus > 0:
             lines.append(f"Damage Bonus: +{self.damage_bonus}")
-        lines.append(f"Attack Speed: {self.attack_speed}s")
+        lines.append(f"Attacks per Turn: {self.attacks_per_turn}")
         if self.attack_bonus > 0:
             lines.append(f"Attack Bonus: +{self.attack_bonus}")
         if self.crit_range < 20:
@@ -58,6 +60,7 @@ class Weapon(BaseItem):
         data.update({
             'damage_dice': self.damage_dice,
             'attack_speed': self.attack_speed,
+            'attacks_per_turn': self.attacks_per_turn,
             'crit_range': self.crit_range,
             'attack_bonus': self.attack_bonus,
             'damage_bonus': self.damage_bonus
@@ -74,6 +77,7 @@ class Weapon(BaseItem):
             damage_dice=data['damage_dice'],
             attack_speed=data['attack_speed'],
             crit_range=data.get('crit_range', 20),
+            attacks_per_turn=data.get('attacks_per_turn', 1),
             weight=data.get('weight', 0.0),
             value=data.get('value', 0),
             rarity=ItemRarity(data.get('rarity', 'common'))
@@ -102,6 +106,7 @@ class RustyDagger(Weapon):
             damage_dice="1d4",
             attack_speed=2.0,
             crit_range=19,  # Rogues get improved crit range
+            attacks_per_turn=2,  # Fast dual-strike capability
             weight=1.0,
             value=5,
             rarity=ItemRarity.COMMON
@@ -116,6 +121,7 @@ class TrainingSword(Weapon):
             description="A sturdy practice sword used to train new knights. While not the finest blade, it's well-balanced and reliable.",
             damage_dice="1d6",
             attack_speed=4.0,
+            attacks_per_turn=1,  # Standard single attack
             weight=3.0,
             value=10,
             rarity=ItemRarity.COMMON
@@ -130,6 +136,7 @@ class WoodenStaff(Weapon):
             description="A simple wooden staff that helps focus magical energies. More useful for spellcasting than physical combat.",
             damage_dice="1d4",
             attack_speed=6.0,
+            attacks_per_turn=1,  # Slow but powerful magical attacks
             weight=2.0,
             value=8,
             rarity=ItemRarity.COMMON
@@ -145,6 +152,7 @@ class HandWraps(Weapon):
             description="Simple cloth wrappings that protect the hands during unarmed combat while maintaining flexibility.",
             damage_dice="1d3",
             attack_speed=3.0,
+            attacks_per_turn=1,  # Balanced unarmed combat
             weight=0.5,
             value=3,
             rarity=ItemRarity.COMMON
@@ -159,6 +167,7 @@ class IronSword(Weapon):
             description="A well-forged iron blade with a sturdy crossguard. A significant upgrade over training weapons.",
             damage_dice="1d8",
             attack_speed=4.0,
+            attacks_per_turn=1,  # Standard single attack
             weight=4.0,
             value=50,
             rarity=ItemRarity.UNCOMMON
@@ -175,6 +184,7 @@ class SteelDagger(Weapon):
             damage_dice="1d4+1",
             attack_speed=1.8,
             crit_range=19,
+            attacks_per_turn=2,  # Fast dual-strike capability
             weight=1.5,
             value=40,
             rarity=ItemRarity.UNCOMMON
@@ -190,6 +200,7 @@ class OakStaff(Weapon):
             description="A staff carved from ancient oak, inscribed with mystical runes that enhance magical focus.",
             damage_dice="1d6",
             attack_speed=5.5,
+            attacks_per_turn=1,  # Slow but powerful magical attacks
             weight=3.0,
             value=60,
             rarity=ItemRarity.UNCOMMON
@@ -206,6 +217,7 @@ class MysticWraps(Weapon):
             description="Enchanted wrappings that enhance the wearer's natural combat abilities and spiritual focus.",
             damage_dice="1d4",
             attack_speed=2.5,
+            attacks_per_turn=1,  # Balanced unarmed combat
             weight=0.8,
             value=35,
             rarity=ItemRarity.UNCOMMON

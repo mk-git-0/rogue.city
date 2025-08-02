@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Any
+from typing import Dict, Optional, Any, List
 from items.base_item import BaseItem, ItemType
 from items.weapons import Weapon
 from items.armor import Armor
@@ -38,6 +38,10 @@ class EquipmentSystem:
             'armor': EquipmentSlot('armor', [ItemType.ARMOR]),
             'accessory': EquipmentSlot('accessory', [ItemType.ACCESSORY])
         }
+        
+        # Add off-hand weapon slot for dual-wielding classes (rogues)
+        if hasattr(character, 'character_class') and character.character_class == 'rogue':
+            self.slots['offhand'] = EquipmentSlot('offhand', [ItemType.WEAPON])
         
         # Track applied bonuses for removal
         self.applied_bonuses = {}
@@ -156,11 +160,29 @@ class EquipmentSystem:
             del self.applied_bonuses[slot_name]
     
     def get_equipped_weapon(self) -> Optional[Weapon]:
-        """Get currently equipped weapon."""
+        """Get currently equipped main-hand weapon."""
         weapon_slot = self.slots.get('weapon')
         if weapon_slot and weapon_slot.equipped_item:
             return weapon_slot.equipped_item
         return None
+        
+    def get_offhand_weapon(self) -> Optional[Weapon]:
+        """Get currently equipped off-hand weapon (for dual-wielding)."""
+        offhand_slot = self.slots.get('offhand')
+        if offhand_slot and offhand_slot.equipped_item:
+            return offhand_slot.equipped_item
+        return None
+        
+    def get_all_weapons(self) -> List[Weapon]:
+        """Get all equipped weapons (main-hand and off-hand)."""
+        weapons = []
+        main_weapon = self.get_equipped_weapon()
+        if main_weapon:
+            weapons.append(main_weapon)
+        offhand_weapon = self.get_offhand_weapon()
+        if offhand_weapon:
+            weapons.append(offhand_weapon)
+        return weapons
     
     def get_equipped_armor(self) -> Optional[Armor]:
         """Get currently equipped armor."""
@@ -229,19 +251,32 @@ class EquipmentSystem:
             else:
                 lines.append(f"{slot_name.title()}: None")
         
-        # Show combat stats if weapon equipped
-        weapon = self.get_equipped_weapon()
-        if weapon:
+        # Show combat stats for all weapons
+        weapons = []
+        main_weapon = self.get_equipped_weapon()
+        if main_weapon:
+            weapons.append(("Main Hand", main_weapon))
+        
+        if hasattr(self, 'get_offhand_weapon'):
+            offhand_weapon = self.get_offhand_weapon()
+            if offhand_weapon:
+                weapons.append(("Off Hand", offhand_weapon))
+        
+        if weapons:
             lines.append("")
             lines.append("=== COMBAT STATS ===")
-            lines.append(f"Weapon: {weapon.name}")
-            lines.append(f"Damage: {weapon.damage_dice}")
-            if weapon.damage_bonus > 0:
-                lines.append(f"Damage Bonus: +{weapon.damage_bonus}")
-            lines.append(f"Attack Speed: {weapon.attack_speed}s")
-            if weapon.attack_bonus > 0:
-                lines.append(f"Attack Bonus: +{weapon.attack_bonus}")
-            lines.append(f"Critical: {weapon.crit_range}-20")
+            for hand_name, weapon in weapons:
+                lines.append(f"{hand_name}: {weapon.name}")
+                lines.append(f"  Damage: {weapon.damage_dice}")
+                if hasattr(weapon, 'attacks_per_turn'):
+                    lines.append(f"  Attacks per Turn: {weapon.attacks_per_turn}")
+                if hasattr(weapon, 'damage_bonus') and weapon.damage_bonus > 0:
+                    lines.append(f"  Damage Bonus: +{weapon.damage_bonus}")
+                if hasattr(weapon, 'attack_bonus') and weapon.attack_bonus > 0:
+                    lines.append(f"  Attack Bonus: +{weapon.attack_bonus}")
+                if hasattr(weapon, 'crit_range'):
+                    lines.append(f"  Critical: {weapon.crit_range}-20")
+                lines.append("")
         
         # Show armor stats if armor equipped
         armor = self.get_equipped_armor()

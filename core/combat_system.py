@@ -38,7 +38,7 @@ class CombatSystem:
     auto-combat functionality, and multi-enemy support.
     """
     
-    def __init__(self, timer_system: TimerSystem, dice_system: DiceSystem, ui_manager):
+    def __init__(self, timer_system: TimerSystem, dice_system: DiceSystem, ui_manager, game_engine=None):
         """
         Initialize the combat system.
         
@@ -46,10 +46,12 @@ class CombatSystem:
             timer_system: Game timer system for action scheduling
             dice_system: Dice system for combat calculations
             ui_manager: UI manager for displaying combat messages
+            game_engine: Reference to game engine for state management
         """
         self.timer_system = timer_system
         self.dice_system = dice_system
         self.ui_manager = ui_manager
+        self.game_engine = game_engine
         
         # Combat state
         self.state = CombatState.INACTIVE
@@ -150,6 +152,10 @@ class CombatSystem:
         self.enemies.clear()
         self.auto_combat_enabled = False
         self.last_combat_action = None
+        
+        # Notify game engine to reset game state
+        if self.game_engine:
+            self.game_engine.end_combat(victory)
         
         return results
         
@@ -282,13 +288,40 @@ class CombatSystem:
         if not self.is_active():
             return
             
-        for enemy_id, enemy in self.enemies.items():
-            if enemy.is_alive() and self.current_character.is_alive():
+        # Create a list copy to avoid "dictionary changed size during iteration" error
+        enemies_list = list(self.enemies.items())
+        for enemy_id, enemy in enemies_list:
+            if enemy.is_alive() and self.current_character.is_alive() and self.is_active():
                 self._execute_single_enemy_attack(enemy)
                 
     def _get_player_attacks_per_turn(self) -> int:
-        """Get number of attacks player gets per turn (to be enhanced)."""
-        # Default to 1 attack for now, will be improved with class/weapon data
+        """Get number of attacks player gets per turn based on weapon and class."""
+        if not (hasattr(self.current_character, 'equipment_system') and 
+                self.current_character.equipment_system):
+            return 1
+            
+        equipment = self.current_character.equipment_system
+        
+        # For dual-wielding classes (rogues), sum attacks from both weapons
+        if (hasattr(self.current_character, 'character_class') and 
+            self.current_character.character_class == 'rogue' and
+            hasattr(equipment, 'get_all_weapons')):
+            
+            weapons = equipment.get_all_weapons()
+            total_attacks = 0
+            for weapon in weapons:
+                if hasattr(weapon, 'attacks_per_turn'):
+                    total_attacks += weapon.attacks_per_turn
+                else:
+                    total_attacks += 1  # Default if no attacks_per_turn
+            return max(1, total_attacks)  # At least 1 attack
+        
+        # For non-dual-wielding classes, use main weapon only
+        weapon = equipment.get_equipped_weapon()
+        if weapon and hasattr(weapon, 'attacks_per_turn'):
+            return weapon.attacks_per_turn
+        
+        # Default to 1 attack for unarmed or weapons without this property
         return 1
         
     def flee_combat(self) -> bool:

@@ -54,7 +54,7 @@ class GameEngine:
         self.dice_system = DiceSystem(show_rolls=True)
         self.timer_system = TimerSystem()
         self.save_manager = SaveManager()
-        self.combat_system = CombatSystem(self.timer_system, self.dice_system, self.ui_manager)
+        self.combat_system = CombatSystem(self.timer_system, self.dice_system, self.ui_manager, self)
         
         # Enhanced systems
         self.command_parser = CommandParser(self)
@@ -1444,8 +1444,13 @@ class GameEngine:
         
         if victory:
             # Track combat victory for statistics
-            # This would be called by combat system with enemy info
-            pass
+            self.ui_manager.log_success("Combat victorious!")
+        else:
+            # Player was defeated - restore to 1 HP and show defeat message
+            if self.current_character and not self.current_character.is_alive():
+                self.current_character.current_hp = 1
+                self.ui_manager.log_error("You have been defeated and barely escape with your life!")
+                self.ui_manager.log_info("You recover consciousness with 1 hit point remaining.")
     
     def complete_game(self) -> None:
         """Complete the game and show completion screen."""
