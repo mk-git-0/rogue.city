@@ -103,8 +103,7 @@ class CombatSystem:
             enemy_names = [enemy.name for enemy in enemies]
             self.ui_manager.log_combat(f"Enemies appear: {', '.join(enemy_names)}!")
             
-        # Schedule initial enemy actions
-        self._schedule_enemy_actions()
+        # Turn-based combat - no initial scheduling needed
         
         return True
         
@@ -172,14 +171,8 @@ class CombatSystem:
         
         if self.auto_combat_enabled:
             self.ui_manager.log_system("Auto-combat enabled - attacking automatically")
-            # If we have a last action and character is ready, schedule it
-            if (self.last_combat_action and 
-                self.timer_system.is_actor_ready(self.current_character.name)):
-                self._execute_auto_combat()
         else:
             self.ui_manager.log_system("Auto-combat disabled")
-            # Cancel any pending auto-combat actions
-            self.timer_system.cancel_actor_actions(self.current_character.name)
             
         return self.auto_combat_enabled
         
@@ -226,44 +219,77 @@ class CombatSystem:
                 self.ui_manager.log_error("There are no enemies to attack.")
             return False
             
-        # Check if character can act (allow initial attack if no timer exists)
-        delay = self.timer_system.get_actor_action_delay(self.current_character.name)
-        if delay is not None and delay > 0.01:  # Small tolerance for timing
-            self.ui_manager.log_error(f"You must wait {delay:.1f} seconds before attacking again.")
-            return False
+        # Turn-based combat - no delays needed
             
-        # Create attack action
-        action = CombatAction(
-            actor_id=self.current_character.name,
-            action_type="attack",
-            target_id=target_id,
-            action_data={"target_enemy": target_enemy}
-        )
+        # Turn-based combat: Execute player turn immediately
+        self._execute_player_turn(target_name)
         
-        # Schedule the attack
-        attack_speed = self.current_character.get_attack_speed()
-        self.timer_system.schedule_action(
-            actor_id=self.current_character.name,
-            action_type="attack",
-            delay=0.1,  # Small delay for immediate execution
-            action_data={"action": action},
-            callback=self._execute_player_action
-        )
-        
-        # Store as last action for auto-combat
-        self.last_combat_action = action
-        
-        # Schedule next auto-attack if enabled
-        if self.auto_combat_enabled:
-            self.timer_system.schedule_action(
-                actor_id=self.current_character.name,
-                action_type="auto_attack",
-                delay=attack_speed,
-                action_data={"action": action},
-                callback=self._execute_auto_combat_callback
-            )
+        # Then execute enemy turn if combat is still active
+        if self.is_active():
+            self._execute_enemy_turn()
+            
+        # Auto-combat will be handled by the command parser asking for another attack
             
         return True
+        
+    def _execute_player_turn(self, target_name: str = None) -> None:
+        """Execute the player's turn with multiple attacks if applicable."""
+        if not self.is_active() or not self.current_character.is_alive():
+            return
+            
+        # Get number of attacks per turn (to be implemented)
+        num_attacks = self._get_player_attacks_per_turn()
+        
+        for attack_num in range(num_attacks):
+            if not self.is_active():  # Combat might end mid-turn
+                break
+                
+            # Find target for this attack
+            target_enemy = None
+            target_id = None
+            
+            if target_name:
+                # Look for enemy by name (allow partial matches)
+                for enemy_id, enemy in self.enemies.items():
+                    if enemy.is_alive():
+                        enemy_name = enemy.name.lower()
+                        target_lower = target_name.lower()
+                        if enemy_name == target_lower or target_lower in enemy_name or enemy_name in target_lower:
+                            target_enemy = enemy
+                            target_id = enemy_id
+                            break
+            
+            if not target_enemy:
+                # Attack first living enemy
+                for enemy_id, enemy in self.enemies.items():
+                    if enemy.is_alive():
+                        target_enemy = enemy
+                        target_id = enemy_id
+                        break
+                        
+            if not target_enemy:
+                break  # No enemies left
+                
+            # Show attack number if multiple attacks
+            if num_attacks > 1:
+                self.ui_manager.log_info(f"Attack {attack_num + 1} of {num_attacks}:")
+                
+            # Execute the attack
+            self._execute_single_player_attack(target_enemy)
+            
+    def _execute_enemy_turn(self) -> None:
+        """Execute all enemies' turns."""
+        if not self.is_active():
+            return
+            
+        for enemy_id, enemy in self.enemies.items():
+            if enemy.is_alive() and self.current_character.is_alive():
+                self._execute_single_enemy_attack(enemy)
+                
+    def _get_player_attacks_per_turn(self) -> int:
+        """Get number of attacks player gets per turn (to be enhanced)."""
+        # Default to 1 attack for now, will be improved with class/weapon data
+        return 1
         
     def flee_combat(self) -> bool:
         """
@@ -308,19 +334,6 @@ class CombatSystem:
             "living_enemies": len(living_enemies)
         }
         
-    def _schedule_enemy_actions(self) -> None:
-        """Schedule actions for all living enemies."""
-        for enemy_id, enemy in self.enemies.items():
-            if enemy.is_alive():
-                # Schedule enemy attack with their attack speed
-                attack_delay = enemy.get_attack_speed()
-                self.timer_system.schedule_action(
-                    actor_id=enemy_id,
-                    action_type="attack",
-                    delay=attack_delay,
-                    action_data={"enemy": enemy},
-                    callback=self._execute_enemy_action
-                )
                 
     def _execute_player_action(self, timed_action) -> None:
         """Execute a player combat action."""
@@ -333,9 +346,8 @@ class CombatSystem:
         if action.action_type == "attack":
             self._execute_player_attack(action)
             
-    def _execute_player_attack(self, action: CombatAction) -> None:
-        """Execute a player attack action."""
-        target_enemy = action.action_data.get("target_enemy")
+    def _execute_single_player_attack(self, target_enemy) -> None:
+        """Execute a single player attack."""
         if not target_enemy or not target_enemy.is_alive():
             return
             
@@ -348,8 +360,10 @@ class CombatSystem:
             self.current_character.equipment_system and 
             self.current_character.equipment_system.get_equipped_weapon()):
             weapon = self.current_character.equipment_system.get_equipped_weapon()
-            attack_bonus += weapon.attack_bonus
-            crit_range = weapon.crit_range
+            if hasattr(weapon, 'attack_bonus'):
+                attack_bonus += weapon.attack_bonus
+            if hasattr(weapon, 'crit_range'):
+                crit_range = weapon.crit_range
         
         # Display attack attempt  
         enemy_colored = self.ui_manager.colorize_enemy(target_enemy.name)
@@ -368,8 +382,14 @@ class CombatSystem:
                 self.current_character.equipment_system.get_equipped_weapon()):
                 # Use equipped weapon damage
                 weapon = self.current_character.equipment_system.get_equipped_weapon()
-                base_damage = weapon.damage_dice
-                weapon_bonus = weapon.damage_bonus
+                if hasattr(weapon, 'damage_dice'):
+                    base_damage = weapon.damage_dice
+                else:
+                    base_damage = "1d4"
+                if hasattr(weapon, 'damage_bonus'):
+                    weapon_bonus = weapon.damage_bonus
+                else:
+                    weapon_bonus = 0
             else:
                 # Use unarmed damage 1d4 with -2 penalty (handled later)
                 base_damage = "1d4"  # Unarmed damage
@@ -422,9 +442,8 @@ class CombatSystem:
         else:
             self.ui_manager.log_info(f"You miss the {enemy_colored}!")
             
-    def _execute_enemy_action(self, timed_action) -> None:
-        """Execute an enemy combat action."""
-        enemy = timed_action.action_data.get("enemy")
+    def _execute_single_enemy_attack(self, enemy) -> None:
+        """Execute a single enemy attack."""
         if not enemy or not enemy.is_alive() or not self.is_active():
             return
             
@@ -458,16 +477,7 @@ class CombatSystem:
         else:
             self.ui_manager.log_info(f"The {enemy_colored} misses you!")
             
-        # Schedule next enemy action if combat is still active
-        if self.is_active() and enemy.is_alive():
-            attack_delay = enemy.get_attack_speed()
-            self.timer_system.schedule_action(
-                actor_id=enemy.combat_id,
-                action_type="attack",
-                delay=attack_delay,
-                action_data={"enemy": enemy},
-                callback=self._execute_enemy_action
-            )
+        # Turn-based combat - no scheduling needed
             
     def _execute_auto_combat(self) -> None:
         """Execute auto-combat action."""
