@@ -256,9 +256,10 @@ class SimpleUIManager:
         print("A MajorMUD-style text RPG")
         print()
         print("Commands:")
-        print("  new  - Create a new character")
-        print("  load - Load an existing character")
-        print("  quit - Exit the game")
+        print("  new    - Create a new character")
+        print("  load   - Load an existing character")
+        print("  delete - Delete a saved character")
+        print("  quit   - Exit the game")
         print()
         
     def show_character_selection(self, characters: list) -> None:
@@ -285,6 +286,45 @@ class SimpleUIManager:
         print()
         print("Enter the number of the character to load:")
         print("or 'back' to return to main menu.")
+        
+    def show_character_deletion(self, characters: list) -> None:
+        """Show character deletion menu."""
+        if not characters:
+            print("\n=== DELETE CHARACTER ===")
+            print()
+            print("No saved characters found.")
+            print()
+            print("Nothing to delete.")
+            return
+            
+        print("\n=== DELETE CHARACTER ===")
+        print()
+        print("WARNING: Character deletion is permanent!")
+        print()
+        print("Saved Characters:")
+        print()
+        
+        for i, char_info in enumerate(characters, 1):
+            name = char_info['name']
+            char_class = char_info['class'].title()
+            level = char_info['level']
+            print(f"{i}. {name} the {char_class} (Level {level})")
+            
+        print()
+        print("Enter the number of the character to DELETE:")
+        print("or 'back' to return to main menu.")
+        
+    def show_deletion_confirmation(self, character_info: dict) -> None:
+        """Show deletion confirmation dialog."""
+        print("\n=== CONFIRM DELETION ===")
+        print()
+        print("You are about to PERMANENTLY DELETE:")
+        print(f"  {character_info['name']} the {character_info['class'].title()} (Level {character_info['level']})")
+        print()
+        print("This action CANNOT be undone!")
+        print()
+        print("Type 'DELETE' (all caps) to confirm deletion:")
+        print("or anything else to cancel.")
         
     def get_input(self) -> Optional[str]:
         """

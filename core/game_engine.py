@@ -25,6 +25,8 @@ class GameState(Enum):
     MENU = "menu"
     CHARACTER_CREATION = "character_creation"
     CHARACTER_SELECTION = "character_selection"
+    CHARACTER_DELETION = "character_deletion"
+    CHARACTER_DELETION_CONFIRMATION = "character_deletion_confirmation"
     PLAYING = "playing"
     PAUSED = "paused"
     COMBAT = "combat"
@@ -78,6 +80,7 @@ class GameEngine:
         self.current_character = None
         self.current_player = None  # Alias for current_character
         self.character_creation_state = None
+        self.character_deletion_state = None
         
         # Game loop timing
         self.last_frame_time = 0.0
@@ -201,6 +204,10 @@ class GameEngine:
             self._handle_character_creation_command_legacy(command)
         elif self.current_state == GameState.CHARACTER_SELECTION:
             self._handle_character_selection_command_legacy(command)
+        elif self.current_state == GameState.CHARACTER_DELETION:
+            self._handle_character_deletion_command_legacy(command)
+        elif self.current_state == GameState.CHARACTER_DELETION_CONFIRMATION:
+            self._handle_character_deletion_confirmation_command_legacy(command)
         elif self.current_state == GameState.PLAYING:
             # Use new command parser for gameplay
             continue_game = self.command_parser.parse_command(command)
@@ -230,10 +237,13 @@ class GameEngine:
         elif cmd in ['load', 'l']:
             self.current_state = GameState.CHARACTER_SELECTION
             self._show_character_selection()
+        elif cmd in ['delete', 'del', 'd']:
+            self.current_state = GameState.CHARACTER_DELETION
+            self._show_character_deletion()
         elif cmd in ['quit', 'exit', 'q']:
             self.shutdown()
         else:
-            self.ui_manager.log_info("Menu commands: new (create character), load (load character), quit")
+            self.ui_manager.log_info("Menu commands: new (create character), load (load character), delete (delete character), quit")
     
     def _handle_menu_command(self, cmd: str, args: List[str]) -> None:
         """Handle commands in menu state."""
@@ -480,6 +490,61 @@ class GameEngine:
                 
         except ValueError:
             self.ui_manager.log_error("Enter a number to select a character, or 'back' to return to menu.")
+    
+    def _handle_character_deletion_command_legacy(self, command: str) -> None:
+        """Handle commands during character deletion (legacy method)."""
+        parts = command.lower().strip().split()
+        if not parts:
+            return
+        cmd = parts[0]
+        
+        if cmd in ['quit', 'exit', 'q', 'back']:
+            self.current_state = GameState.MENU
+            self._show_main_menu()
+            return
+            
+        # Try to parse as character deletion number
+        try:
+            choice = int(cmd)
+            saved_characters = self.save_manager.list_saved_characters()
+            
+            if 1 <= choice <= len(saved_characters):
+                character_info = saved_characters[choice - 1]
+                
+                # Store character info for confirmation
+                self.character_deletion_state = character_info
+                self.current_state = GameState.CHARACTER_DELETION_CONFIRMATION
+                self.ui_manager.show_deletion_confirmation(character_info)
+            else:
+                self.ui_manager.log_error("Invalid selection. Enter a number from the list.")
+                
+        except ValueError:
+            self.ui_manager.log_error("Enter a number to select a character to delete, or 'back' to return to menu.")
+    
+    def _handle_character_deletion_confirmation_command_legacy(self, command: str) -> None:
+        """Handle commands during deletion confirmation (legacy method)."""
+        command = command.strip()
+        
+        if command == "DELETE":
+            # Perform the deletion
+            character_info = self.character_deletion_state
+            character_name = character_info['name']
+            
+            if self.save_manager.delete_character(character_name):
+                self.ui_manager.log_success(f"Character '{character_name}' has been permanently deleted.")
+            else:
+                self.ui_manager.log_error(f"Failed to delete character '{character_name}'.")
+                
+            # Reset state and return to menu
+            self.character_deletion_state = None
+            self.current_state = GameState.MENU
+            self._show_main_menu()
+        else:
+            # Any other input cancels the deletion
+            self.ui_manager.log_info("Character deletion cancelled.")
+            self.character_deletion_state = None
+            self.current_state = GameState.MENU
+            self._show_main_menu()
             
     # Character Creation Implementation Methods
     
@@ -693,6 +758,14 @@ class GameEngine:
         
         if not saved_characters:
             self.ui_manager.log_info("No characters to load. Type 'back' to return to menu.")
+    
+    def _show_character_deletion(self) -> None:
+        """Show character deletion interface."""
+        saved_characters = self.save_manager.list_saved_characters()
+        self.ui_manager.show_character_deletion(saved_characters)
+        
+        if not saved_characters:
+            self.ui_manager.log_info("No characters to delete. Type 'back' to return to menu.")
             
     def _show_help(self) -> None:
         """Show available commands using help system."""
