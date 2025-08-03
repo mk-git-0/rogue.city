@@ -18,6 +18,7 @@ from .tutorial_system import TutorialSystem
 from .command_parser import CommandParser
 from .help_system import HelpSystem
 from .game_completion import GameCompletion
+from .alignment_system import Alignment, AlignmentSystem
 
 
 class GameState(Enum):
@@ -62,6 +63,7 @@ class GameEngine:
         self.command_parser = CommandParser(self)
         self.help_system = HelpSystem(self.ui_manager)
         self.game_completion = GameCompletion(self)
+        self.alignment_system = AlignmentSystem()
         
         # Reference for systems
         self.ui = self.ui_manager  # Convenience reference
@@ -363,6 +365,10 @@ class GameEngine:
             self._handle_race_selection(cmd, args)
         elif step == 'race_confirmation':
             self._handle_race_confirmation(cmd, args)
+        elif step == 'alignment_selection':
+            self._handle_alignment_selection(cmd, args)
+        elif step == 'alignment_confirmation':
+            self._handle_alignment_confirmation(cmd, args)
         elif step == 'class_selection':
             self._handle_class_selection(cmd, args)
         elif step == 'class_confirmation':
@@ -393,6 +399,10 @@ class GameEngine:
             self._handle_race_selection(cmd, args)
         elif step == 'race_confirmation':
             self._handle_race_confirmation(cmd, args)
+        elif step == 'alignment_selection':
+            self._handle_alignment_selection(cmd, args)
+        elif step == 'alignment_confirmation':
+            self._handle_alignment_confirmation(cmd, args)
         elif step == 'class_selection':
             self._handle_class_selection(cmd, args)
         elif step == 'class_confirmation':
@@ -664,13 +674,144 @@ class GameEngine:
     def _handle_race_confirmation(self, cmd: str, args: List[str]) -> None:
         """Handle race confirmation input."""
         if cmd.lower() in ['y', 'yes']:
-            # Confirmed race selection, move to class selection
-            self.character_creation_state['step'] = 'class_selection'
-            self._show_class_selection()
+            # Confirmed race selection, move to alignment selection
+            self.character_creation_state['step'] = 'alignment_selection'
+            self._show_alignment_selection()
         elif cmd.lower() in ['n', 'no']:
             # Go back to race selection
             self.character_creation_state['step'] = 'race_selection'
             self._show_race_selection()
+        else:
+            self.ui_manager.log_error("Enter 'y' for yes or 'n' for no.")
+        
+    def _show_alignment_selection(self) -> None:
+        """Show alignment selection interface."""
+        selected_race = self.character_creation_state.get('selected_race')
+        
+        self.ui_manager.log_system("\n" + "="*50)
+        self.ui_manager.log_system("=== CHARACTER ALIGNMENT SELECTION ===")
+        self.ui_manager.log_system("="*50)
+        self.ui_manager.log_system("")
+        self.ui_manager.log_system("Your character's moral outlook shapes their entire adventure.")
+        self.ui_manager.log_system("Choose your alignment carefully - it affects abilities, equipment, and NPC reactions.")
+        self.ui_manager.log_system("")
+        
+        # Load alignment data
+        alignment_data = self.alignment_system.alignment_data
+        
+        # Display alignment options
+        alignments = ['good', 'neutral', 'evil']
+        alignment_displays = {
+            'good': 'GOOD - "Protector of the Innocent"',
+            'neutral': 'NEUTRAL - "Seeker of Balance"',
+            'evil': 'EVIL - "Pursuer of Power"'
+        }
+        
+        for i, alignment_key in enumerate(alignments, 1):
+            data = alignment_data.get(alignment_key, {})
+            philosophy = data.get('philosophy', 'Unknown philosophy')
+            benefits = data.get('benefits', [])
+            restrictions = data.get('restrictions', [])
+            
+            self.ui_manager.log_system(f"{i}. {alignment_displays[alignment_key]}")
+            self.ui_manager.log_system(f"   Philosophy: {philosophy}")
+            self.ui_manager.log_system(f"   Benefits: {', '.join([b.get('name', b) if isinstance(b, dict) else str(b) for b in benefits[:3]])}")
+            self.ui_manager.log_system(f"   Restrictions: {', '.join([r.get('name', r) if isinstance(r, dict) else str(r) for r in restrictions[:2]])}")
+            self.ui_manager.log_system("")
+        
+        # Show race compatibility note
+        if selected_race:
+            race_suggestions = {
+                'dark_elf': 'Recommended: Neutral or Evil (Dark-Elves rarely choose Good)',
+                'elf': 'Recommended: Good or Neutral (Elves tend toward good)',
+                'half_ogre': 'Recommended: Neutral or Evil (Half-Ogres value strength)',
+                'goblin': 'Recommended: Neutral or Evil (Goblins are naturally cunning)',
+                'gaunt_one': 'Recommended: Any alignment (Gaunt Ones are mysterious)',
+                'human': 'Recommended: Any alignment (Humans are versatile)'
+            }
+            suggestion = race_suggestions.get(selected_race, 'Any alignment is suitable')
+            race_name = selected_race.replace('_', '-').title()
+            self.ui_manager.log_system(f"Current Character: {race_name}")
+            self.ui_manager.log_system(f"{suggestion}")
+            self.ui_manager.log_system("")
+        
+        self.ui_manager.log_system("Enter choice (1-3): ")
+        
+        # Store alignment list for processing input
+        self.character_creation_state['alignment_list'] = alignments
+        
+    def _handle_alignment_selection(self, cmd: str, args: List[str]) -> None:
+        """Handle alignment selection input."""
+        try:
+            choice = int(cmd)
+            alignment_list = self.character_creation_state.get('alignment_list', [])
+            
+            if 1 <= choice <= len(alignment_list):
+                selected_alignment_key = alignment_list[choice - 1]
+                alignment_enum = {
+                    'good': Alignment.GOOD,
+                    'neutral': Alignment.NEUTRAL,
+                    'evil': Alignment.EVIL
+                }.get(selected_alignment_key, Alignment.NEUTRAL)
+                
+                # Show alignment confirmation
+                self._show_alignment_confirmation(selected_alignment_key, alignment_enum)
+                self.character_creation_state['selected_alignment'] = alignment_enum
+                self.character_creation_state['step'] = 'alignment_confirmation'
+                
+            else:
+                self.ui_manager.log_error(f"Invalid choice. Enter a number 1-{len(alignment_list)}.")
+                
+        except ValueError:
+            alignment_list = self.character_creation_state.get('alignment_list', [])
+            self.ui_manager.log_error(f"Enter a number 1-{len(alignment_list)} to select an alignment.")
+    
+    def _show_alignment_confirmation(self, alignment_key: str, alignment_enum: Alignment) -> None:
+        """Show alignment confirmation with detailed information."""
+        alignment_data = self.alignment_system.alignment_data.get(alignment_key, {})
+        
+        name = alignment_data.get('name', alignment_key.title())
+        display_name = alignment_data.get('display_name', name)
+        philosophy = alignment_data.get('philosophy', 'Unknown philosophy')
+        benefits = alignment_data.get('benefits', [])
+        restrictions = alignment_data.get('restrictions', [])
+        
+        self.ui_manager.log_system(f"\nSelected: {name} Alignment")
+        self.ui_manager.log_system(f'"{philosophy}"')
+        self.ui_manager.log_system("")
+        self.ui_manager.log_system("This alignment will:")
+        
+        # Show benefits
+        for benefit in benefits[:4]:  # Show first 4 benefits
+            if isinstance(benefit, dict):
+                name_text = benefit.get('name', 'Unknown')
+                desc_text = benefit.get('description', '')
+                self.ui_manager.log_system(f"+ {name_text}: {desc_text}")
+            else:
+                self.ui_manager.log_system(f"+ {benefit}")
+        
+        # Show restrictions
+        for restriction in restrictions[:3]:  # Show first 3 restrictions
+            if isinstance(restriction, dict):
+                name_text = restriction.get('name', 'Unknown')
+                desc_text = restriction.get('description', '')
+                self.ui_manager.log_system(f"- {name_text}: {desc_text}")
+            else:
+                self.ui_manager.log_system(f"- {restriction}")
+        
+        self.ui_manager.log_system("")
+        self.ui_manager.log_system(f"Confirm {name} alignment? (y/n): ")
+    
+    def _handle_alignment_confirmation(self, cmd: str, args: List[str]) -> None:
+        """Handle alignment confirmation input."""
+        if cmd.lower() in ['y', 'yes']:
+            # Confirmed alignment selection, move to class selection
+            self.character_creation_state['step'] = 'class_selection'
+            self._show_class_selection()
+        elif cmd.lower() in ['n', 'no']:
+            # Go back to alignment selection
+            self.character_creation_state['step'] = 'alignment_selection'
+            self._show_alignment_selection()
         else:
             self.ui_manager.log_error("Enter 'y' for yes or 'n' for no.")
         
@@ -749,9 +890,10 @@ class GameEngine:
             # Create character instance and apply class modifiers
             selected_class = self.character_creation_state['selected_class']
             selected_race = self.character_creation_state['selected_race']
+            selected_alignment = self.character_creation_state['selected_alignment']
             character_name = self.character_creation_state['character_name']
             
-            character = self._create_character_instance(character_name, selected_class, selected_race)
+            character = self._create_character_instance(character_name, selected_class, selected_race, selected_alignment)
             
             # Apply class modifiers
             class_data = self.save_manager.load_class_definitions()
@@ -820,20 +962,20 @@ class GameEngine:
             else:
                 self.ui_manager.log_error("Invalid stat name. Use: str, dex, con, int, wis, cha")
                 
-    def _create_character_instance(self, name: str, class_type: str, race_id: str = "human"):
+    def _create_character_instance(self, name: str, class_type: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
         """Create appropriate character class instance."""
         if class_type == 'rogue':
             from characters.class_rogue import Rogue
-            return Rogue(name, race_id)
+            return Rogue(name, race_id, alignment)
         elif class_type == 'knight':
             from characters.class_knight import Knight
-            return Knight(name, race_id)
+            return Knight(name, race_id, alignment)
         elif class_type == 'mage':
             from characters.class_mage import Mage
-            return Mage(name, race_id)
+            return Mage(name, race_id, alignment)
         elif class_type == 'mystic':
             from characters.class_mystic import Mystic
-            return Mystic(name, race_id)
+            return Mystic(name, race_id, alignment)
         else:
             raise ValueError(f"Unknown class type: {class_type}")
             

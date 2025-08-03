@@ -4,6 +4,7 @@ High difficulty class focused on dexterity, critical strikes, and skill.
 """
 
 from .base_character import BaseCharacter
+from core.alignment_system import Alignment
 from typing import Dict, Any
 
 
@@ -18,9 +19,9 @@ class Rogue(BaseCharacter):
     Critical Range: 19-20 (improved critical chance)
     """
     
-    def __init__(self, name: str, race_id: str = "human"):
+    def __init__(self, name: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
         """Initialize Rogue character"""
-        super().__init__(name, 'rogue', race_id)
+        super().__init__(name, 'rogue', race_id, alignment)
         
     def get_hit_die_value(self) -> int:
         """Rogues use d6 hit die (average 6 HP per level)"""
@@ -78,7 +79,14 @@ class Rogue(BaseCharacter):
     def from_dict(cls, data: Dict[str, Any]) -> 'Rogue':
         """Create Rogue from save data"""
         race_id = data.get('race_id', 'human')
-        rogue = cls(data['character_name'], race_id)
+        
+        # Load alignment from save data or default to neutral
+        alignment = Alignment.NEUTRAL
+        if 'alignment_data' in data:
+            alignment_name = data['alignment_data'].get('alignment', 'NEUTRAL')
+            alignment = getattr(Alignment, alignment_name, Alignment.NEUTRAL)
+        
+        rogue = cls(data['character_name'], race_id, alignment)
         
         # Restore basic character data
         rogue.level = data['level']
@@ -110,6 +118,10 @@ class Rogue(BaseCharacter):
         # Restore character creation state
         rogue.unallocated_stats = data.get('unallocated_stats', 0)
         rogue.creation_complete = data.get('creation_complete', True)
+        
+        # Load alignment data
+        if 'alignment_data' in data:
+            rogue.load_alignment_data(data['alignment_data'])
         
         return rogue
         

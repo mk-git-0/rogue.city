@@ -4,6 +4,7 @@ High difficulty spellcaster class with mana system and powerful magic.
 """
 
 from .base_character import BaseCharacter
+from core.alignment_system import Alignment
 from typing import Dict, Any
 
 
@@ -19,12 +20,12 @@ class Mage(BaseCharacter):
     Special: Mana system for spellcasting
     """
     
-    def __init__(self, name: str, race_id: str = "human"):
+    def __init__(self, name: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
         """Initialize Mage character"""
         # Initialize mana attributes before calling parent __init__
         self.max_mana = 0
         self.current_mana = 0
-        super().__init__(name, 'mage', race_id)
+        super().__init__(name, 'mage', race_id, alignment)
         
     def get_hit_die_value(self) -> int:
         """Mages use d4 hit die (lowest HP per level)"""
@@ -137,7 +138,14 @@ class Mage(BaseCharacter):
     def from_dict(cls, data: Dict[str, Any]) -> 'Mage':
         """Create Mage from save data"""
         race_id = data.get('race_id', 'human')
-        mage = cls(data['character_name'], race_id)
+        
+        # Load alignment from save data or default to neutral
+        alignment = Alignment.NEUTRAL
+        if 'alignment_data' in data:
+            alignment_name = data['alignment_data'].get('alignment', 'NEUTRAL')
+            alignment = getattr(Alignment, alignment_name, Alignment.NEUTRAL)
+        
+        mage = cls(data['character_name'], race_id, alignment)
         
         # Restore basic character data
         mage.level = data['level']
@@ -177,6 +185,10 @@ class Mage(BaseCharacter):
         else:
             # Recalculate mana if not in save data
             mage.calculate_derived_stats()
+        
+        # Load alignment data
+        if 'alignment_data' in data:
+            mage.load_alignment_data(data['alignment_data'])
             
         return mage
         

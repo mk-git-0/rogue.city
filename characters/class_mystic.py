@@ -4,6 +4,7 @@ Moderate difficulty balanced class focused on dexterity, wisdom, and evasion.
 """
 
 from .base_character import BaseCharacter
+from core.alignment_system import Alignment
 from typing import Dict, Any
 
 
@@ -19,9 +20,9 @@ class Mystic(BaseCharacter):
     Special: 15% base evasion chance
     """
     
-    def __init__(self, name: str, race_id: str = "human"):
+    def __init__(self, name: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
         """Initialize Mystic character"""
-        super().__init__(name, 'mystic', race_id)
+        super().__init__(name, 'mystic', race_id, alignment)
         
     def get_hit_die_value(self) -> int:
         """Mystics use d8 hit die (moderate HP per level)"""
@@ -137,7 +138,14 @@ class Mystic(BaseCharacter):
     def from_dict(cls, data: Dict[str, Any]) -> 'Mystic':
         """Create Mystic from save data"""
         race_id = data.get('race_id', 'human')
-        mystic = cls(data['character_name'], race_id)
+        
+        # Load alignment from save data or default to neutral
+        alignment = Alignment.NEUTRAL
+        if 'alignment_data' in data:
+            alignment_name = data['alignment_data'].get('alignment', 'NEUTRAL')
+            alignment = getattr(Alignment, alignment_name, Alignment.NEUTRAL)
+        
+        mystic = cls(data['character_name'], race_id, alignment)
         
         # Restore basic character data
         mystic.level = data['level']
@@ -169,6 +177,10 @@ class Mystic(BaseCharacter):
         # Restore character creation state
         mystic.unallocated_stats = data.get('unallocated_stats', 0)
         mystic.creation_complete = data.get('creation_complete', True)
+        
+        # Load alignment data
+        if 'alignment_data' in data:
+            mystic.load_alignment_data(data['alignment_data'])
         
         return mystic
         

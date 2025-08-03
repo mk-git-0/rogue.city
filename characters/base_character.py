@@ -6,19 +6,25 @@ Abstract base class providing core character functionality.
 from typing import Dict, List, Optional, Any
 from abc import ABC, abstractmethod
 import time
+from core.alignment_system import Alignment
+from characters.alignment_manager import AlignmentManager
 
 
 class BaseCharacter(ABC):
     """Base class for all character types with core functionality"""
     
-    def __init__(self, name: str, character_class: str, race_id: str = "human"):
-        """Initialize base character with name, class, and race"""
+    def __init__(self, name: str, character_class: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
+        """Initialize base character with name, class, race, and alignment"""
         self.name = name
         self.character_class = character_class
         self.race_id = race_id
         self.race = None
         self.level = 1  # Start at level 1
         self.experience = 0
+        
+        # Initialize alignment system
+        self.alignment_manager = AlignmentManager(alignment)
+        self.alignment_manager.character_name = name  # For reputation tracking
         
         # Initialize race
         self._initialize_race()
@@ -342,6 +348,89 @@ class BaseCharacter(ABC):
         if self.race:
             return self.race.get_display_info()
         return "Unknown Race"
+    
+    def get_alignment(self) -> Alignment:
+        """Get character's current alignment"""
+        return self.alignment_manager.get_alignment()
+    
+    def set_alignment(self, new_alignment: Alignment) -> bool:
+        """Set character alignment (usually for character creation)"""
+        return self.alignment_manager.set_alignment(new_alignment)
+    
+    def get_alignment_display(self) -> str:
+        """Get formatted alignment information"""
+        return self.alignment_manager.get_alignment_display()
+    
+    def get_reputation(self, faction: str) -> int:
+        """Get reputation with a specific faction"""
+        return self.alignment_manager.get_reputation(faction)
+    
+    def modify_reputation(self, faction: str, change: int) -> int:
+        """Modify reputation with a faction"""
+        return self.alignment_manager.modify_reputation(faction, change)
+    
+    def can_use_item_alignment(self, item_alignment: Optional[str]) -> tuple[bool, str]:
+        """Check if character can use an item based on alignment"""
+        return self.alignment_manager.can_use_item(item_alignment)
+    
+    def get_npc_reaction_modifier(self, npc_alignment: Alignment) -> int:
+        """Get reaction modifier when interacting with an NPC"""
+        return self.alignment_manager.get_npc_reaction_modifier(npc_alignment)
+    
+    def add_alignment_drift(self, action_type: str) -> bool:
+        """Add alignment drift based on character actions"""
+        return self.alignment_manager.add_alignment_drift(action_type)
+    
+    def get_alignment_bonuses(self) -> Dict[str, int]:
+        """Get stat bonuses from current alignment"""
+        return self.alignment_manager.get_alignment_bonuses()
+    
+    def load_alignment_data(self, alignment_data: Dict):
+        """Load alignment data from save file"""
+        if alignment_data:
+            self.alignment_manager = AlignmentManager.load_from_dict(alignment_data)
+            self.alignment_manager.character_name = self.name
+        else:
+            # Default to neutral alignment for legacy characters
+            self.alignment_manager = AlignmentManager(Alignment.NEUTRAL)
+            self.alignment_manager.character_name = self.name
+    
+    def get_character_display(self) -> str:
+        """Get detailed character information for display"""
+        lines = []
+        
+        # Header
+        race_name = self.race.name if self.race else "Unknown"
+        alignment_display = self.alignment_manager.get_alignment_display()
+        lines.append(f"=== {self.name.upper()} THE {race_name.upper()} {self.character_class.upper()} ===")
+        lines.append(f"Race: {race_name}      Alignment: {alignment_display.split(' - ')[0]}")
+        lines.append(f"Level: {self.level}           Experience: {self.experience}/{self.calculate_required_experience()}")
+        lines.append(f"HP: {self.current_hp}/{self.max_hp}          AC: {self.armor_class}")
+        lines.append("")
+        
+        # Reputation section
+        lines.append("Reputation:")
+        reputation_lines = self.alignment_manager.get_reputation_display()
+        lines.extend(reputation_lines)
+        lines.append("")
+        
+        # Stats
+        lines.append("STR: {0:2d}  DEX: {1:2d}  CON: {2:2d}  INT: {3:2d}  WIS: {4:2d}  CHA: {5:2d}".format(
+            self.stats['strength'], self.stats['dexterity'], self.stats['constitution'],
+            self.stats['intelligence'], self.stats['wisdom'], self.stats['charisma']
+        ))
+        
+        # Alignment bonuses
+        alignment_bonuses = self.get_alignment_bonuses()
+        if alignment_bonuses:
+            bonus_descriptions = []
+            for bonus_type, value in alignment_bonuses.items():
+                if value > 0:
+                    bonus_descriptions.append(f"+{value} {bonus_type.replace('_', ' ')}")
+            if bonus_descriptions:
+                lines.append(f"Alignment Bonuses: {', '.join(bonus_descriptions)}")
+        
+        return "\n".join(lines)
         
     def to_dict(self) -> Dict[str, Any]:
         """Serialize character for saving to JSON"""
@@ -365,6 +454,7 @@ class BaseCharacter(ABC):
             },
             'unallocated_stats': self.unallocated_stats,
             'creation_complete': self.creation_complete,
+            'alignment_data': self.alignment_manager.save_to_dict(),
             'save_timestamp': time.time()
         }
         

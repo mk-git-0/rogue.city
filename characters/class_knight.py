@@ -4,6 +4,7 @@ Low difficulty tank class focused on strength, constitution, and survivability.
 """
 
 from .base_character import BaseCharacter
+from core.alignment_system import Alignment
 from typing import Dict, Any
 
 
@@ -18,9 +19,9 @@ class Knight(BaseCharacter):
     Critical Range: 20 (standard critical chance)
     """
     
-    def __init__(self, name: str, race_id: str = "human"):
+    def __init__(self, name: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
         """Initialize Knight character"""
-        super().__init__(name, 'knight', race_id)
+        super().__init__(name, 'knight', race_id, alignment)
         
     def get_hit_die_value(self) -> int:
         """Knights use d10 hit die (highest HP per level)"""
@@ -94,7 +95,14 @@ class Knight(BaseCharacter):
     def from_dict(cls, data: Dict[str, Any]) -> 'Knight':
         """Create Knight from save data"""
         race_id = data.get('race_id', 'human')
-        knight = cls(data['character_name'], race_id)
+        
+        # Load alignment from save data or default to neutral
+        alignment = Alignment.NEUTRAL
+        if 'alignment_data' in data:
+            alignment_name = data['alignment_data'].get('alignment', 'NEUTRAL')
+            alignment = getattr(Alignment, alignment_name, Alignment.NEUTRAL)
+        
+        knight = cls(data['character_name'], race_id, alignment)
         
         # Restore basic character data
         knight.level = data['level']
@@ -126,6 +134,10 @@ class Knight(BaseCharacter):
         # Restore character creation state
         knight.unallocated_stats = data.get('unallocated_stats', 0)
         knight.creation_complete = data.get('creation_complete', True)
+        
+        # Load alignment data
+        if 'alignment_data' in data:
+            knight.load_alignment_data(data['alignment_data'])
         
         return knight
         

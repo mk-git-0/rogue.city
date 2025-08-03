@@ -1,0 +1,292 @@
+{
+  "good": {
+    "name": "Good",
+    "display_name": "Protector of the Innocent",
+    "philosophy": "Uphold justice, protect the weak, fight against evil",
+    "description": "Good characters are driven by a desire to help others and fight against injustice. They believe in protecting the innocent and upholding moral principles, even at personal cost.",
+    "benefits": [
+      {
+        "name": "Holy Weapon Access",
+        "description": "Can use blessed and holy weapons that deal extra damage to evil creatures"
+      },
+      {
+        "name": "Enhanced Healing",
+        "description": "+10% effectiveness on all healing spells and abilities"
+      },
+      {
+        "name": "Turn Undead",
+        "description": "Ability to turn or destroy undead creatures through divine power"
+      },
+      {
+        "name": "Damage vs Evil",
+        "description": "+1 damage bonus when fighting evil-aligned creatures"
+      },
+      {
+        "name": "Divine Protection",
+        "description": "Resistance to fear effects and evil-based attacks"
+      }
+    ],
+    "restrictions": [
+      {
+        "name": "No Evil Items",
+        "description": "Cannot equip cursed, evil, or necromantic items"
+      },
+      {
+        "name": "Protect Innocents",
+        "description": "Cannot harm innocent NPCs or allow them to be harmed without consequence"
+      },
+      {
+        "name": "Honor Code",
+        "description": "Must keep promises and cannot use underhanded tactics"
+      }
+    ],
+    "starting_bonuses": {
+      "healing_effectiveness": 10,
+      "turn_undead_bonus": 2,
+      "damage_vs_evil": 1,
+      "divine_resistance": 5
+    },
+    "npc_reactions": {
+      "good_npcs": 2,
+      "neutral_npcs": 0,
+      "evil_npcs": -2
+    },
+    "faction_standing": {
+      "good_faction": 10,
+      "town_guards": 15,
+      "priests": 20,
+      "merchants": 5,
+      "scholars": 5,
+      "evil_faction": -10,
+      "thieves_guild": -15,
+      "necromancers": -20
+    }
+  },
+  "neutral": {
+    "name": "Neutral",
+    "display_name": "Seeker of Balance",
+    "philosophy": "Pragmatic approach, balance in all things",
+    "description": "Neutral characters seek balance and take a pragmatic approach to problems. They are not bound by rigid moral codes but act according to circumstance and personal benefit.",
+    "benefits": [
+      {
+        "name": "Equipment Versatility",
+        "description": "Can use most magical items without alignment restrictions"
+      },
+      {
+        "name": "Skill Progression",
+        "description": "+5% bonus to all skill advancement rates"
+      },
+      {
+        "name": "Diplomatic Immunity",
+        "description": "Neutral stance in conflicts, accepted by most factions"
+      },
+      {
+        "name": "Balanced Magic",
+        "description": "Access to both beneficial and harmful spells without restriction"
+      },
+      {
+        "name": "Adaptability",
+        "description": "Versatility bonus when using different equipment types"
+      }
+    ],
+    "restrictions": [
+      {
+        "name": "Limited Extremes",
+        "description": "Some restrictions on the most powerful good or evil items"
+      },
+      {
+        "name": "No Zealotry",
+        "description": "Cannot take extreme moral stances that would shift alignment"
+      }
+    ],
+    "starting_bonuses": {
+      "skill_progression": 5,
+      "diplomatic_bonus": 2,
+      "versatility_bonus": 1,
+      "magic_balance": 3
+    },
+    "npc_reactions": {
+      "good_npcs": 0,
+      "neutral_npcs": 1,
+      "evil_npcs": 0
+    },
+    "faction_standing": {
+      "good_faction": 0,
+      "neutral_faction": 10,
+      "evil_faction": 0,
+      "town_guards": 0,
+      "merchants": 10,
+      "scholars": 15,
+      "priests": 0,
+      "thieves_guild": 0,
+      "necromancers": 0
+    }
+  },
+  "evil": {
+    "name": "Evil",
+    "display_name": "Pursuer of Power",
+    "philosophy": "Achieve goals by any means, power through strength",
+    "description": "Evil characters are driven by personal ambition and the pursuit of power. They are willing to use any means necessary to achieve their goals, including harming others for personal gain.",
+    "benefits": [
+      {
+        "name": "Dark Weapon Access",
+        "description": "Can wield cursed and necromantic weapons with enhanced power"
+      },
+      {
+        "name": "Necromantic Magic",
+        "description": "Access to dark magic schools including necromancy and curses"
+      },
+      {
+        "name": "Intimidation Mastery",
+        "description": "+2 bonus to intimidation and fear-based abilities"
+      },
+      {
+        "name": "Damage vs Good",
+        "description": "+1 damage bonus when fighting good-aligned creatures"
+      },
+      {
+        "name": "Dark Resilience",
+        "description": "Resistance to good-based attacks and turning attempts"
+      }
+    ],
+    "restrictions": [
+      {
+        "name": "No Holy Items",
+        "description": "Cannot equip blessed, holy, or divine items"
+      },
+      {
+        "name": "Selfish Nature",
+        "description": "Cannot cast beneficial spells on good-aligned characters"
+      },
+      {
+        "name": "Reputation Cost",
+        "description": "Actions are viewed with suspicion by good and neutral NPCs"
+      }
+    ],
+    "starting_bonuses": {
+      "damage_vs_good": 1,
+      "intimidation_bonus": 2,
+      "necromantic_power": 10,
+      "dark_resistance": 5
+    },
+    "npc_reactions": {
+      "good_npcs": -2,
+      "neutral_npcs": -1,
+      "evil_npcs": 2
+    },
+    "faction_standing": {
+      "evil_faction": 10,
+      "thieves_guild": 15,
+      "necromancers": 20,
+      "merchants": -5,
+      "scholars": -5,
+      "good_faction": -10,
+      "town_guards": -15,
+      "priests": -20
+    }
+  },
+  "alignment_interactions": {
+    "same_alignment": {
+      "reaction_modifier": 2,
+      "description": "Characters of the same alignment generally trust and support each other"
+    },
+    "opposed_alignment": {
+      "pairs": [["good", "evil"]],
+      "reaction_modifier": -2,
+      "description": "Good and Evil alignments are fundamentally opposed and distrust each other"
+    },
+    "neutral_interactions": {
+      "good_to_neutral": 0,
+      "evil_to_neutral": 0,
+      "description": "Neutral alignment serves as a bridge between good and evil"
+    }
+  },
+  "alignment_drift": {
+    "description": "Character actions can gradually shift alignment over time",
+    "drift_actions": {
+      "help_innocent": {
+        "good_points": 2,
+        "evil_points": -1,
+        "description": "Helping innocent people pushes toward good alignment"
+      },
+      "kill_innocent": {
+        "evil_points": 3,
+        "good_points": -2,
+        "description": "Harming innocents pushes strongly toward evil"
+      },
+      "donate_charity": {
+        "good_points": 1,
+        "neutral_points": 1,
+        "description": "Charitable acts support good and neutral alignments"
+      },
+      "steal_from_poor": {
+        "evil_points": 2,
+        "good_points": -1,
+        "description": "Stealing from the needy is considered evil"
+      },
+      "negotiate_peace": {
+        "neutral_points": 2,
+        "good_points": 1,
+        "evil_points": -1,
+        "description": "Peaceful solutions support neutral and good alignments"
+      },
+      "murder_for_gain": {
+        "evil_points": 3,
+        "good_points": -2,
+        "description": "Killing for personal benefit is a strong evil act"
+      },
+      "protect_weak": {
+        "good_points": 2,
+        "neutral_points": 1,
+        "description": "Protecting the defenseless is considered good"
+      }
+    },
+    "drift_threshold": 20,
+    "description_threshold": "Characters need 20+ drift points to change alignment"
+  },
+  "equipment_restrictions": {
+    "holy_items": {
+      "allowed_alignments": ["good", "neutral"],
+      "evil_restriction": "This holy item burns your evil hands!",
+      "examples": ["blessed weapons", "holy symbols", "divine armor"]
+    },
+    "cursed_items": {
+      "allowed_alignments": ["evil", "neutral"],
+      "good_restriction": "You cannot bring yourself to wield this cursed weapon!",
+      "examples": ["cursed weapons", "necromantic items", "dark artifacts"]
+    },
+    "neutral_items": {
+      "allowed_alignments": ["good", "neutral", "evil"],
+      "description": "Most standard equipment can be used by any alignment"
+    }
+  },
+  "reputation_system": {
+    "reputation_ranges": {
+      "revered": 80,
+      "honored": 60,
+      "respected": 40,
+      "liked": 20,
+      "accepted": 10,
+      "neutral": 0,
+      "disliked": -10,
+      "distrusted": -20,
+      "despised": -40,
+      "hated": -60
+    },
+    "reputation_effects": {
+      "trading": {
+        "revered": 0.7,
+        "honored": 0.8,
+        "respected": 0.9,
+        "liked": 0.95,
+        "accepted": 1.0,
+        "neutral": 1.0,
+        "disliked": 1.1,
+        "distrusted": 1.2,
+        "despised": 1.5,
+        "hated": 2.0
+      },
+      "description": "Reputation affects prices, quest availability, and NPC interactions"
+    }
+  }
+}
