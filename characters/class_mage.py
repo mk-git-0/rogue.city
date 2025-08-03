@@ -1,31 +1,69 @@
 """
 Mage Character Class for Rogue City
-High difficulty spellcaster class with mana system and powerful magic.
+Traditional MajorMUD spellcaster with extensive spell arsenal and mana system.
+Glass cannon design requiring strategic resource management.
 """
 
 from .base_character import BaseCharacter
 from core.alignment_system import Alignment
-from typing import Dict, Any
+from typing import Dict, Any, List, Tuple
 
 
 class Mage(BaseCharacter):
     """
-    Mage class - Wielders of arcane power with devastating magical abilities
+    Mage class - Traditional spellcaster with extensive magical arsenal
     
-    Difficulty: 9 (High)
+    GLASS CANNON CLASS - High damage, complex resource management
+    
+    Difficulty: 9 (High) - Complex spellcasting and resource management
     Stat Modifiers: +3 INT, +2 WIS, -2 STR, -3 CON
-    Hit Die: d4
-    Attack Speed: 6.0 seconds (slow fire bolt casting)
+    Hit Die: d4 (Lowest HP per level)
+    Attack Speed: 6.0 seconds (staff/spell casting)
     Critical Range: 20 (standard critical chance)
-    Special: Mana system for spellcasting
+    
+    SPELL SYSTEM:
+    - Mana Pool: Based on INT and WIS modifiers
+    - Spell Schools: Combat, Protection, Utility magic
+    - Spell Learning: Gain new spells at odd levels
+    - Spell Power: Bonus damage/healing from INT
+    - Mana Regeneration: Enhanced natural recovery
+    
+    MAGICAL ABILITIES:
+    - Spell Mastery: Access to all mage spells
+    - Spell Critical: 20% chance for double effect
+    - Elemental Resistance: Fire/Cold/Lightning +1
+    - Magical Research: Learn spells faster
+    - Arcane Knowledge: Detect magic, identify items
+    
+    EQUIPMENT RESTRICTIONS:
+    - Weapons: Staves and daggers only
+    - Armor: Robes only (cloth armor)
+    - Focus: Must have spellcasting focus
+    - Physical Combat: Penalties due to frailty
     """
     
     def __init__(self, name: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
-        """Initialize Mage character"""
+        """Initialize Mage character with spell and mana systems"""
         # Initialize mana attributes before calling parent __init__
         self.max_mana = 0
         self.current_mana = 0
         super().__init__(name, 'mage', race_id, alignment)
+        
+        # Spell system attributes
+        self.known_spells = self._get_starting_spells()
+        self.spell_slots_used = {}  # Track spell usage per day
+        self.spell_critical_chance = 20  # 20% chance for spell crits
+        
+        # Elemental resistances
+        self.elemental_resistances = {
+            'fire': 1,
+            'cold': 1,
+            'lightning': 1
+        }
+        
+        # Spellcasting focus tracking
+        self.has_spellcasting_focus = False
+        self.spell_failure_chance = 0
         
     def get_hit_die_value(self) -> int:
         """Mages use d4 hit die (lowest HP per level)"""
@@ -50,24 +88,50 @@ class Mage(BaseCharacter):
         return 20
         
     def get_special_abilities(self) -> Dict[str, Any]:
-        """Mage-specific special abilities"""
+        """Comprehensive Mage magical abilities"""
         return {
+            # Core spellcasting
             'mana_system': True,
-            'spell_power_bonus': 2,
-            'mana_regeneration': 5,
+            'known_spells': self.get_known_spells(),
+            'spell_power_bonus': self.get_spell_power_bonus(),
+            'spell_critical_chance': self.spell_critical_chance,
+            'mana_efficiency': 25,  # +25% mana regeneration
+            
+            # Spell schools
+            'combat_magic': True,
+            'protection_magic': True,
+            'utility_magic': True,
+            'elemental_mastery': True,
+            
+            # Magical knowledge
             'arcane_knowledge': True,
-            'spell_critical': True,
-            'robes_only': True
+            'magical_research': True,
+            'detect_magic': True,
+            'identify_items': True,
+            'spell_learning': True,
+            
+            # Resistances and defenses
+            'elemental_resistance': self.elemental_resistances,
+            'magic_insight': True,
+            'spell_turning': self.level >= 15,
+            
+            # Equipment restrictions
+            'staves_and_daggers_only': True,
+            'robes_only': True,
+            'requires_focus': True,
+            'no_heavy_armor': True
         }
         
     def calculate_derived_stats(self):
-        """Override to include mana calculation"""
+        """Override to include comprehensive mana and spell calculations"""
         super().calculate_derived_stats()
         
-        # Mana calculation: 6 + (2 * INT modifier * level)
+        # Enhanced mana calculation: 6 + (INT modifier × level) + (WIS modifier × level/2)
         int_modifier = max(0, (self.stats['intelligence'] - 10) // 2)
+        wis_modifier = max(0, (self.stats['wisdom'] - 10) // 2)
         level_for_mana = max(1, self.level)  # Minimum level 1 for mana calculation
-        self.max_mana = 6 + (2 * int_modifier * level_for_mana)
+        
+        self.max_mana = 6 + (int_modifier * level_for_mana) + (wis_modifier * level_for_mana // 2)
         
         # Set current mana to max if this is first calculation
         if self.current_mana == 0:
@@ -77,6 +141,59 @@ class Mage(BaseCharacter):
         int_modifier = (self.stats['intelligence'] - 10) // 2
         self.base_attack_bonus = self.level + int_modifier
         
+        # Update elemental resistances based on level (if attribute exists)
+        if hasattr(self, 'elemental_resistances'):
+            base_resistance = 1 + (self.level // 10)  # +1 per 10 levels
+            for element in self.elemental_resistances:
+                self.elemental_resistances[element] = base_resistance
+        
+    # === SPELL SYSTEM ===
+    
+    def _get_starting_spells(self) -> List[str]:
+        """Get starting spells for new mage"""
+        return ['magic_missile', 'light']  # Traditional starting spells
+    
+    def get_known_spells(self) -> List[str]:
+        """Get list of known spells"""
+        return self.known_spells.copy()
+    
+    def learn_spell(self, spell_name: str) -> bool:
+        """Learn a new spell"""
+        if spell_name not in self.known_spells:
+            self.known_spells.append(spell_name)
+            return True
+        return False
+    
+    def can_learn_new_spell(self) -> bool:
+        """Check if mage can learn a new spell this level"""
+        # Learn spells at odd levels (3, 5, 7, 9, etc.)
+        return self.level % 2 == 1 and self.level >= 3
+    
+    def get_available_spells_for_level(self) -> List[str]:
+        """Get spells available to learn at current level"""
+        spell_list = {
+            1: ['magic_missile', 'light'],
+            3: ['shield', 'detect_magic'],
+            5: ['fireball', 'mage_armor'],
+            7: ['lightning_bolt', 'dispel_magic'],
+            9: ['ice_shard', 'teleport'],
+            11: ['greater_fireball', 'protection_from_elements'],
+            13: ['chain_lightning', 'identify'],
+            15: ['meteor', 'spell_turning'],
+            17: ['time_stop', 'disintegrate'],
+            19: ['wish', 'power_word_kill']
+        }
+        
+        available = []
+        for level, spells in spell_list.items():
+            if level <= self.level:
+                available.extend(spells)
+        
+        # Return spells not yet known
+        return [spell for spell in available if spell not in self.known_spells]
+    
+    # === MANA SYSTEM ===
+    
     def get_mana_percentage(self) -> float:
         """Get mana as percentage (0.0 to 1.0)"""
         if self.max_mana <= 0:
@@ -100,38 +217,152 @@ class Mage(BaseCharacter):
         return self.current_mana - old_mana
         
     def regenerate_mana(self) -> int:
-        """Natural mana regeneration (called periodically)"""
-        regen_rate = self.get_special_abilities().get('mana_regeneration', 5)
-        wis_modifier = (self.stats['wisdom'] - 10) // 2
-        regen_amount = max(1, regen_rate + wis_modifier)
-        return self.restore_mana(regen_amount)
+        """Enhanced mana regeneration for mages"""
+        base_regen = 5
+        wis_bonus = (self.stats['wisdom'] - 10) // 2
+        efficiency_bonus = int(base_regen * 0.25)  # 25% efficiency bonus
+        total_regen = base_regen + wis_bonus + efficiency_bonus
+        return self.restore_mana(max(1, total_regen))
         
     def get_spell_power_bonus(self) -> int:
-        """Get spell damage bonus"""
-        base_bonus = self.get_special_abilities().get('spell_power_bonus', 0)
+        """Get spell damage/healing bonus"""
+        base_bonus = 2  # Base spell power
         int_modifier = (self.stats['intelligence'] - 10) // 2
-        return base_bonus + int_modifier + (self.level // 5)
+        level_bonus = self.level // 5  # +1 per 5 levels
+        return base_bonus + int_modifier + level_bonus
+    
+    # === SPELL CASTING ===
         
-    def can_cast_spell(self, mana_cost: int) -> bool:
-        """Check if mage can cast a spell"""
-        return self.current_mana >= mana_cost
+    def can_cast_spell(self, spell_name: str, mana_cost: int) -> Tuple[bool, str]:
+        """Check if mage can cast a specific spell"""
+        if spell_name not in self.known_spells:
+            return False, f"Spell '{spell_name}' not known"
         
-    def get_fire_bolt_damage(self) -> str:
-        """Get fire bolt spell damage dice"""
-        # Fire bolt scales with level: 1d10 + spell power bonus
-        base_dice = "1d10"
-        spell_bonus = self.get_spell_power_bonus()
-        if spell_bonus > 0:
-            return f"{base_dice}+{spell_bonus}"
-        return base_dice
+        if self.current_mana < mana_cost:
+            return False, f"Insufficient mana (need {mana_cost}, have {self.current_mana})"
         
-    def to_dict(self) -> Dict[str, Any]:
-        """Override to include mana in save data"""
-        data = super().to_dict()
-        data['mana'] = {
-            'max_mana': self.max_mana,
-            'current_mana': self.current_mana
+        if not self.has_spellcasting_focus:
+            return False, "Requires spellcasting focus (staff or wand)"
+        
+        return True, "Can cast spell"
+    
+    def get_spell_mana_cost(self, spell_name: str) -> int:
+        """Get mana cost for a specific spell"""
+        spell_costs = {
+            'magic_missile': 2,
+            'light': 1,
+            'shield': 3,
+            'detect_magic': 2,
+            'fireball': 4,
+            'mage_armor': 3,
+            'lightning_bolt': 4,
+            'dispel_magic': 5,
+            'ice_shard': 4,
+            'teleport': 6,
+            'greater_fireball': 6,
+            'protection_from_elements': 5,
+            'chain_lightning': 8,
+            'identify': 3,
+            'meteor': 10,
+            'spell_turning': 8,
+            'time_stop': 15,
+            'disintegrate': 12,
+            'wish': 20,
+            'power_word_kill': 18
         }
+        return spell_costs.get(spell_name, 5)  # Default 5 mana
+    
+    def attempt_spell_critical(self) -> bool:
+        """Check if spell achieves critical effect"""
+        try:
+            from core.dice_system import DiceSystem
+            dice = DiceSystem(show_rolls=False)
+            roll = dice.roll("1d100")
+            return roll <= self.spell_critical_chance
+        except ImportError:
+            import random
+            return random.randint(1, 100) <= self.spell_critical_chance
+    
+    def get_spell_damage(self, spell_name: str) -> str:
+        """Get damage dice for combat spells"""
+        spell_damage = {
+            'magic_missile': '1d4',
+            'fireball': '1d6',
+            'lightning_bolt': '1d8',
+            'ice_shard': '1d6',
+            'greater_fireball': '2d6',
+            'chain_lightning': '1d10',
+            'meteor': '3d6',
+            'disintegrate': '4d6',
+            'power_word_kill': '10d10'
+        }
+        
+        base_damage = spell_damage.get(spell_name, '1d4')
+        spell_power = self.get_spell_power_bonus()
+        
+        if spell_power > 0:
+            return f"{base_damage}+{spell_power}"
+        return base_damage
+    
+    # === MAGICAL ABILITIES ===
+    
+    def get_elemental_resistance(self, element: str) -> int:
+        """Get resistance to specific element"""
+        return self.elemental_resistances.get(element.lower(), 0)
+    
+    def can_detect_magic(self) -> bool:
+        """Mages can always detect magic"""
+        return True
+    
+    def can_identify_items(self) -> bool:
+        """Check if mage can identify magical items"""
+        return self.level >= 5
+    
+    def get_magical_research_bonus(self) -> int:
+        """Get bonus for learning new spells"""
+        base_bonus = 3
+        int_bonus = (self.stats['intelligence'] - 10) // 2
+        return base_bonus + int_bonus
+        
+    def can_use_weapon(self, weapon) -> bool:
+        """Check if mage can use a specific weapon (staves and daggers only)"""
+        if hasattr(weapon, 'weapon_type'):
+            return weapon.weapon_type.lower() in ['staff', 'dagger', 'wand']
+        if hasattr(weapon, 'name'):
+            weapon_name = weapon.name.lower()
+            return any(word in weapon_name for word in ['staff', 'dagger', 'wand'])
+        return False
+    
+    def can_use_armor(self, armor) -> bool:
+        """Check if mage can use specific armor (robes only)"""
+        if hasattr(armor, 'armor_type'):
+            return armor.armor_type.lower() in ['robe', 'cloth']
+        if hasattr(armor, 'name'):
+            return 'robe' in armor.name.lower()
+        return False
+    
+    def get_difficulty(self) -> int:
+        """Return class difficulty rating"""
+        return 9  # High difficulty - glass cannon with complex resource management
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Override to include mage-specific data in save"""
+        data = super().to_dict()
+        data.update({
+            'mana': {
+                'max_mana': self.max_mana,
+                'current_mana': self.current_mana
+            },
+            'spells': {
+                'known_spells': self.known_spells,
+                'spell_slots_used': self.spell_slots_used
+            },
+            'magical_attributes': {
+                'elemental_resistances': self.elemental_resistances,
+                'spell_critical_chance': self.spell_critical_chance,
+                'has_spellcasting_focus': self.has_spellcasting_focus
+            }
+        })
         return data
         
     @classmethod
@@ -186,6 +417,18 @@ class Mage(BaseCharacter):
             # Recalculate mana if not in save data
             mage.calculate_derived_stats()
         
+        # Restore spell data
+        if 'spells' in data:
+            mage.known_spells = data['spells'].get('known_spells', mage._get_starting_spells())
+            mage.spell_slots_used = data['spells'].get('spell_slots_used', {})
+        
+        # Restore magical attributes
+        if 'magical_attributes' in data:
+            mage.elemental_resistances = data['magical_attributes'].get('elemental_resistances', 
+                                                                      {'fire': 1, 'cold': 1, 'lightning': 1})
+            mage.spell_critical_chance = data['magical_attributes'].get('spell_critical_chance', 20)
+            mage.has_spellcasting_focus = data['magical_attributes'].get('has_spellcasting_focus', False)
+        
         # Load alignment data
         if 'alignment_data' in data:
             mage.load_alignment_data(data['alignment_data'])
@@ -193,19 +436,36 @@ class Mage(BaseCharacter):
         return mage
         
     def __str__(self) -> str:
-        """String representation of Mage"""
+        """String representation of enhanced Mage"""
         abilities = []
         
+        # Mana status
         mana_status = f"MP: {self.current_mana}/{self.max_mana}"
         abilities.append(mana_status)
         
-        spell_bonus = self.get_spell_power_bonus()
-        if spell_bonus > 0:
-            abilities.append(f"Spell Power +{spell_bonus}")
-            
-        fire_bolt_dmg = self.get_fire_bolt_damage()
-        abilities.append(f"Fire Bolt {fire_bolt_dmg}")
+        # Spell power
+        spell_power = self.get_spell_power_bonus()
+        abilities.append(f"Spell Power +{spell_power}")
         
+        # Known spells count
+        spell_count = len(self.known_spells)
+        abilities.append(f"{spell_count} Spells")
+        
+        # Elemental resistances (if any are > 1)
+        high_resistances = [f"{elem.title()} {res}" for elem, res in self.elemental_resistances.items() if res > 1]
+        if high_resistances:
+            abilities.append(f"Resist: {', '.join(high_resistances)}")
+        
+        # Spell critical chance (if different from default)
+        if self.spell_critical_chance != 20:
+            abilities.append(f"Spell Crit {self.spell_critical_chance}%")
+        
+        # Focus status
+        if self.has_spellcasting_focus:
+            abilities.append("Focus")
+        else:
+            abilities.append("No Focus")
+            
         base_str = super().__str__()
         if abilities:
             base_str += f" [{', '.join(abilities)}]"
