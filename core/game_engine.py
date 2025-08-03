@@ -232,7 +232,7 @@ class GameEngine:
         
         if cmd in ['new', 'create', 'n']:
             self.current_state = GameState.CHARACTER_CREATION
-            self.character_creation_state = {'step': 'class_selection'}
+            self.character_creation_state = {'step': 'race_selection'}
             self._start_character_creation()
         elif cmd in ['load', 'l']:
             self.current_state = GameState.CHARACTER_SELECTION
@@ -249,7 +249,7 @@ class GameEngine:
         """Handle commands in menu state."""
         if cmd in ['new', 'create', 'n']:
             self.current_state = GameState.CHARACTER_CREATION
-            self.character_creation_state = {'step': 'class_selection'}
+            self.character_creation_state = {'step': 'race_selection'}
             self._start_character_creation()
         elif cmd in ['load', 'l']:
             self.current_state = GameState.CHARACTER_SELECTION
@@ -359,7 +359,11 @@ class GameEngine:
             
         step = self.character_creation_state.get('step')
         
-        if step == 'class_selection':
+        if step == 'race_selection':
+            self._handle_race_selection(cmd, args)
+        elif step == 'race_confirmation':
+            self._handle_race_confirmation(cmd, args)
+        elif step == 'class_selection':
             self._handle_class_selection(cmd, args)
         elif step == 'class_confirmation':
             self._handle_class_confirmation(cmd, args)
@@ -385,7 +389,11 @@ class GameEngine:
             
         step = self.character_creation_state.get('step')
         
-        if step == 'class_selection':
+        if step == 'race_selection':
+            self._handle_race_selection(cmd, args)
+        elif step == 'race_confirmation':
+            self._handle_race_confirmation(cmd, args)
+        elif step == 'class_selection':
             self._handle_class_selection(cmd, args)
         elif step == 'class_confirmation':
             self._handle_class_confirmation(cmd, args)
@@ -555,7 +563,116 @@ class GameEngine:
     def _start_character_creation(self) -> None:
         """Start the character creation process."""
         self.ui_manager.log_system("Starting character creation...")
-        self._show_class_selection()
+        self._show_race_selection()
+    
+    def _show_race_selection(self) -> None:
+        """Show race selection interface."""
+        try:
+            import json
+            with open('/Users/knight/workspace/github.com/mk-git-0/rogue.city/data/races/race_definitions.json', 'r') as f:
+                race_data = json.load(f)
+        except Exception as e:
+            self.ui_manager.log_error(f"Error loading race data: {e}")
+            return
+        
+        self.ui_manager.log_system("\n=== CHARACTER RACE SELECTION ===\n")
+        self.ui_manager.log_system("Choose your character's race:\n")
+        
+        race_list = []
+        for i, (race_id, race_info) in enumerate(race_data.items(), 1):
+            race_name = race_info['name']
+            exp_mod = race_info['experience_modifier']
+            exp_text = f"+{exp_mod}%" if exp_mod >= 0 else f"{exp_mod}%"
+            description = race_info['description']
+            
+            self.ui_manager.log_system(f"{i:2d}. {race_name:<12} - {description} ({exp_text} experience)")
+            race_list.append(race_id)
+        
+        self.ui_manager.log_system(f"\nEnter choice (1-{len(race_list)}): ")
+        
+        # Store race list for processing input
+        self.character_creation_state['race_list'] = race_list
+        
+    def _handle_race_selection(self, cmd: str, args: List[str]) -> None:
+        """Handle race selection input."""
+        try:
+            choice = int(cmd)
+            race_list = self.character_creation_state.get('race_list', [])
+            
+            if 1 <= choice <= len(race_list):
+                selected_race = race_list[choice - 1]
+                
+                # Load race data for confirmation display
+                try:
+                    import json
+                    with open('/Users/knight/workspace/github.com/mk-git-0/rogue.city/data/races/race_definitions.json', 'r') as f:
+                        race_data = json.load(f)
+                    
+                    selected_info = race_data[selected_race]
+                    
+                    # Show race confirmation
+                    self._show_race_confirmation(selected_info)
+                    self.character_creation_state['selected_race'] = selected_race
+                    self.character_creation_state['step'] = 'race_confirmation'
+                    
+                except Exception as e:
+                    self.ui_manager.log_error(f"Error loading race details: {e}")
+                    
+            else:
+                self.ui_manager.log_error(f"Invalid choice. Enter a number 1-{len(race_list)}.")
+                
+        except ValueError:
+            race_list = self.character_creation_state.get('race_list', [])
+            self.ui_manager.log_error(f"Enter a number 1-{len(race_list)} to select a race.")
+    
+    def _show_race_confirmation(self, race_info: Dict[str, Any]) -> None:
+        """Show race confirmation with detailed stats."""
+        name = race_info['name']
+        description = race_info['description']
+        stat_mods = race_info['stat_modifiers']
+        abilities = race_info['special_abilities']
+        exp_mod = race_info['experience_modifier']
+        
+        self.ui_manager.log_system(f"\nSelected: {name}")
+        self.ui_manager.log_system(f"{description}")
+        
+        # Show stat modifiers
+        mod_text = []
+        for stat, mod in stat_mods.items():
+            if mod != 0:
+                stat_abbrev = stat[:3].upper()
+                sign = "+" if mod > 0 else ""
+                mod_text.append(f"{sign}{mod} {stat_abbrev}")
+        
+        if mod_text:
+            self.ui_manager.log_system(f"Stat Modifiers: {', '.join(mod_text)}")
+        else:
+            self.ui_manager.log_system("Stat Modifiers: None")
+        
+        # Show special abilities
+        if abilities:
+            ability_names = list(abilities.keys())
+            self.ui_manager.log_system(f"Special Abilities: {', '.join(ability_names)}")
+        else:
+            self.ui_manager.log_system("Special Abilities: None")
+        
+        exp_text = f"+{exp_mod}%" if exp_mod >= 0 else f"{exp_mod}%"
+        self.ui_manager.log_system(f"Experience Cost: {exp_text}")
+        
+        self.ui_manager.log_system("\nConfirm this race? (y/n): ")
+    
+    def _handle_race_confirmation(self, cmd: str, args: List[str]) -> None:
+        """Handle race confirmation input."""
+        if cmd.lower() in ['y', 'yes']:
+            # Confirmed race selection, move to class selection
+            self.character_creation_state['step'] = 'class_selection'
+            self._show_class_selection()
+        elif cmd.lower() in ['n', 'no']:
+            # Go back to race selection
+            self.character_creation_state['step'] = 'race_selection'
+            self._show_race_selection()
+        else:
+            self.ui_manager.log_error("Enter 'y' for yes or 'n' for no.")
         
     def _show_class_selection(self) -> None:
         """Show class selection interface."""
@@ -631,9 +748,10 @@ class GameEngine:
         if cmd.lower() in ['y', 'yes']:
             # Create character instance and apply class modifiers
             selected_class = self.character_creation_state['selected_class']
+            selected_race = self.character_creation_state['selected_race']
             character_name = self.character_creation_state['character_name']
             
-            character = self._create_character_instance(character_name, selected_class)
+            character = self._create_character_instance(character_name, selected_class, selected_race)
             
             # Apply class modifiers
             class_data = self.save_manager.load_class_definitions()
@@ -702,20 +820,20 @@ class GameEngine:
             else:
                 self.ui_manager.log_error("Invalid stat name. Use: str, dex, con, int, wis, cha")
                 
-    def _create_character_instance(self, name: str, class_type: str):
+    def _create_character_instance(self, name: str, class_type: str, race_id: str = "human"):
         """Create appropriate character class instance."""
         if class_type == 'rogue':
             from characters.class_rogue import Rogue
-            return Rogue(name)
+            return Rogue(name, race_id)
         elif class_type == 'knight':
             from characters.class_knight import Knight
-            return Knight(name)
+            return Knight(name, race_id)
         elif class_type == 'mage':
             from characters.class_mage import Mage
-            return Mage(name)
+            return Mage(name, race_id)
         elif class_type == 'mystic':
             from characters.class_mystic import Mystic
-            return Mystic(name)
+            return Mystic(name, race_id)
         else:
             raise ValueError(f"Unknown class type: {class_type}")
             

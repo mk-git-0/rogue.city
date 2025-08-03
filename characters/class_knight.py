@@ -18,9 +18,9 @@ class Knight(BaseCharacter):
     Critical Range: 20 (standard critical chance)
     """
     
-    def __init__(self, name: str):
+    def __init__(self, name: str, race_id: str = "human"):
         """Initialize Knight character"""
-        super().__init__(name, 'knight')
+        super().__init__(name, 'knight', race_id)
         
     def get_hit_die_value(self) -> int:
         """Knights use d10 hit die (highest HP per level)"""
@@ -93,7 +93,8 @@ class Knight(BaseCharacter):
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Knight':
         """Create Knight from save data"""
-        knight = cls(data['character_name'])
+        race_id = data.get('race_id', 'human')
+        knight = cls(data['character_name'], race_id)
         
         # Restore basic character data
         knight.level = data['level']

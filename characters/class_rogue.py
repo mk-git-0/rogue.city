@@ -18,9 +18,9 @@ class Rogue(BaseCharacter):
     Critical Range: 19-20 (improved critical chance)
     """
     
-    def __init__(self, name: str):
+    def __init__(self, name: str, race_id: str = "human"):
         """Initialize Rogue character"""
-        super().__init__(name, 'rogue')
+        super().__init__(name, 'rogue', race_id)
         
     def get_hit_die_value(self) -> int:
         """Rogues use d6 hit die (average 6 HP per level)"""
@@ -77,7 +77,8 @@ class Rogue(BaseCharacter):
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Rogue':
         """Create Rogue from save data"""
-        rogue = cls(data['character_name'])
+        race_id = data.get('race_id', 'human')
+        rogue = cls(data['character_name'], race_id)
         
         # Restore basic character data
         rogue.level = data['level']

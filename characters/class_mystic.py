@@ -19,9 +19,9 @@ class Mystic(BaseCharacter):
     Special: 15% base evasion chance
     """
     
-    def __init__(self, name: str):
+    def __init__(self, name: str, race_id: str = "human"):
         """Initialize Mystic character"""
-        super().__init__(name, 'mystic')
+        super().__init__(name, 'mystic', race_id)
         
     def get_hit_die_value(self) -> int:
         """Mystics use d8 hit die (moderate HP per level)"""
@@ -136,7 +136,8 @@ class Mystic(BaseCharacter):
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Mystic':
         """Create Mystic from save data"""
-        mystic = cls(data['character_name'])
+        race_id = data.get('race_id', 'human')
+        mystic = cls(data['character_name'], race_id)
         
         # Restore basic character data
         mystic.level = data['level']

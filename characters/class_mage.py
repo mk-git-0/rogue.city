@@ -19,12 +19,12 @@ class Mage(BaseCharacter):
     Special: Mana system for spellcasting
     """
     
-    def __init__(self, name: str):
+    def __init__(self, name: str, race_id: str = "human"):
         """Initialize Mage character"""
         # Initialize mana attributes before calling parent __init__
         self.max_mana = 0
         self.current_mana = 0
-        super().__init__(name, 'mage')
+        super().__init__(name, 'mage', race_id)
         
     def get_hit_die_value(self) -> int:
         """Mages use d4 hit die (lowest HP per level)"""
@@ -136,7 +136,8 @@ class Mage(BaseCharacter):
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Mage':
         """Create Mage from save data"""
-        mage = cls(data['character_name'])
+        race_id = data.get('race_id', 'human')
+        mage = cls(data['character_name'], race_id)
         
         # Restore basic character data
         mage.level = data['level']

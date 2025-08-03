@@ -11,12 +11,17 @@ import time
 class BaseCharacter(ABC):
     """Base class for all character types with core functionality"""
     
-    def __init__(self, name: str, character_class: str):
-        """Initialize base character with name and class"""
+    def __init__(self, name: str, character_class: str, race_id: str = "human"):
+        """Initialize base character with name, class, and race"""
         self.name = name
         self.character_class = character_class
+        self.race_id = race_id
+        self.race = None
         self.level = 1  # Start at level 1
         self.experience = 0
+        
+        # Initialize race
+        self._initialize_race()
         
         # Base stats (3-18 range, 10 is average human)
         self.base_stats = {
@@ -55,6 +60,22 @@ class BaseCharacter(ABC):
         self.unallocated_stats = 10  # Points to spend during creation
         self.creation_complete = False
         
+    def _initialize_race(self):
+        """Initialize the character's race"""
+        try:
+            from characters.races import get_race_class
+            race_class = get_race_class(self.race_id)
+            if race_class:
+                self.race = race_class()
+            else:
+                # Default to human if race not found
+                from characters.races.race_human import Human
+                self.race = Human()
+                self.race_id = "human"
+        except ImportError:
+            # If races module not available, create a basic race object
+            self.race = None
+        
     def _apply_initial_class_modifiers(self):
         """Apply class modifiers during character initialization"""
         try:
@@ -69,10 +90,18 @@ class BaseCharacter(ABC):
         
     def apply_class_modifiers(self, class_data: Dict[str, Any]):
         """Apply class-specific stat modifiers to base stats"""
-        modifiers = class_data.get('stat_modifiers', {})
-        for stat, modifier in modifiers.items():
+        # Start with base stats
+        self.stats = self.base_stats.copy()
+        
+        # Apply racial modifiers first
+        if self.race:
+            self.stats = self.race.apply_stat_modifiers(self.stats)
+        
+        # Then apply class modifiers
+        class_modifiers = class_data.get('stat_modifiers', {})
+        for stat, modifier in class_modifiers.items():
             if stat in self.stats:
-                self.stats[stat] = self.base_stats[stat] + modifier
+                self.stats[stat] += modifier
                 
     def calculate_derived_stats(self):
         """Calculate HP, AC, attack bonus from base stats"""
@@ -85,9 +114,16 @@ class BaseCharacter(ABC):
         if self.current_hp == 0:
             self.current_hp = self.max_hp
             
-        # AC calculation: 10 + DEX modifier + armor bonuses
+        # AC calculation: 10 + DEX modifier + racial bonuses + armor bonuses
         dex_modifier = (self.stats['dexterity'] - 10) // 2
         base_ac = 10 + dex_modifier
+        
+        # Add racial AC bonuses
+        racial_ac_bonus = 0
+        if self.race:
+            for ability_name, ability_data in self.race.special_abilities.items():
+                if isinstance(ability_data, dict) and 'ac_bonus' in ability_data:
+                    racial_ac_bonus += ability_data['ac_bonus']
         
         # Add equipment bonuses if available
         if hasattr(self, 'equipment_system') and self.equipment_system:
@@ -95,9 +131,9 @@ class BaseCharacter(ABC):
             max_dex = self.equipment_system.get_max_dex_bonus()
             if max_dex is not None:
                 dex_modifier = min(dex_modifier, max_dex)
-            self.armor_class = base_ac + armor_bonus
+            self.armor_class = base_ac + racial_ac_bonus + armor_bonus
         else:
-            self.armor_class = base_ac
+            self.armor_class = base_ac + racial_ac_bonus
         
         # Attack bonus: level + primary stat modifier
         str_modifier = (self.stats['strength'] - 10) // 2
@@ -170,13 +206,19 @@ class BaseCharacter(ABC):
             required_exp = self.calculate_required_experience()
             
     def calculate_required_experience(self) -> int:
-        """Calculate XP needed for next level"""
+        """Calculate XP needed for next level with racial modifiers"""
         if self.level >= 100:
             return float('inf')  # Max level reached
             
         base_exp = 100
         multiplier = 1.5
-        return int(base_exp * (multiplier ** self.level))
+        base_requirement = int(base_exp * (multiplier ** self.level))
+        
+        # Apply racial experience modifier
+        if self.race:
+            return self.race.calculate_experience_requirement(base_requirement)
+        
+        return base_requirement
         
     def level_up(self):
         """Handle character level increase"""
@@ -276,12 +318,37 @@ class BaseCharacter(ABC):
     def get_special_abilities(self) -> Dict[str, Any]:
         """Get class-specific special abilities (override in subclasses)"""
         return {}
+    
+    def get_racial_abilities(self) -> Dict[str, Any]:
+        """Get racial special abilities"""
+        if self.race:
+            return self.race.special_abilities
+        return {}
+    
+    def has_racial_ability(self, ability_name: str) -> bool:
+        """Check if character has a specific racial ability"""
+        if self.race:
+            return self.race.has_ability(ability_name)
+        return False
+    
+    def get_racial_ability_value(self, ability_name: str, default=None):
+        """Get the value of a racial ability"""
+        if self.race:
+            return self.race.get_ability_value(ability_name, default)
+        return default
+    
+    def get_race_info(self) -> str:
+        """Get formatted race information"""
+        if self.race:
+            return self.race.get_display_info()
+        return "Unknown Race"
         
     def to_dict(self) -> Dict[str, Any]:
         """Serialize character for saving to JSON"""
         save_data = {
             'character_name': self.name,
             'character_class': self.character_class,
+            'race_id': self.race_id,
             'level': self.level,
             'experience': self.experience,
             'base_stats': self.base_stats.copy(),
@@ -322,7 +389,8 @@ class BaseCharacter(ABC):
     def __str__(self) -> str:
         """String representation of character"""
         hp_status = f"{self.current_hp}/{self.max_hp}"
-        return f"{self.name} the {self.character_class.title()} (Level {self.level}, HP: {hp_status})"
+        race_name = self.race.name if self.race else "Unknown"
+        return f"{self.name} the {race_name} {self.character_class.title()} (Level {self.level}, HP: {hp_status})"
         
     def __repr__(self) -> str:
         """Debug representation of character"""
