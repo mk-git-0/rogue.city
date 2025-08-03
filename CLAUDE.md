@@ -27,26 +27,46 @@ This is a Python-based text RPG (Rogue City) inspired by MajorMUD, built with a 
 - **GameEngine** (`game_engine.py`): Central coordinator running at 60 FPS, manages game state and system interactions
 - **SimpleUIManager** (`simple_ui_manager.py`): Traditional MajorMUD-style single-terminal interface
 - **DiceSystem** (`dice_system.py`): D&D-style dice mechanics for combat and skill checks
-- **TimerSystem** (`timer_system.py`): Handles timer-based combat with weapon speed differences
+- **CombatSystem** (`combat_system.py`): Turn-based combat with attacks per turn and dual-wielding
+- **TimerSystem** (`timer_system.py`): General timer utilities (combat is now turn-based)
 
 ### Game State Architecture
 - Game states: MENU, PLAYING, COMBAT, INVENTORY, CHARACTER_SHEET, QUIT
 - All data stored in JSON format in `data/` subdirectories
 - Character saves in `data/saves/{character_name}.json`
-- Game content in `data/areas/`, `data/items/`, `data/classes/`, etc.
+- Game content in `data/areas/`, `data/items/`, `data/classes/`, `data/races/`, etc.
 
 ### Combat System
-- Timer-based combat with class-specific weapon speeds (Rogue: 2s, Knight: 4s, Mage: 6s, Mystic: 3s)
-- Auto-combat continues after initial attack command
+- **Turn-based combat** system (replaced timer-based approach)
+- Players and enemies take turns executing attacks
+- Multiple attacks per turn based on class and weapons (dual-wielding support)
 - D20 + modifiers vs AC for attacks, weapon dice + modifiers for damage
 - Critical hits on natural 20 (Rogues crit on 19-20)
+- MajorMUD-style health display with detailed status information
 
-### Character Classes
+### Character System
+
+#### Races (13 MajorMUD Races)
+Complete race system with stat modifiers, special abilities, and experience costs:
+- **Human** (0% exp): Versatile baseline race
+- **Elf** (+25% exp): Magical race with nightvision and spell power
+- **Dark-Elf** (+50% exp): Arcane masters with perfect darkvision
+- **Half-Elf** (+15% exp): Adaptable hybrid with elven heritage
+- **Dwarf** (+20% exp): Hardy folk with magic resistance and underground vision
+- **Gnome** (+30% exp): Clever inventors with mechanical aptitude and small size
+- **Halfling** (+25% exp): Nimble folk with natural stealth and luck
+- **Half-Ogre** (-10% exp): Mighty but simple with intimidation abilities
+- **Goblin** (+15% exp): Cunning creatures with darkvision and stealth
+- **Kang** (+35% exp): Exotic swamp dwellers with natural armor
+- **Nekojin** (+40% exp): Cat-people with tracking and fire resistance
+- **Gaunt One** (+50% exp): Mysterious seers with perfect perception
+
+#### Character Classes
 Four classes with D&D-style stat modifiers and difficulty ratings:
-- **Rogue** (Difficulty 11): DEX-focused, fast daggers, high crit chance
-- **Knight** (Difficulty 3): STR/CON tank, slow swords, damage resistance  
-- **Mage** (Difficulty 9): INT/WIS caster, slowest attacks, mana system
-- **Mystic** (Difficulty 6): DEX/WIS hybrid, unarmed combat, evasion
+- **Rogue** (Difficulty 11): DEX-focused, multiple attacks, high crit chance
+- **Knight** (Difficulty 3): STR/CON tank, heavy armor, damage resistance  
+- **Mage** (Difficulty 9): INT/WIS caster, mana system, elemental magic
+- **Mystic** (Difficulty 6): DEX/WIS hybrid, evasion, spiritual abilities
 
 ### UI Layout Requirements
 The terminal interface uses a simplified MajorMUD-style approach:
@@ -59,9 +79,9 @@ The terminal interface uses a simplified MajorMUD-style approach:
 ### Integration Points
 - UI ↔ Combat: Combat messages displayed in single scrolling output
 - Dice ↔ Combat: All calculations use dice system
-- Timer ↔ Combat: Attack speeds create action delays
-- Character ↔ Equipment: Stats affect combat bonuses
-- UI ↔ Character Creation: Step-by-step prompts in traditional terminal style
+- Race ↔ Character: Racial modifiers affect stats, AC, experience costs, and special abilities
+- Character ↔ Equipment: Stats affect combat bonuses and equipment effectiveness
+- UI ↔ Character Creation: Race selection → Class selection → Name → Stats (MajorMUD flow)
 
 ## File Structure Patterns
 
@@ -69,10 +89,18 @@ The terminal interface uses a simplified MajorMUD-style approach:
 All game content stored as human-readable JSON:
 - `areas/` - Room definitions and connections
 - `classes/` - Character class templates and abilities
+- `races/` - Race definitions with stat modifiers and special abilities
 - `items/` - Weapons, armor, consumables
 - `enemies/` - Monster definitions and AI
-- `saves/` - Character save files
+- `saves/` - Character save files (includes race_id for new characters)
 - `config/` - Game configuration
+
+### Character Files (`characters/`)
+Character system with race and class hierarchies:
+- `base_character.py` - Abstract character foundation with race integration
+- `base_race.py` - Abstract race class with stat modifiers and abilities
+- `class_*.py` - Four character classes (Rogue, Knight, Mage, Mystic)
+- `races/` - 13 individual race implementations with MajorMUD specifications
 
 ### Documentation (`docs/`)
 - `00_quick_reference.md` - Complete gameplay mechanics reference
@@ -97,13 +125,35 @@ All game content stored as human-readable JSON:
 - Fallback to simple input() for maximum compatibility
 
 ### Game Loop
-- 60 FPS main loop for smooth timer processing
-- State-based game management
-- Automatic combat continuation after initial attack
+- 60 FPS main loop for smooth UI updates and state management
+- State-based game management (MENU, PLAYING, COMBAT, etc.)
+- Turn-based combat execution within state system
 
 ### MajorMUD Compatibility
 The game follows classic MajorMUD patterns:
 - Command-based interface (`look`, `north`, `attack goblin`)
 - Room-based exploration with exits
-- Timer-based combat with weapon speed differences
-- Experience and leveling systems
+- **Complete 13-race system** with authentic stat modifiers and experience costs
+- **Turn-based combat** with attacks per turn and weapon-specific damage
+- Traditional character creation flow: Race → Class → Name → Stats
+- Experience and leveling systems with racial modifiers
+
+## Documentation Maintenance
+
+### IMPORTANT: Update CLAUDE.md After Significant Changes
+When implementing major system changes to Rogue City, **ALWAYS update this CLAUDE.md file** to reflect:
+
+1. **New Systems**: Add sections for major new features (race system, spell system, etc.)
+2. **Changed Systems**: Update descriptions when core mechanics change (combat system, character creation, etc.)
+3. **File Structure**: Update file structure descriptions when new directories or important files are added
+4. **Integration Points**: Modify integration descriptions when new systems interact with existing ones
+5. **Architecture Changes**: Update architectural overview when core systems are modified
+
+**Examples of changes requiring CLAUDE.md updates:**
+- ✅ Adding race system (requires architecture, file structure, and integration updates)
+- ✅ Changing from timer-based to turn-based combat (requires combat system description update)
+- ✅ Adding new character classes or major class changes
+- ✅ Implementing spell/magic systems
+- ✅ Adding new data directories or major file reorganization
+
+This ensures Claude Code always has accurate, up-to-date context for development work.
