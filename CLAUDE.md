@@ -29,6 +29,7 @@ This is a Python-based text RPG (Rogue City) inspired by MajorMUD, built with a 
 - **DiceSystem** (`dice_system.py`): D&D-style dice mechanics for combat and skill checks
 - **CombatSystem** (`combat_system.py`): Turn-based combat with attacks per turn and dual-wielding
 - **TimerSystem** (`timer_system.py`): General timer utilities (combat is now turn-based)
+- **AlignmentSystem** (`alignment_system.py`): MajorMUD three-alignment system with reputation tracking and NPC reactions
 
 ### Game State Architecture
 - Game states: MENU, PLAYING, COMBAT, INVENTORY, CHARACTER_SHEET, QUIT
@@ -68,6 +69,20 @@ Four classes with D&D-style stat modifiers and difficulty ratings:
 - **Mage** (Difficulty 9): INT/WIS caster, mana system, elemental magic
 - **Mystic** (Difficulty 6): DEX/WIS hybrid, evasion, spiritual abilities
 
+#### Alignment System (MajorMUD Three-Alignment Model)
+Complete moral framework affecting character identity, equipment access, and NPC interactions:
+- **Good** - "Protector of the Innocent": Holy weapons, healing bonuses, turn undead, but cannot use evil items
+- **Neutral** - "Seeker of Balance": Equipment versatility, skill bonuses, diplomatic immunity, balanced approach
+- **Evil** - "Pursuer of Power": Dark weapons, necromantic magic, intimidation bonuses, but cannot use holy items
+
+**Features:**
+- **Character Creation Integration**: Alignment selection between race and class selection with MajorMUD-style interface
+- **Reputation System**: Dynamic faction standing (Good/Neutral/Evil factions, Town Guards, Priests, Merchants, etc.)
+- **NPC Reaction System**: Alignment-based dialogue, trading prices, and relationship modifiers
+- **Equipment Restrictions**: Good characters burn when touching evil items, evil characters seared by holy items
+- **Alignment Bonuses**: Each alignment provides specific combat and utility bonuses
+- **Foundation for Future Systems**: Spell access, quest availability, guild membership will use alignment
+
 ### UI Layout Requirements
 The terminal interface uses a simplified MajorMUD-style approach:
 - Single scrolling terminal output for all game content
@@ -81,7 +96,10 @@ The terminal interface uses a simplified MajorMUD-style approach:
 - Dice ↔ Combat: All calculations use dice system
 - Race ↔ Character: Racial modifiers affect stats, AC, experience costs, and special abilities
 - Character ↔ Equipment: Stats affect combat bonuses and equipment effectiveness
-- UI ↔ Character Creation: Race selection → Class selection → Name → Stats (MajorMUD flow)
+- **Alignment ↔ Character**: Alignment affects equipment access, NPC reactions, combat bonuses, and special abilities
+- **Alignment ↔ NPCs**: Dynamic reaction modifiers, dialogue options, and trading prices based on alignment compatibility
+- **Alignment ↔ Equipment**: Item restrictions prevent use of opposing alignment items (good/evil)
+- UI ↔ Character Creation: Race selection → **Alignment selection** → Class selection → Name → Stats (Enhanced MajorMUD flow)
 
 ## File Structure Patterns
 
@@ -90,17 +108,23 @@ All game content stored as human-readable JSON:
 - `areas/` - Room definitions and connections
 - `classes/` - Character class templates and abilities
 - `races/` - Race definitions with stat modifiers and special abilities
+- `alignments/` - Alignment definitions with benefits, restrictions, and faction relationships
 - `items/` - Weapons, armor, consumables
 - `enemies/` - Monster definitions and AI
-- `saves/` - Character save files (includes race_id for new characters)
+- `saves/` - Character save files (includes race_id and alignment_data for new characters)
 - `config/` - Game configuration
 
 ### Character Files (`characters/`)
-Character system with race and class hierarchies:
-- `base_character.py` - Abstract character foundation with race integration
+Character system with race, class, and alignment hierarchies:
+- `base_character.py` - Abstract character foundation with race and alignment integration
 - `base_race.py` - Abstract race class with stat modifiers and abilities
-- `class_*.py` - Four character classes (Rogue, Knight, Mage, Mystic)
+- `alignment_manager.py` - Individual character alignment tracking and reputation management
+- `class_*.py` - Four character classes (Rogue, Knight, Mage, Mystic) with alignment support
 - `races/` - 13 individual race implementations with MajorMUD specifications
+
+### Area Files (`areas/`)
+NPC and location management:
+- `npc_system.py` - NPC framework with alignment-based reactions and dialogue
 
 ### Documentation (`docs/`)
 - `00_quick_reference.md` - Complete gameplay mechanics reference
@@ -134,9 +158,12 @@ The game follows classic MajorMUD patterns:
 - Command-based interface (`look`, `north`, `attack goblin`)
 - Room-based exploration with exits
 - **Complete 13-race system** with authentic stat modifiers and experience costs
+- **Three-alignment system** with Good/Neutral/Evil moral framework affecting gameplay
 - **Turn-based combat** with attacks per turn and weapon-specific damage
-- Traditional character creation flow: Race → Class → Name → Stats
+- **NPC reputation system** with faction standing and alignment-based reactions
+- Traditional character creation flow: Race → **Alignment** → Class → Name → Stats
 - Experience and leveling systems with racial modifiers
+- Equipment restrictions based on character alignment (holy vs evil items)
 
 ## Documentation Maintenance
 
