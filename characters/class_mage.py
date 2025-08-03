@@ -341,9 +341,9 @@ class Mage(BaseCharacter):
             return 'robe' in armor.name.lower()
         return False
     
-    def get_difficulty(self) -> int:
-        """Return class difficulty rating"""
-        return 9  # High difficulty - glass cannon with complex resource management
+    def get_experience_penalty(self) -> int:
+        """Mages have +40% experience penalty (arcane spellcaster)"""
+        return 40
     
     def to_dict(self) -> Dict[str, Any]:
         """Override to include mage-specific data in save"""

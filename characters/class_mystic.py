@@ -406,9 +406,9 @@ class Mystic(BaseCharacter):
             return armor.armor_type.lower() in ['light', 'medium', 'leather', 'cloth', 'studded']
         return True  # Default allow for most armor
     
-    def get_difficulty(self) -> int:
-        """Return class difficulty rating"""
-        return 6  # Moderate difficulty - balanced and versatile
+    def get_experience_penalty(self) -> int:
+        """Mystics have +25% experience penalty (warrior-monk hybrid)"""
+        return 25
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Mystic':

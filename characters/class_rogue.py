@@ -343,9 +343,9 @@ class Rogue(BaseCharacter):
         
         return True, "Equipment allowed"
     
-    def get_difficulty(self) -> int:
-        """Return class difficulty rating"""
-        return 11  # Highest difficulty - flagship class
+    def get_experience_penalty(self) -> int:
+        """Rogues have +75% experience penalty (flagship class)"""
+        return 75
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Rogue':

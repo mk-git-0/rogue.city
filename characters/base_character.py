@@ -172,6 +172,11 @@ class BaseCharacter(ABC):
         """Return critical hit range (20 = only natural 20, 19 = 19-20)"""
         pass
         
+    @abstractmethod
+    def get_experience_penalty(self) -> int:
+        """Return experience penalty percentage for this class (0-100)"""
+        pass
+        
     def allocate_stat_point(self, stat_name: str) -> bool:
         """Allocate one stat point during character creation"""
         if self.unallocated_stats <= 0:
@@ -212,7 +217,7 @@ class BaseCharacter(ABC):
             required_exp = self.calculate_required_experience()
             
     def calculate_required_experience(self) -> int:
-        """Calculate XP needed for next level with racial modifiers"""
+        """Calculate XP needed for next level with racial and class modifiers"""
         if self.level >= 100:
             return float('inf')  # Max level reached
             
@@ -220,11 +225,15 @@ class BaseCharacter(ABC):
         multiplier = 1.5
         base_requirement = int(base_exp * (multiplier ** self.level))
         
-        # Apply racial experience modifier
-        if self.race:
-            return self.race.calculate_experience_requirement(base_requirement)
+        # Apply class experience penalty first
+        class_penalty = self.get_experience_penalty()
+        class_modified_exp = int(base_requirement * (1.0 + class_penalty / 100.0))
         
-        return base_requirement
+        # Apply racial experience modifier to class-modified amount
+        if self.race:
+            return self.race.calculate_experience_requirement(class_modified_exp)
+        
+        return class_modified_exp
         
     def level_up(self):
         """Handle character level increase"""
@@ -404,7 +413,9 @@ class BaseCharacter(ABC):
         alignment_display = self.alignment_manager.get_alignment_display()
         lines.append(f"=== {self.name.upper()} THE {race_name.upper()} {self.character_class.upper()} ===")
         lines.append(f"Race: {race_name}      Alignment: {alignment_display.split(' - ')[0]}")
-        lines.append(f"Level: {self.level}           Experience: {self.experience}/{self.calculate_required_experience()}")
+        exp_penalty = self.get_experience_penalty()
+        exp_display = f" (+{exp_penalty}% exp)" if exp_penalty > 0 else ""
+        lines.append(f"Level: {self.level}           Experience: {self.experience}/{self.calculate_required_experience()}{exp_display}")
         lines.append(f"HP: {self.current_hp}/{self.max_hp}          AC: {self.armor_class}")
         lines.append("")
         

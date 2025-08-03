@@ -319,9 +319,9 @@ class Knight(BaseCharacter):
         """Knights can use all shield types"""
         return True  # Knights have proficiency with all shields
     
-    def get_difficulty(self) -> int:
-        """Return class difficulty rating"""
-        return 3  # Lowest difficulty - beginner friendly
+    def get_experience_penalty(self) -> int:
+        """Knights have +10% experience penalty (defensive specialist)"""
+        return 10
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Knight':
