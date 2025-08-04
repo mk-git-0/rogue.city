@@ -17,7 +17,7 @@ class Warrior(BaseCharacter):
     Experience Penalty: +0% (fastest leveling in game)
     Stat Modifiers: +3 STR, +2 CON, -1 INT, -1 WIS
     Hit Die: d10 (excellent HP progression)
-    Attack Speed: 3.0 seconds (standard combat speed)
+    Attacks Per Turn: Multiple attacks at higher levels
     Critical Range: 20 (standard critical chance)
     
     PURE FIGHTER CORE:
@@ -85,7 +85,7 @@ class Warrior(BaseCharacter):
         return 20
         
     def get_experience_penalty(self) -> int:
-        """Warriors have +0% experience penalty (baseline class)"""
+        """Warriors have 0% experience penalty (baseline class)"""
         return 0
         
     def get_special_abilities(self) -> Dict[str, Any]:

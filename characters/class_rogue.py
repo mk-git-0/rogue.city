@@ -18,7 +18,7 @@ class Rogue(BaseCharacter):
     Difficulty: 11 (Highest) - Challenging but extremely powerful
     Stat Modifiers: +3 DEX, +2 INT, -2 STR, -2 CON, -1 WIS, -1 CHA
     Hit Die: d6
-    Attack Speed: 2.0 seconds (dagger mastery)
+    Attacks Per Turn: Fast dual-wield dagger combat
     Critical Range: 19-20 (improved critical chance)
     
     WITCHHUNTER HERITAGE (Anti-Magic Core):
@@ -344,8 +344,8 @@ class Rogue(BaseCharacter):
         return True, "Equipment allowed"
     
     def get_experience_penalty(self) -> int:
-        """Rogues have +75% experience penalty (flagship class)"""
-        return 75
+        """Rogues have +77% experience penalty (flagship class)"""
+        return 77
     
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> 'Rogue':

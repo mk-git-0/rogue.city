@@ -17,8 +17,8 @@ class Knight(BaseCharacter):
     
     Difficulty: 3 (Lowest) - Perfect for new players
     Stat Modifiers: +3 STR, +1 DEX, +2 CON, +1 CHA, -1 INT, -1 WIS
-    Hit Die: d10 (Highest HP per level)
-    Attack Speed: 4.0 seconds (heavy weapons)
+    Hit Die: d10 (Highest HP per level)  
+    Attacks Per Turn: Steady defensive combat style
     Critical Range: 20 (standard critical chance)
     
     DEFENSIVE CORE ABILITIES:
@@ -320,7 +320,7 @@ class Knight(BaseCharacter):
         return True  # Knights have proficiency with all shields
     
     def get_experience_penalty(self) -> int:
-        """Knights have +10% experience penalty (defensive specialist)"""
+        """Knights have 10% experience penalty (defensive specialist)"""
         return 10
     
     @classmethod

@@ -204,7 +204,11 @@ class SimpleUIManager:
         print("\n=== CHARACTER CREATION ===")
         print()
         print(f"Selected Class: {class_info['name']}")
-        print(f"Difficulty: {class_info['difficulty']}")
+        exp_penalty = class_info.get('experience_penalty', 0)
+        if exp_penalty > 0:
+            print(f"Experience Penalty: +{exp_penalty}%")
+        else:
+            print(f"Experience Penalty: Normal leveling")
         print()
         print(f"Description: {class_info['description']}")
         print()
@@ -216,7 +220,43 @@ class SimpleUIManager:
             
         print()
         print(f"Hit Die: {class_info['hit_die']}")
-        print(f"Attack Speed: {class_info['base_attack_speed']} seconds")
+        print("Combat: Turn-based attacks per round")
+        
+        # Show core class abilities if available
+        if 'special_abilities' in class_info:
+            print()
+            print("Core Abilities:")
+            abilities = class_info['special_abilities']
+            ability_descriptions = {
+                'magic_resistance': 'Magic Resistance',
+                'anti_magic_aura': 'Anti-Magic Aura',
+                'cannot_use_magic_items': 'Cannot Use Magic Items',
+                'stealth_mastery': 'Stealth Mastery',
+                'backstab': 'Backstab Attacks',
+                'shield_mastery': 'Shield Mastery',
+                'damage_resistance': 'Damage Resistance',
+                'heavy_armor_proficiency': 'Heavy Armor Proficiency',
+                'defensive_stance': 'Defensive Stance',
+                'guardian_protection': 'Guardian Protection',
+                'mana_system': 'Mana Spellcasting',
+                'spell_mastery': 'Spell Mastery',
+                'ki_system': 'Ki Powers',
+                'unarmed_mastery': 'Unarmed Combat',
+                'evasion_training': 'Evasion Training'
+            }
+            
+            shown_abilities = []
+            for ability, enabled in abilities.items():
+                if enabled and ability in ability_descriptions:
+                    shown_abilities.append(ability_descriptions[ability])
+            
+            if shown_abilities:
+                # Show up to 4 core abilities
+                for ability in shown_abilities[:4]:
+                    print(f"  • {ability}")
+                if len(shown_abilities) > 4:
+                    print(f"  • And {len(shown_abilities) - 4} more abilities...")
+        
         print()
         print("Confirm this choice? (y/n):")
         

@@ -1,48 +1,27 @@
 {
-  "rogue": {
-    "name": "Rogue",
-    "difficulty": 11,
-    "description": "DEX-focused precision striker with stealth, backstab, and critical hit mastery. High speed attacks with daggers.",
-    "experience_penalty": 35,
-    "class_type": "advanced",
-    "recommended_for": ["stealth_players", "critical_hit_specialists"],
+  "warrior": {
+    "name": "Warrior",
+    "difficulty": 2,
+    "description": "Pure combat specialist with weapon mastery and multiple attacks. Simple but effective melee fighter.",
+    "experience_penalty": 0,
+    "class_type": "basic",
     "stat_modifiers": {
-      "strength": -2,
-      "dexterity": 3,
-      "constitution": -2,
-      "intelligence": 2,
-      "wisdom": -1,
+      "strength": 3,
+      "dexterity": 1,
+      "constitution": 2,
+      "intelligence": -2,
+      "wisdom": 0,
       "charisma": -1
     },
-    "hit_die": "d6",
-    "base_attack_speed": 2.0,
-    "critical_hit_range": 19,
-    "special_abilities": {
-      "magic_resistance": true,
-      "anti_magic_aura": true,
-      "cannot_use_magic_items": true,
-      "stealth_mastery": true,
-      "backstab": true,
-      "lockpicking": true,
-      "trap_detection": true,
-      "dual_wield_mastery": true,
-      "pressure_points": true,
-      "shadow_step": true,
-      "assassination": true,
-      "improved_critical": true
-    },
-    "equipment_restrictions": {
-      "weapons": ["daggers_only"],
-      "armor_types": ["light_only"],
-      "magical_items": "forbidden",
-      "special_note": "Witchhunter heritage prevents use of any magical equipment"
-    }
+    "hit_die": "d10",
+    "base_attack_speed": 3.5,
+    "critical_hit_range": 20
   },
   "knight": {
     "name": "Knight",
     "difficulty": 3,
     "description": "STR/CON tank with heavy armor, shield mastery, and damage resistance. Excellent survivability for beginners.",
-    "experience_penalty": 0,
+    "experience_penalty": 10,
     "class_type": "beginner",
     "recommended_for": ["new_players", "tank_role", "defensive_play"],
     "stat_modifiers": {
@@ -74,6 +53,101 @@
       "armor_types": ["all_armor"],
       "shields": ["all_shields"],
       "special_note": "Can use any equipment type with proficiency bonuses"
+    }
+  },
+  "barbarian": {
+    "name": "Barbarian",
+    "difficulty": 4,
+    "description": "Berserker with rage abilities and damage resistance. High HP warrior with fury-based combat.",
+    "experience_penalty": 15,
+    "class_type": "intermediate",
+    "stat_modifiers": {
+      "strength": 4,
+      "dexterity": 1,
+      "constitution": 3,
+      "intelligence": -3,
+      "wisdom": -1,
+      "charisma": -1
+    },
+    "hit_die": "d12",
+    "base_attack_speed": 3.0,
+    "critical_hit_range": 20
+  },
+  "ranger": {
+    "name": "Ranger",
+    "difficulty": 5,
+    "description": "Wilderness scout with bow mastery, tracking, and nature magic. Versatile outdoorsman and archer.",
+    "experience_penalty": 20,
+    "class_type": "advanced",
+    "stat_modifiers": {
+      "strength": 1,
+      "dexterity": 3,
+      "constitution": 1,
+      "intelligence": 0,
+      "wisdom": 2,
+      "charisma": -1
+    },
+    "hit_die": "d8",
+    "base_attack_speed": 3.0,
+    "critical_hit_range": 20
+  },
+  "thief": {
+    "name": "Thief",
+    "difficulty": 6,
+    "description": "Classic burglar with lockpicking, trap detection, and stealth. Utility-focused rogue variant.",
+    "experience_penalty": 20,
+    "class_type": "intermediate",
+    "stat_modifiers": {
+      "strength": -1,
+      "dexterity": 4,
+      "constitution": -1,
+      "intelligence": 2,
+      "wisdom": 1,
+      "charisma": 0
+    },
+    "hit_die": "d6",
+    "base_attack_speed": 2.5,
+    "critical_hit_range": 19
+  },
+  "mystic": {
+    "name": "Mystic",
+    "difficulty": 6,
+    "description": "DEX/WIS warrior-monk with ki powers, unarmed combat, and evasion training. Balanced hybrid approach.",
+    "experience_penalty": 25,
+    "class_type": "hybrid",
+    "recommended_for": ["balanced_play", "martial_arts", "spiritual_powers"],
+    "stat_modifiers": {
+      "strength": -1,
+      "dexterity": 4,
+      "constitution": -1,
+      "intelligence": -2,
+      "wisdom": 2,
+      "charisma": 1
+    },
+    "hit_die": "d8",
+    "base_attack_speed": 3.0,
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "ki_system": true,
+      "ki_strike": true,
+      "ki_defense": true,
+      "ki_healing": true,
+      "ki_speed": true,
+      "unarmed_mastery": true,
+      "multiple_attacks": true,
+      "evasion_training": true,
+      "deflect_missiles": true,
+      "meditation": true,
+      "spiritual_resistance": true,
+      "inner_focus": true,
+      "mystical_insight": true,
+      "spiritual_awareness": true
+    },
+    "equipment_restrictions": {
+      "weapons": ["simple_weapons", "unarmed"],
+      "armor_types": ["light", "medium"],
+      "shields": "not_preferred",
+      "special_note": "Relies on evasion and ki defense rather than heavy armor"
     }
   },
   "mage": {
@@ -117,81 +191,22 @@
       "special_note": "Requires spellcasting focus for magic use"
     }
   },
-  "mystic": {
-    "name": "Mystic",
-    "difficulty": 6,
-    "description": "DEX/WIS warrior-monk with ki powers, unarmed combat, and evasion training. Balanced hybrid approach.",
-    "experience_penalty": 25,
-    "class_type": "hybrid",
-    "recommended_for": ["balanced_play", "martial_arts", "spiritual_powers"],
+  "priest": {
+    "name": "Priest",
+    "difficulty": 7,
+    "description": "Divine spellcaster with healing, blessing, and protective magic. Support-focused holy caster.",
+    "experience_penalty": 30,
+    "class_type": "intermediate",
     "stat_modifiers": {
       "strength": -1,
-      "dexterity": 4,
-      "constitution": -1,
-      "intelligence": -2,
-      "wisdom": 2,
-      "charisma": 1
-    },
-    "hit_die": "d8",
-    "base_attack_speed": 3.0,
-    "critical_hit_range": 20,
-    "special_abilities": {
-      "ki_system": true,
-      "ki_strike": true,
-      "ki_defense": true,
-      "ki_healing": true,
-      "ki_speed": true,
-      "unarmed_mastery": true,
-      "multiple_attacks": true,
-      "evasion_training": true,
-      "deflect_missiles": true,
-      "meditation": true,
-      "spiritual_resistance": true,
-      "inner_focus": true,
-      "mystical_insight": true,
-      "spiritual_awareness": true
-    },
-    "equipment_restrictions": {
-      "weapons": ["simple_weapons", "unarmed"],
-      "armor_types": ["light", "medium"],
-      "shields": "not_preferred",
-      "special_note": "Relies on evasion and ki defense rather than heavy armor"
-    }
-  },
-  "warrior": {
-    "name": "Warrior",
-    "difficulty": 2,
-    "description": "Pure combat specialist with weapon mastery and multiple attacks. Simple but effective melee fighter.",
-    "experience_penalty": 5,
-    "class_type": "basic",
-    "stat_modifiers": {
-      "strength": 3,
-      "dexterity": 1,
-      "constitution": 2,
-      "intelligence": -2,
-      "wisdom": 0,
-      "charisma": -1
-    },
-    "hit_die": "d10",
-    "base_attack_speed": 3.5,
-    "critical_hit_range": 20
-  },
-  "ranger": {
-    "name": "Ranger",
-    "difficulty": 5,
-    "description": "Wilderness scout with bow mastery, tracking, and nature magic. Versatile outdoorsman and archer.",
-    "experience_penalty": 20,
-    "class_type": "advanced",
-    "stat_modifiers": {
-      "strength": 1,
-      "dexterity": 3,
+      "dexterity": 0,
       "constitution": 1,
-      "intelligence": 0,
-      "wisdom": 2,
-      "charisma": -1
+      "intelligence": 1,
+      "wisdom": 4,
+      "charisma": 2
     },
     "hit_die": "d8",
-    "base_attack_speed": 3.0,
+    "base_attack_speed": 5.0,
     "critical_hit_range": 20
   },
   "paladin": {
@@ -212,42 +227,6 @@
     "base_attack_speed": 4.0,
     "critical_hit_range": 20
   },
-  "barbarian": {
-    "name": "Barbarian",
-    "difficulty": 4,
-    "description": "Berserker with rage abilities and damage resistance. High HP warrior with fury-based combat.",
-    "experience_penalty": 15,
-    "class_type": "intermediate",
-    "stat_modifiers": {
-      "strength": 4,
-      "dexterity": 1,
-      "constitution": 3,
-      "intelligence": -3,
-      "wisdom": -1,
-      "charisma": -1
-    },
-    "hit_die": "d12",
-    "base_attack_speed": 3.0,
-    "critical_hit_range": 20
-  },
-  "thief": {
-    "name": "Thief",
-    "difficulty": 6,
-    "description": "Classic burglar with lockpicking, trap detection, and stealth. Utility-focused rogue variant.",
-    "experience_penalty": 20,
-    "class_type": "intermediate",
-    "stat_modifiers": {
-      "strength": -1,
-      "dexterity": 4,
-      "constitution": -1,
-      "intelligence": 2,
-      "wisdom": 1,
-      "charisma": 0
-    },
-    "hit_die": "d6",
-    "base_attack_speed": 2.5,
-    "critical_hit_range": 19
-  },
   "spellsword": {
     "name": "Spellsword",
     "difficulty": 8,
@@ -264,24 +243,6 @@
     },
     "hit_die": "d8",
     "base_attack_speed": 3.5,
-    "critical_hit_range": 20
-  },
-  "priest": {
-    "name": "Priest",
-    "difficulty": 7,
-    "description": "Divine spellcaster with healing, blessing, and protective magic. Support-focused holy caster.",
-    "experience_penalty": 30,
-    "class_type": "intermediate",
-    "stat_modifiers": {
-      "strength": -1,
-      "dexterity": 0,
-      "constitution": 1,
-      "intelligence": 1,
-      "wisdom": 4,
-      "charisma": 2
-    },
-    "hit_die": "d8",
-    "base_attack_speed": 5.0,
     "critical_hit_range": 20
   },
   "ninja": {
@@ -355,5 +316,44 @@
     "hit_die": "d10",
     "base_attack_speed": 3.5,
     "critical_hit_range": 19
+  },
+  "rogue": {
+    "name": "Rogue",
+    "difficulty": 11,
+    "description": "Anti-magic specialist combining stealth mastery, critical strikes, and magic immunity. Cannot use magical items but devastating against spellcasters.",
+    "experience_penalty": 77,
+    "class_type": "advanced",
+    "recommended_for": ["stealth_players", "critical_hit_specialists"],
+    "stat_modifiers": {
+      "strength": -2,
+      "dexterity": 3,
+      "constitution": -2,
+      "intelligence": 2,
+      "wisdom": -1,
+      "charisma": -1
+    },
+    "hit_die": "d6",
+    "base_attack_speed": 2.0,
+    "critical_hit_range": 19,
+    "special_abilities": {
+      "magic_resistance": true,
+      "anti_magic_aura": true,
+      "cannot_use_magic_items": true,
+      "stealth_mastery": true,
+      "backstab": true,
+      "lockpicking": true,
+      "trap_detection": true,
+      "dual_wield_mastery": true,
+      "pressure_points": true,
+      "shadow_step": true,
+      "assassination": true,
+      "improved_critical": true
+    },
+    "equipment_restrictions": {
+      "weapons": ["daggers_only"],
+      "armor_types": ["light_only"],
+      "magical_items": "forbidden",
+      "special_note": "Witchhunter heritage prevents use of any magical equipment"
+    }
   }
 }

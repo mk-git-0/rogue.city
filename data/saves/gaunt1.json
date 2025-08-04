@@ -1,0 +1,361 @@
+{
+  "character_name": "gaunt1",
+  "character_class": "rogue",
+  "race_id": "gaunt_one",
+  "level": 1,
+  "experience": 50,
+  "base_stats": {
+    "strength": 14,
+    "dexterity": 12,
+    "constitution": 14,
+    "intelligence": 10,
+    "wisdom": 10,
+    "charisma": 10
+  },
+  "stats": {
+    "strength": 10,
+    "dexterity": 15,
+    "constitution": 10,
+    "intelligence": 16,
+    "wisdom": 11,
+    "charisma": 8
+  },
+  "derived_stats": {
+    "max_hp": 6,
+    "current_hp": 1,
+    "armor_class": 13,
+    "base_attack_bonus": 3
+  },
+  "current_location": {
+    "area_id": "tutorial_cave",
+    "room_id": "boss_chamber"
+  },
+  "unallocated_stats": 0,
+  "creation_complete": true,
+  "alignment_data": {
+    "alignment": "EVIL",
+    "reputation": {
+      "good_faction": -10,
+      "neutral_faction": 0,
+      "evil_faction": 10,
+      "town_guards": -15,
+      "merchants": 0,
+      "thieves_guild": 15,
+      "priests": -20,
+      "necromancers": 20,
+      "scholars": 0
+    },
+    "alignment_history": [
+      "EVIL"
+    ],
+    "drift_points": {
+      "good": 0,
+      "neutral": 0,
+      "evil": 0
+    }
+  },
+  "save_timestamp": "2025-08-03T17:26:23.838269",
+  "inventory": {
+    "items": {
+      "rusty_dagger": {
+        "item": {
+          "item_id": "rusty_dagger",
+          "name": "Rusty Dagger",
+          "description": "A small, rusty blade that has seen better days. Despite its worn appearance, it's still sharp enough to be deadly in the right hands.",
+          "item_type": "weapon",
+          "weight": 1.0,
+          "value": 5,
+          "rarity": "common",
+          "class_restrictions": [
+            "rogue"
+          ],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "damage_dice": "1d4",
+          "attack_speed": 2.0,
+          "attacks_per_turn": 2,
+          "crit_range": 19,
+          "attack_bonus": 0,
+          "damage_bonus": 0
+        },
+        "quantity": 1,
+        "equipped": true
+      },
+      "leather_scraps": {
+        "item": {
+          "item_id": "leather_scraps",
+          "name": "Leather Scraps",
+          "description": "Rough pieces of leather hastily sewn together. Provides minimal protection but doesn't restrict movement.",
+          "item_type": "armor",
+          "weight": 5.0,
+          "value": 5,
+          "rarity": "common",
+          "class_restrictions": [
+            "rogue",
+            "mystic"
+          ],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "ac_bonus": 1,
+          "armor_type": "light",
+          "max_dex_bonus": null,
+          "stealth_penalty": 0,
+          "movement_penalty": 0
+        },
+        "quantity": 1,
+        "equipped": true
+      },
+      "minor_health_potion": {
+        "item": {
+          "item_id": "minor_health_potion",
+          "name": "Minor Health Potion",
+          "description": "A small vial of red liquid that restores a modest amount of health when consumed.",
+          "item_type": "consumable",
+          "weight": 0.5,
+          "value": 25,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "usage_time": 1.0,
+          "stackable": true,
+          "hp_restore": 8,
+          "mana_restore": 0,
+          "effect_description": "The potion tastes bitter but you feel your wounds begin to heal."
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "rusty_dagger_1": {
+        "item": {
+          "item_id": "rusty_dagger",
+          "name": "Rusty Dagger",
+          "description": "A small, rusty blade that has seen better days. Despite its worn appearance, it's still sharp enough to be deadly in the right hands.",
+          "item_type": "weapon",
+          "weight": 1.0,
+          "value": 5,
+          "rarity": "common",
+          "class_restrictions": [
+            "rogue"
+          ],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "damage_dice": "1d4",
+          "attack_speed": 2.0,
+          "attacks_per_turn": 2,
+          "crit_range": 19,
+          "attack_bonus": 0,
+          "damage_bonus": 0
+        },
+        "quantity": 1,
+        "equipped": false
+      }
+    },
+    "max_weight": 50.0
+  },
+  "equipment": {
+    "equipped_items": {
+      "weapon": "rusty_dagger",
+      "armor": "leather_scraps",
+      "accessory": null,
+      "offhand": null
+    },
+    "applied_bonuses": {
+      "armor": {},
+      "weapon": {}
+    }
+  },
+  "statistics": {
+    "start_time": 1754266757.282748,
+    "enemies_defeated": 0,
+    "areas_explored": 1,
+    "items_found": 0,
+    "levels_gained": 0,
+    "total_damage_dealt": 0,
+    "total_damage_taken": 0,
+    "commands_entered": 49,
+    "times_died": 0,
+    "items_equipped": 0,
+    "areas_discovered": [
+      "Tutorial Cave"
+    ],
+    "enemies_defeated_list": [],
+    "items_found_list": []
+  },
+  "achievements": {
+    "tutorial_complete": {
+      "name": "Tutorial Master",
+      "description": "Complete the tutorial cave",
+      "condition_met": true,
+      "hidden": false
+    },
+    "first_combat": {
+      "name": "First Blood",
+      "description": "Win your first combat",
+      "condition_met": false,
+      "hidden": false
+    },
+    "first_item": {
+      "name": "Treasure Hunter",
+      "description": "Find your first item",
+      "condition_met": false,
+      "hidden": false
+    },
+    "first_level": {
+      "name": "Growing Stronger",
+      "description": "Reach level 2",
+      "condition_met": false,
+      "hidden": false
+    },
+    "monster_slayer": {
+      "name": "Monster Slayer",
+      "description": "Defeat 10 enemies",
+      "condition_met": false,
+      "hidden": false
+    },
+    "veteran_warrior": {
+      "name": "Veteran Warrior",
+      "description": "Defeat 25 enemies",
+      "condition_met": false,
+      "hidden": false
+    },
+    "combat_expert": {
+      "name": "Combat Expert",
+      "description": "Win 5 combats without taking damage",
+      "condition_met": false,
+      "hidden": false
+    },
+    "critical_master": {
+      "name": "Critical Master",
+      "description": "Land 10 critical hits",
+      "condition_met": false,
+      "hidden": false
+    },
+    "explorer": {
+      "name": "Explorer",
+      "description": "Discover 5 different areas",
+      "condition_met": false,
+      "hidden": false
+    },
+    "cartographer": {
+      "name": "Cartographer",
+      "description": "Explore every room available",
+      "condition_met": false,
+      "hidden": false
+    },
+    "forest_ranger": {
+      "name": "Forest Ranger",
+      "description": "Complete forest exploration",
+      "condition_met": false,
+      "hidden": false
+    },
+    "equipment_master": {
+      "name": "Equipment Master",
+      "description": "Equip 10 different items",
+      "condition_met": false,
+      "hidden": false
+    },
+    "inventory_full": {
+      "name": "Pack Rat",
+      "description": "Fill your inventory to capacity",
+      "condition_met": false,
+      "hidden": false
+    },
+    "stat_boost": {
+      "name": "Enhanced",
+      "description": "Gain stat bonuses from equipment",
+      "condition_met": false,
+      "hidden": false
+    },
+    "rogue_master": {
+      "name": "Master Thief",
+      "description": "Complete game as Rogue (Difficulty 11)",
+      "condition_met": false,
+      "hidden": false
+    },
+    "knight_master": {
+      "name": "Noble Warrior",
+      "description": "Complete game as Knight (Difficulty 3)",
+      "condition_met": false,
+      "hidden": false
+    },
+    "mage_master": {
+      "name": "Arcane Scholar",
+      "description": "Complete game as Mage (Difficulty 9)",
+      "condition_met": false,
+      "hidden": false
+    },
+    "mystic_master": {
+      "name": "Enlightened One",
+      "description": "Complete game as Mystic (Difficulty 6)",
+      "condition_met": false,
+      "hidden": false
+    },
+    "speedrun": {
+      "name": "Speed Runner",
+      "description": "Complete game in under 30 minutes",
+      "condition_met": false,
+      "hidden": false
+    },
+    "casual_explorer": {
+      "name": "Casual Explorer",
+      "description": "Take time to explore (over 60 minutes)",
+      "condition_met": false,
+      "hidden": false
+    },
+    "perfectionist": {
+      "name": "Perfectionist",
+      "description": "Complete without dying",
+      "condition_met": false,
+      "hidden": false
+    },
+    "pacifist": {
+      "name": "Peaceful Soul",
+      "description": "Complete with minimal combat",
+      "condition_met": false,
+      "hidden": false
+    },
+    "collector": {
+      "name": "Collector",
+      "description": "Find every available item",
+      "condition_met": false,
+      "hidden": false
+    },
+    "city_reached": {
+      "name": "Rogue City Reached",
+      "description": "Successfully reach Rogue City",
+      "condition_met": false,
+      "hidden": false
+    }
+  },
+  "game_completed": false,
+  "completion_time": null
+}
