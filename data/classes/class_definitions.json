@@ -5,6 +5,7 @@
     "description": "Pure combat specialist with weapon mastery and multiple attacks. Simple but effective melee fighter.",
     "experience_penalty": 0,
     "class_type": "basic",
+    "core_stats": ["strength", "constitution"],
     "stat_modifiers": {
       "strength": 3,
       "dexterity": 1,
@@ -15,14 +16,25 @@
     },
     "hit_die": "d10",
     "base_attack_speed": 3.5,
-    "critical_hit_range": 20
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "weapon_specialization": true,
+      "multiple_attacks": true,
+      "combat_expertise": true,
+      "all_weapon_proficiency": true,
+      "all_armor_proficiency": true,
+      "battle_tactics": true,
+      "weapon_mastery": true,
+      "armor_optimization": true
+    }
   },
   "knight": {
     "name": "Knight",
     "difficulty": 3,
-    "description": "STR/CON tank with heavy armor, shield mastery, and damage resistance. Excellent survivability for beginners.",
+    "description": "Defensive specialist with heavy armor, shield mastery, and damage resistance. Excellent survivability for beginners.",
     "experience_penalty": 10,
     "class_type": "beginner",
+    "core_stats": ["strength", "constitution"],
     "recommended_for": ["new_players", "tank_role", "defensive_play"],
     "stat_modifiers": {
       "strength": 3,
@@ -46,7 +58,7 @@
       "taunt": true,
       "shield_bash": true,
       "armor_mastery": true,
-      "leadership_bonus": 1
+      "leadership_bonus": true
     },
     "equipment_restrictions": {
       "weapons": ["all_weapons"],
@@ -61,6 +73,7 @@
     "description": "Berserker with rage abilities and damage resistance. High HP warrior with fury-based combat.",
     "experience_penalty": 15,
     "class_type": "intermediate",
+    "core_stats": ["strength", "constitution"],
     "stat_modifiers": {
       "strength": 4,
       "dexterity": 1,
@@ -71,7 +84,17 @@
     },
     "hit_die": "d12",
     "base_attack_speed": 3.0,
-    "critical_hit_range": 20
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "berserker_rage": true,
+      "damage_resistance": true,
+      "intimidation": true,
+      "weapon_specialization": true,
+      "fast_movement": true,
+      "uncanny_dodge": true,
+      "trap_sense": true,
+      "improved_uncanny_dodge": true
+    }
   },
   "ranger": {
     "name": "Ranger",
@@ -79,6 +102,7 @@
     "description": "Wilderness scout with bow mastery, tracking, and nature magic. Versatile outdoorsman and archer.",
     "experience_penalty": 20,
     "class_type": "advanced",
+    "core_stats": ["dexterity", "wisdom"],
     "stat_modifiers": {
       "strength": 1,
       "dexterity": 3,
@@ -89,7 +113,17 @@
     },
     "hit_die": "d8",
     "base_attack_speed": 3.0,
-    "critical_hit_range": 20
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "bow_mastery": true,
+      "tracking": true,
+      "animal_companion": true,
+      "favored_enemy": true,
+      "two_weapon_fighting": true,
+      "nature_magic": true,
+      "hide_in_shadows": true,
+      "move_silently": true
+    }
   },
   "thief": {
     "name": "Thief",
@@ -97,6 +131,7 @@
     "description": "Classic burglar with lockpicking, trap detection, and stealth. Utility-focused rogue variant.",
     "experience_penalty": 20,
     "class_type": "intermediate",
+    "core_stats": ["dexterity", "intelligence"],
     "stat_modifiers": {
       "strength": -1,
       "dexterity": 4,
@@ -107,14 +142,25 @@
     },
     "hit_die": "d6",
     "base_attack_speed": 2.5,
-    "critical_hit_range": 19
+    "critical_hit_range": 19,
+    "special_abilities": {
+      "lockpicking": true,
+      "trap_detection": true,
+      "trap_disarmament": true,
+      "stealth_mastery": true,
+      "backstab": true,
+      "pickpocket": true,
+      "hide_in_shadows": true,
+      "move_silently": true
+    }
   },
   "mystic": {
     "name": "Mystic",
     "difficulty": 6,
-    "description": "DEX/WIS warrior-monk with ki powers, unarmed combat, and evasion training. Balanced hybrid approach.",
+    "description": "Warrior-monk with ki powers, unarmed combat, and evasion training. Balanced hybrid approach.",
     "experience_penalty": 25,
     "class_type": "hybrid",
+    "core_stats": ["dexterity", "wisdom"],
     "recommended_for": ["balanced_play", "martial_arts", "spiritual_powers"],
     "stat_modifiers": {
       "strength": -1,
@@ -153,9 +199,10 @@
   "mage": {
     "name": "Mage",
     "difficulty": 9,
-    "description": "INT/WIS spellcaster with mana system and elemental magic. Glass cannon with powerful offensive spells.",
+    "description": "Spellcaster with mana system and elemental magic. Glass cannon with powerful offensive spells.",
     "experience_penalty": 30,
     "class_type": "spellcaster",
+    "core_stats": ["intelligence", "wisdom"],
     "recommended_for": ["magic_users", "ranged_combat", "tactical_players"],
     "stat_modifiers": {
       "strength": -2,
@@ -197,6 +244,7 @@
     "description": "Divine spellcaster with healing, blessing, and protective magic. Support-focused holy caster.",
     "experience_penalty": 30,
     "class_type": "intermediate",
+    "core_stats": ["wisdom", "charisma"],
     "stat_modifiers": {
       "strength": -1,
       "dexterity": 0,
@@ -207,7 +255,17 @@
     },
     "hit_die": "d8",
     "base_attack_speed": 5.0,
-    "critical_hit_range": 20
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "divine_magic": true,
+      "healing_spells": true,
+      "blessing_spells": true,
+      "protection_spells": true,
+      "turn_undead": true,
+      "divine_favor": true,
+      "sanctuary": true,
+      "divine_guidance": true
+    }
   },
   "paladin": {
     "name": "Paladin",
@@ -215,6 +273,7 @@
     "description": "Holy warrior with divine magic, healing, and undead turning. Good-aligned knight with divine powers.",
     "experience_penalty": 35,
     "class_type": "advanced",
+    "core_stats": ["strength", "charisma"],
     "stat_modifiers": {
       "strength": 2,
       "dexterity": 0,
@@ -225,7 +284,17 @@
     },
     "hit_die": "d10",
     "base_attack_speed": 4.0,
-    "critical_hit_range": 20
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "divine_magic": true,
+      "lay_on_hands": true,
+      "turn_undead": true,
+      "detect_evil": true,
+      "divine_grace": true,
+      "smite_evil": true,
+      "remove_disease": true,
+      "aura_of_courage": true
+    }
   },
   "spellsword": {
     "name": "Spellsword",
@@ -233,6 +302,7 @@
     "description": "Warrior-mage hybrid combining melee combat with battle magic. Balanced fighter-caster.",
     "experience_penalty": 40,
     "class_type": "advanced",
+    "core_stats": ["strength", "intelligence"],
     "stat_modifiers": {
       "strength": 2,
       "dexterity": 1,
@@ -243,7 +313,17 @@
     },
     "hit_die": "d8",
     "base_attack_speed": 3.5,
-    "critical_hit_range": 20
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "weapon_enchantment": true,
+      "battle_magic": true,
+      "spell_combat": true,
+      "arcane_weapon": true,
+      "mage_armor": true,
+      "spell_strike": true,
+      "arcane_pool": true,
+      "spell_recall": true
+    }
   },
   "ninja": {
     "name": "Ninja",
@@ -251,6 +331,7 @@
     "description": "Shadow warrior with death strikes, eastern weapons, and honor code. Expert assassin with exotic abilities.",
     "experience_penalty": 50,
     "class_type": "expert",
+    "core_stats": ["dexterity", "wisdom"],
     "stat_modifiers": {
       "strength": -2,
       "dexterity": 3,
@@ -261,7 +342,17 @@
     },
     "hit_die": "d6",
     "base_attack_speed": 2.0,
-    "critical_hit_range": 18
+    "critical_hit_range": 18,
+    "special_abilities": {
+      "shadow_step": true,
+      "death_strike": true,
+      "eastern_weapons": true,
+      "honor_code": true,
+      "assassination": true,
+      "shadow_clone": true,
+      "ki_powers": true,
+      "stealth_mastery": true
+    }
   },
   "warlock": {
     "name": "Warlock",
@@ -269,6 +360,7 @@
     "description": "Battle mage with eldritch blast and weapon enchantment. Spellsword with dark magical abilities.",
     "experience_penalty": 55,
     "class_type": "expert",
+    "core_stats": ["intelligence", "charisma"],
     "stat_modifiers": {
       "strength": 1,
       "dexterity": 1,
@@ -279,7 +371,17 @@
     },
     "hit_die": "d8",
     "base_attack_speed": 3.5,
-    "critical_hit_range": 20
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "eldritch_blast": true,
+      "weapon_enchantment": true,
+      "dark_magic": true,
+      "invocations": true,
+      "damage_reduction": true,
+      "fiendish_resilience": true,
+      "energy_resistance": true,
+      "deceive_item": true
+    }
   },
   "necromancer": {
     "name": "Necromancer",
@@ -287,6 +389,7 @@
     "description": "Death magic master with undead minions and life drain. Evil-aligned specialist in necromantic arts.",
     "experience_penalty": 65,
     "class_type": "expert",
+    "core_stats": ["intelligence", "wisdom"],
     "stat_modifiers": {
       "strength": -2,
       "dexterity": 0,
@@ -297,7 +400,17 @@
     },
     "hit_die": "d6",
     "base_attack_speed": 5.0,
-    "critical_hit_range": 20
+    "critical_hit_range": 20,
+    "special_abilities": {
+      "animate_dead": true,
+      "undead_mastery": true,
+      "life_drain": true,
+      "death_magic": true,
+      "necromantic_focus": true,
+      "speak_with_dead": true,
+      "control_undead": true,
+      "death_touch": true
+    }
   },
   "witchhunter": {
     "name": "Witchhunter",
@@ -305,6 +418,7 @@
     "description": "Anti-magic zealot with supreme spell immunity and magic item destruction. Ultimate anti-caster specialist.",
     "experience_penalty": 70,
     "class_type": "expert",
+    "core_stats": ["strength", "constitution"],
     "stat_modifiers": {
       "strength": 2,
       "dexterity": -1,
@@ -315,7 +429,17 @@
     },
     "hit_die": "d10",
     "base_attack_speed": 3.5,
-    "critical_hit_range": 19
+    "critical_hit_range": 19,
+    "special_abilities": {
+      "supreme_spell_immunity": true,
+      "magic_item_destruction": true,
+      "anti_magic_field": true,
+      "spell_turning": true,
+      "detect_magic": true,
+      "dispel_magic": true,
+      "magic_resistance": true,
+      "zealotry": true
+    }
   },
   "rogue": {
     "name": "Rogue",
@@ -323,6 +447,7 @@
     "description": "Anti-magic specialist combining stealth mastery, critical strikes, and magic immunity. Cannot use magical items but devastating against spellcasters.",
     "experience_penalty": 77,
     "class_type": "advanced",
+    "core_stats": ["dexterity", "intelligence"],
     "recommended_for": ["stealth_players", "critical_hit_specialists"],
     "stat_modifiers": {
       "strength": -2,

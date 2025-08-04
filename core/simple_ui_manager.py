@@ -220,7 +220,14 @@ class SimpleUIManager:
             
         print()
         print(f"Hit Die: {class_info['hit_die']}")
-        print("Combat: Turn-based attacks per round")
+        
+        # Show core stats if available
+        if 'core_stats' in class_info:
+            core_stats = class_info['core_stats']
+            if len(core_stats) == 1:
+                print(f"Core Stat: {core_stats[0].title()}")
+            else:
+                print(f"Core Stats: {', '.join(stat.title() for stat in core_stats)}")
         
         # Show core class abilities if available
         if 'special_abilities' in class_info:
@@ -228,21 +235,152 @@ class SimpleUIManager:
             print("Core Abilities:")
             abilities = class_info['special_abilities']
             ability_descriptions = {
+                # Combat abilities
+                'weapon_specialization': 'Weapon Specialization',
+                'multiple_attacks': 'Multiple Attacks',
+                'combat_expertise': 'Combat Expertise',
+                'all_weapon_proficiency': 'All Weapon Proficiency', 
+                'all_armor_proficiency': 'All Armor Proficiency',
+                'battle_tactics': 'Battle Tactics',
+                'weapon_mastery': 'Weapon Mastery',
+                'armor_optimization': 'Armor Optimization',
+                
+                # Defensive abilities
+                'shield_mastery': 'Shield Mastery',
+                'shield_ac_doubled': 'Double Shield AC',
+                'shield_blocking': 'Shield Blocking',
+                'damage_resistance': 'Damage Resistance',
+                'heavy_armor_proficiency': 'Heavy Armor Proficiency',
+                'defensive_stance': 'Defensive Stance',
+                'guardian_protection': 'Guardian Protection',
+                'taunt': 'Taunt Enemies',
+                'shield_bash': 'Shield Bash',
+                'armor_mastery': 'Armor Mastery',
+                'leadership_bonus': 'Leadership Bonus',
+                
+                # Stealth and rogue abilities
                 'magic_resistance': 'Magic Resistance',
                 'anti_magic_aura': 'Anti-Magic Aura',
                 'cannot_use_magic_items': 'Cannot Use Magic Items',
                 'stealth_mastery': 'Stealth Mastery',
                 'backstab': 'Backstab Attacks',
-                'shield_mastery': 'Shield Mastery',
-                'damage_resistance': 'Damage Resistance',
-                'heavy_armor_proficiency': 'Heavy Armor Proficiency',
-                'defensive_stance': 'Defensive Stance',
-                'guardian_protection': 'Guardian Protection',
+                'lockpicking': 'Lockpicking',
+                'trap_detection': 'Trap Detection',
+                'trap_disarmament': 'Trap Disarmament',
+                'pickpocket': 'Pickpocketing',
+                'hide_in_shadows': 'Hide in Shadows',
+                'move_silently': 'Move Silently',
+                'dual_wield_mastery': 'Dual-Wield Mastery',
+                'pressure_points': 'Pressure Points',
+                'shadow_step': 'Shadow Step',
+                'assassination': 'Assassination',
+                'improved_critical': 'Improved Critical',
+                
+                # Barbarian abilities
+                'berserker_rage': 'Berserker Rage',
+                'intimidation': 'Intimidation',
+                'fast_movement': 'Fast Movement',
+                'uncanny_dodge': 'Uncanny Dodge',
+                'trap_sense': 'Trap Sense',
+                'improved_uncanny_dodge': 'Improved Uncanny Dodge',
+                
+                # Ranger abilities
+                'bow_mastery': 'Bow Mastery',
+                'tracking': 'Tracking',
+                'animal_companion': 'Animal Companion',
+                'favored_enemy': 'Favored Enemy',
+                'two_weapon_fighting': 'Two-Weapon Fighting',
+                'nature_magic': 'Nature Magic',
+                
+                # Mystic abilities
+                'ki_system': 'Ki Powers',
+                'ki_strike': 'Ki Strike',
+                'ki_defense': 'Ki Defense',
+                'ki_healing': 'Ki Healing',
+                'ki_speed': 'Ki Speed',
+                'unarmed_mastery': 'Unarmed Combat',
+                'evasion_training': 'Evasion Training',
+                'deflect_missiles': 'Deflect Missiles',
+                'meditation': 'Meditation',
+                'spiritual_resistance': 'Spiritual Resistance',
+                'inner_focus': 'Inner Focus',
+                'mystical_insight': 'Mystical Insight',
+                'spiritual_awareness': 'Spiritual Awareness',
+                
+                # Magic abilities
                 'mana_system': 'Mana Spellcasting',
                 'spell_mastery': 'Spell Mastery',
-                'ki_system': 'Ki Powers',
-                'unarmed_mastery': 'Unarmed Combat',
-                'evasion_training': 'Evasion Training'
+                'spell_learning': 'Spell Learning',
+                'spell_power_bonus': 'Spell Power Bonus',
+                'spell_critical': 'Spell Critical',
+                'mana_efficiency': 'Mana Efficiency',
+                'elemental_resistance': 'Elemental Resistance',
+                'arcane_knowledge': 'Arcane Knowledge',
+                'magical_research': 'Magical Research',
+                'detect_magic': 'Detect Magic',
+                'identify_items': 'Identify Items',
+                'combat_magic': 'Combat Magic',
+                'protection_magic': 'Protection Magic',
+                'utility_magic': 'Utility Magic',
+                
+                # Divine abilities
+                'divine_magic': 'Divine Magic',
+                'healing_spells': 'Healing Spells',
+                'blessing_spells': 'Blessing Spells',
+                'protection_spells': 'Protection Spells',
+                'turn_undead': 'Turn Undead',
+                'divine_favor': 'Divine Favor',
+                'sanctuary': 'Sanctuary',
+                'divine_guidance': 'Divine Guidance',
+                'lay_on_hands': 'Lay on Hands',
+                'detect_evil': 'Detect Evil',
+                'divine_grace': 'Divine Grace',
+                'smite_evil': 'Smite Evil',
+                'remove_disease': 'Remove Disease',
+                'aura_of_courage': 'Aura of Courage',
+                
+                # Hybrid abilities
+                'weapon_enchantment': 'Weapon Enchantment',
+                'battle_magic': 'Battle Magic',
+                'spell_combat': 'Spell Combat',
+                'arcane_weapon': 'Arcane Weapon',
+                'mage_armor': 'Mage Armor',
+                'spell_strike': 'Spell Strike',
+                'arcane_pool': 'Arcane Pool',
+                'spell_recall': 'Spell Recall',
+                
+                # Ninja abilities
+                'death_strike': 'Death Strike',
+                'eastern_weapons': 'Eastern Weapons',
+                'honor_code': 'Honor Code',
+                'shadow_clone': 'Shadow Clone',
+                'ki_powers': 'Ki Powers',
+                
+                # Warlock abilities
+                'eldritch_blast': 'Eldritch Blast',
+                'dark_magic': 'Dark Magic',
+                'invocations': 'Invocations',
+                'fiendish_resilience': 'Fiendish Resilience',
+                'energy_resistance': 'Energy Resistance',
+                'deceive_item': 'Deceive Item',
+                
+                # Necromancer abilities
+                'animate_dead': 'Animate Dead',
+                'undead_mastery': 'Undead Mastery',
+                'life_drain': 'Life Drain',
+                'death_magic': 'Death Magic',
+                'necromantic_focus': 'Necromantic Focus',
+                'speak_with_dead': 'Speak with Dead',
+                'control_undead': 'Control Undead',
+                'death_touch': 'Death Touch',
+                
+                # Witchhunter abilities
+                'supreme_spell_immunity': 'Supreme Spell Immunity',
+                'magic_item_destruction': 'Magic Item Destruction',
+                'anti_magic_field': 'Anti-Magic Field',
+                'spell_turning': 'Spell Turning',
+                'dispel_magic': 'Dispel Magic',
+                'zealotry': 'Zealotry'
             }
             
             shown_abilities = []
