@@ -27,9 +27,15 @@ This is a Python-based text RPG (Rogue City) inspired by MajorMUD, built with a 
 - **GameEngine** (`game_engine.py`): Central coordinator running at 60 FPS, manages game state and system interactions
 - **SimpleUIManager** (`simple_ui_manager.py`): Traditional MajorMUD-style single-terminal interface
 - **DiceSystem** (`dice_system.py`): D&D-style dice mechanics for combat and skill checks
-- **CombatSystem** (`combat_system.py`): Turn-based combat with attacks per turn and dual-wielding
+- **CombatSystem** (`combat_system.py`): Turn-based combat with attacks per turn, dual-wielding, defensive stances, and special attacks
 - **TimerSystem** (`timer_system.py`): General timer utilities (combat is now turn-based)
 - **AlignmentSystem** (`alignment_system.py`): MajorMUD three-alignment system with reputation tracking and NPC reactions
+- **CommandParser** (`command_parser.py`): Complete MajorMUD command system with 56+ commands and class restrictions
+
+#### MajorMUD Command Systems
+- **StealthSystem** (`stealth_system.py`): Stealth mode, hiding, backstab mechanics with class-specific multipliers (2x-5x)
+- **SkillSystem** (`skill_system.py`): Lockpicking, trap detection/disarmament, search, tracking, pickpocketing with skill checks
+- **MagicCommandSystem** (`magic_command_system.py`): Spellcasting framework, mana management, meditation for all magic classes
 
 ### Game State Architecture
 - Game states: MENU, PLAYING, COMBAT, INVENTORY, CHARACTER_SHEET, QUIT
@@ -110,6 +116,50 @@ The terminal interface uses a simplified MajorMUD-style approach:
 - Cross-platform compatibility using standard terminal features
 - Command history navigation with up/down arrows
 
+### MajorMUD Command System (25+ Commands)
+Complete authentic MajorMUD command implementation with class restrictions and skill mechanics:
+
+#### Stealth & Movement Commands
+- **`sneak`** (`sn`): Enter/exit stealth mode - Rogue, Thief, Ninja, Ranger (limited)
+- **`hide`** (`hi`): Hide in current location with area-based bonuses/penalties
+- **`backstab`** (`bs`): Stealth attack with class-specific damage multipliers:
+  - Thief: 2x-5x (level progression), Rogue: 3x-5x, Ninja: 3x-5x
+- **`search`** (`se`): Find hidden doors, traps, items - All classes (skill bonuses vary)
+- **`climb`** (`cl`), **`swim`** (`sw`): Enhanced directional movement
+- **`listen`** (`lis`): Detect sounds and gather environmental information
+
+#### Skill & Utility Commands  
+- **`pick`** (`pi`): Lockpicking with difficulty levels - Thief, Rogue (DEX + class bonuses)
+- **`disarm`** (`dis`): Trap disarmament with critical failure consequences
+- **`steal`** (`st`): Pickpocketing from NPCs with detection risks
+- **`track`** (`tr`): Creature tracking with directional information - Ranger specialty
+- **`forage`** (`fo`): Natural item gathering in wilderness areas
+
+#### Combat Enhancement Commands
+- **`dual`** (`du`): Toggle dual-wielding mode - Ranger, Rogue, Ninja, Bard
+- **`defend`** (`def`): Defensive stance (+2 AC, -2 attack) - Knight, Warrior, Paladin, Barbarian
+- **`block`** (`bl`): Active shield blocking stance
+- **`parry`** (`pa`): Weapon parrying with attack penalties
+- **`charge`** (`ch`): Charging attack for bonus damage - Warrior, Knight, Barbarian, Ranger
+- **`aim`** (`ai`): Careful aiming for ranged attack bonuses
+
+#### Magic & Class Ability Commands
+- **`cast`** (`c`, `ca`): Spellcasting with mana costs, targeting, and spell failure checks
+- **`meditate`** (`med`): Mana/ki recovery - All spellcasters, Mystic, Ninja
+- **`turn`** (`tu`): Turn undead creatures - Paladin, Missionary
+- **`lay hands`** (`lh`): Divine healing touch - Paladin only
+- **`sing`** (`si`): Bardic songs for party buffs - Bard only  
+- **`shapeshift`** (`sh`): Animal transformation - Druid only
+
+#### Command System Features
+- **Class Restrictions**: Commands only available to appropriate classes
+- **Skill Checks**: DEX/INT/WIS modifiers + class bonuses + tool bonuses + experience
+- **State Management**: Stealth mode, dual-wield, defensive stances tracked per character
+- **Tool Integration**: Lockpicks, thieves' tools provide skill bonuses
+- **Experience Learning**: Repeated skill use improves success rates
+- **Authentic Feedback**: MajorMUD-style success/failure messages and combat text
+- **Complete Aliases**: All traditional MajorMUD command shortcuts supported
+
 ### Integration Points
 - UI ↔ Combat: Combat messages displayed in single scrolling output
 - Dice ↔ Combat: All calculations use dice system
@@ -119,6 +169,11 @@ The terminal interface uses a simplified MajorMUD-style approach:
 - **Alignment ↔ NPCs**: Dynamic reaction modifiers, dialogue options, and trading prices based on alignment compatibility
 - **Alignment ↔ Equipment**: Item restrictions prevent use of opposing alignment items (good/evil)
 - UI ↔ Character Creation: Race selection → **Alignment selection** → Class selection → Name → Stats (Enhanced MajorMUD flow)
+- **Commands ↔ Character Classes**: All 25+ MajorMUD commands enforce authentic class restrictions
+- **Stealth ↔ Combat**: Backstab attacks integrate with combat system for multiplied damage
+- **Skills ↔ Character Stats**: All skill checks use appropriate ability modifiers (DEX, INT, WIS)
+- **Magic ↔ Character Classes**: Mana pools calculated from class type and primary casting stat
+- **Combat Stances ↔ AC/Attack**: Defensive stances modify armor class and attack bonuses dynamically
 
 ## File Structure Patterns
 
