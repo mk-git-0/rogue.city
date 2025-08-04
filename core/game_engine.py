@@ -841,10 +841,11 @@ class GameEngine:
                 self.character_creation_state['step'] = 'class_confirmation'
                 
             else:
-                self.ui_manager.log_error("Invalid choice. Enter a number 1-4.")
+                self.ui_manager.log_error(f"Invalid choice. Enter a number 1-{len(class_list)}.")
                 
         except ValueError:
-            self.ui_manager.log_error("Enter a number 1-4 to select a class.")
+            class_list = self.character_creation_state.get('class_list', [])
+            self.ui_manager.log_error(f"Enter a number 1-{len(class_list)} to select a class.")
                 
     def _handle_class_confirmation(self, cmd: str, args: List[str]) -> None:
         """Handle class confirmation input."""

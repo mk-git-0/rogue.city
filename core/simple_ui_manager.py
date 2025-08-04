@@ -180,18 +180,24 @@ class SimpleUIManager:
         print("\n=== CHARACTER CREATION ===")
         print("\nStep 1: Choose Your Class")
         print("\nAvailable Classes:")
+        print("(Experience penalties show cost increase for leveling)")
         print()
+        
+        class_count = len(classes)
         
         for i, (class_id, class_info) in enumerate(classes.items(), 1):
             name = class_info['name']
-            difficulty = class_info['difficulty']
+            exp_penalty = class_info.get('experience_penalty', class_info.get('difficulty', 0))
             description = class_info['description']
             
-            print(f"{i}. {name} (Difficulty: {difficulty})")
-            print(f"   {description}")
+            if exp_penalty > 0:
+                print(f"{i:2d}. {name} (+{exp_penalty}% exp)")
+            else:
+                print(f"{i:2d}. {name} (Normal exp)")
+            print(f"    {description}")
             print()
             
-        print("Enter the number of your choice (1-4):")
+        print(f"Enter the number of your choice (1-{class_count}):")
         
     def show_character_creation_class_confirmation(self, class_info: dict) -> None:
         """Show class confirmation details."""

@@ -62,12 +62,31 @@ Complete race system with stat modifiers, special abilities, and experience cost
 - **Nekojin** (+40% exp): Cat-people with tracking and fire resistance
 - **Gaunt One** (+50% exp): Mysterious seers with perfect perception
 
-#### Character Classes
-Four classes with D&D-style stat modifiers and difficulty ratings:
-- **Rogue** (Difficulty 11): DEX-focused, multiple attacks, high crit chance
-- **Knight** (Difficulty 3): STR/CON tank, heavy armor, damage resistance  
-- **Mage** (Difficulty 9): INT/WIS caster, mana system, elemental magic
-- **Mystic** (Difficulty 6): DEX/WIS hybrid, evasion, spiritual abilities
+#### Character Classes (16-Class System)
+Complete 16-class MajorMUD roster with experience penalty system for balance:
+
+**BASIC CLASSES (0-10% Experience Penalty):**
+- **Knight** (0% exp): STR/CON tank, heavy armor, damage resistance, beginner-friendly
+- **Warrior** (5% exp): Pure combat specialist, weapon mastery, multiple attacks
+
+**INTERMEDIATE CLASSES (15-35% Experience Penalty):**
+- **Barbarian** (15% exp): Berserker with rage abilities, high HP, fury-based combat
+- **Ranger** (20% exp): Wilderness scout, bow mastery, tracking, nature magic
+- **Thief** (20% exp): Classic burglar, lockpicking, trap detection, stealth utility
+- **Mystic** (25% exp): DEX/WIS warrior-monk, ki powers, unarmed combat, evasion
+- **Mage** (30% exp): INT/WIS spellcaster, mana system, elemental magic, glass cannon
+- **Priest** (30% exp): Divine spellcaster, healing, blessing, protective magic
+- **Rogue** (35% exp): DEX-focused precision striker, stealth, backstab, critical hits
+- **Paladin** (35% exp): Holy warrior, divine magic, healing, undead turning
+
+**ADVANCED CLASSES (40-50% Experience Penalty):**
+- **Spellsword** (40% exp): Warrior-mage hybrid, melee combat with battle magic
+
+**EXPERT CLASSES (50-70% Experience Penalty):**
+- **Ninja** (50% exp): Shadow warrior, death strikes, eastern weapons, honor code
+- **Warlock** (55% exp): Battle mage, eldritch blast, weapon enchantment, dark magic
+- **Necromancer** (65% exp): Death magic master, undead minions, life drain, evil-aligned
+- **Witchhunter** (70% exp): Anti-magic zealot, spell immunity, magic item destruction
 
 #### Alignment System (MajorMUD Three-Alignment Model)
 Complete moral framework affecting character identity, equipment access, and NPC interactions:
@@ -119,7 +138,7 @@ Character system with race, class, and alignment hierarchies:
 - `base_character.py` - Abstract character foundation with race and alignment integration
 - `base_race.py` - Abstract race class with stat modifiers and abilities
 - `alignment_manager.py` - Individual character alignment tracking and reputation management
-- `class_*.py` - Four character classes (Rogue, Knight, Mage, Mystic) with alignment support
+- `class_*.py` - Complete 16-class system (4 core + 12 additional classes) with alignment support and experience penalty system
 - `races/` - 13 individual race implementations with MajorMUD specifications
 
 ### Area Files (`areas/`)
@@ -158,12 +177,14 @@ The game follows classic MajorMUD patterns:
 - Command-based interface (`look`, `north`, `attack goblin`)
 - Room-based exploration with exits
 - **Complete 13-race system** with authentic stat modifiers and experience costs
+- **Complete 16-class system** with experience penalty balancing (0-70% penalties)
 - **Three-alignment system** with Good/Neutral/Evil moral framework affecting gameplay
 - **Turn-based combat** with attacks per turn and weapon-specific damage
 - **NPC reputation system** with faction standing and alignment-based reactions
 - Traditional character creation flow: Race → **Alignment** → Class → Name → Stats
-- Experience and leveling systems with racial modifiers
+- Experience and leveling systems with racial and class modifiers (multiplicative)
 - Equipment restrictions based on character alignment (holy vs evil items)
+- **Expert class progression** with increasingly powerful abilities at higher experience costs
 
 ## Documentation Maintenance
 

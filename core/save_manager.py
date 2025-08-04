@@ -79,6 +79,18 @@ class SaveManager:
             elif character_class == 'mystic':
                 from characters.class_mystic import Mystic
                 return Mystic.from_dict(save_data)
+            elif character_class == 'ninja':
+                from characters.class_ninja import Ninja
+                return Ninja.from_dict(save_data)
+            elif character_class == 'warlock':
+                from characters.class_warlock import Warlock
+                return Warlock.from_dict(save_data)
+            elif character_class == 'necromancer':
+                from characters.class_necromancer import Necromancer
+                return Necromancer.from_dict(save_data)
+            elif character_class == 'witchhunter':
+                from characters.class_witchhunter import Witchhunter
+                return Witchhunter.from_dict(save_data)
             else:
                 raise ValueError(f"Unknown character class: {character_class}")
                 
@@ -161,7 +173,7 @@ class SaveManager:
                 class_data = json.load(f)
                 
             # Validate class data structure
-            required_classes = ['rogue', 'knight', 'mage', 'mystic']
+            required_classes = ['rogue', 'knight', 'mage', 'mystic', 'warrior', 'ranger', 'paladin', 'barbarian', 'thief', 'spellsword', 'priest', 'ninja', 'warlock', 'necromancer', 'witchhunter']
             for class_name in required_classes:
                 if class_name not in class_data:
                     print(f"Warning: Missing class definition for {class_name}")
@@ -252,6 +264,193 @@ class SaveManager:
                 "hit_die": "d8",
                 "base_attack_speed": 3.0,
                 "critical_hit_range": 20
+            },
+            "warrior": {
+                "name": "Warrior",
+                "difficulty": 2,
+                "description": "Pure combat specialist with weapon mastery and multiple attacks. Simple but effective melee fighter.",
+                "experience_penalty": 5,
+                "stat_modifiers": {
+                    "strength": 3,
+                    "dexterity": 1,
+                    "constitution": 2,
+                    "intelligence": -2,
+                    "wisdom": 0,
+                    "charisma": -1
+                },
+                "hit_die": "d10",
+                "base_attack_speed": 3.5,
+                "critical_hit_range": 20
+            },
+            "ranger": {
+                "name": "Ranger",
+                "difficulty": 5,
+                "description": "Wilderness scout with bow mastery, tracking, and nature magic. Versatile outdoorsman and archer.",
+                "experience_penalty": 20,
+                "stat_modifiers": {
+                    "strength": 1,
+                    "dexterity": 3,
+                    "constitution": 1,
+                    "intelligence": 0,
+                    "wisdom": 2,
+                    "charisma": -1
+                },
+                "hit_die": "d8",
+                "base_attack_speed": 3.0,
+                "critical_hit_range": 20
+            },
+            "paladin": {
+                "name": "Paladin",
+                "difficulty": 7,
+                "description": "Holy warrior with divine magic, healing, and undead turning. Good-aligned knight with divine powers.",
+                "experience_penalty": 35,
+                "stat_modifiers": {
+                    "strength": 2,
+                    "dexterity": 0,
+                    "constitution": 2,
+                    "intelligence": -1,
+                    "wisdom": 2,
+                    "charisma": 2
+                },
+                "hit_die": "d10",
+                "base_attack_speed": 4.0,
+                "critical_hit_range": 20
+            },
+            "barbarian": {
+                "name": "Barbarian",
+                "difficulty": 4,
+                "description": "Berserker with rage abilities and damage resistance. High HP warrior with fury-based combat.",
+                "experience_penalty": 15,
+                "stat_modifiers": {
+                    "strength": 4,
+                    "dexterity": 1,
+                    "constitution": 3,
+                    "intelligence": -3,
+                    "wisdom": -1,
+                    "charisma": -1
+                },
+                "hit_die": "d12",
+                "base_attack_speed": 3.0,
+                "critical_hit_range": 20
+            },
+            "thief": {
+                "name": "Thief",
+                "difficulty": 6,
+                "description": "Classic burglar with lockpicking, trap detection, and stealth. Utility-focused rogue variant.",
+                "experience_penalty": 20,
+                "stat_modifiers": {
+                    "strength": -1,
+                    "dexterity": 4,
+                    "constitution": -1,
+                    "intelligence": 2,
+                    "wisdom": 1,
+                    "charisma": 0
+                },
+                "hit_die": "d6",
+                "base_attack_speed": 2.5,
+                "critical_hit_range": 19
+            },
+            "spellsword": {
+                "name": "Spellsword",
+                "difficulty": 8,
+                "description": "Warrior-mage hybrid combining melee combat with battle magic. Balanced fighter-caster.",
+                "experience_penalty": 40,
+                "stat_modifiers": {
+                    "strength": 2,
+                    "dexterity": 1,
+                    "constitution": 0,
+                    "intelligence": 2,
+                    "wisdom": 1,
+                    "charisma": -1
+                },
+                "hit_die": "d8",
+                "base_attack_speed": 3.5,
+                "critical_hit_range": 20
+            },
+            "priest": {
+                "name": "Priest",
+                "difficulty": 7,
+                "description": "Divine spellcaster with healing, blessing, and protective magic. Support-focused holy caster.",
+                "experience_penalty": 30,
+                "stat_modifiers": {
+                    "strength": -1,
+                    "dexterity": 0,
+                    "constitution": 1,
+                    "intelligence": 1,
+                    "wisdom": 4,
+                    "charisma": 2
+                },
+                "hit_die": "d8",
+                "base_attack_speed": 5.0,
+                "critical_hit_range": 20
+            },
+            "ninja": {
+                "name": "Ninja",
+                "difficulty": 9,
+                "description": "Shadow warrior with death strikes, eastern weapons, and honor code. Expert assassin with exotic abilities.",
+                "experience_penalty": 50,
+                "stat_modifiers": {
+                    "strength": -2,
+                    "dexterity": 3,
+                    "constitution": 1,
+                    "intelligence": -2,
+                    "wisdom": 2,
+                    "charisma": -1
+                },
+                "hit_die": "d6",
+                "base_attack_speed": 2.0,
+                "critical_hit_range": 18
+            },
+            "warlock": {
+                "name": "Warlock",
+                "difficulty": 10,
+                "description": "Battle mage with eldritch blast and weapon enchantment. Spellsword with dark magical abilities.",
+                "experience_penalty": 55,
+                "stat_modifiers": {
+                    "strength": 1,
+                    "dexterity": 1,
+                    "constitution": 0,
+                    "intelligence": 3,
+                    "wisdom": 1,
+                    "charisma": 1
+                },
+                "hit_die": "d8",
+                "base_attack_speed": 3.5,
+                "critical_hit_range": 20
+            },
+            "necromancer": {
+                "name": "Necromancer",
+                "difficulty": 11,
+                "description": "Death magic master with undead minions and life drain. Evil-aligned specialist in necromantic arts.",
+                "experience_penalty": 65,
+                "stat_modifiers": {
+                    "strength": -2,
+                    "dexterity": 0,
+                    "constitution": 1,
+                    "intelligence": 4,
+                    "wisdom": 2,
+                    "charisma": -1
+                },
+                "hit_die": "d6",
+                "base_attack_speed": 5.0,
+                "critical_hit_range": 20
+            },
+            "witchhunter": {
+                "name": "Witchhunter",
+                "difficulty": 12,
+                "description": "Anti-magic zealot with supreme spell immunity and magic item destruction. Ultimate anti-caster specialist.",
+                "experience_penalty": 70,
+                "stat_modifiers": {
+                    "strength": 2,
+                    "dexterity": -1,
+                    "constitution": 3,
+                    "intelligence": -3,
+                    "wisdom": 2,
+                    "charisma": -2
+                },
+                "hit_die": "d10",
+                "base_attack_speed": 3.5,
+                "critical_hit_range": 19
             }
         }
         
