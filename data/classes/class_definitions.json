@@ -31,7 +31,7 @@
   "knight": {
     "name": "Knight",
     "difficulty": 3,
-    "description": "Defensive specialist with heavy armor, shield mastery, and damage resistance. Excellent survivability for beginners.",
+    "description": "Stalwart fortress of defense with impenetrable armor and shield mastery. Walking tank that protects allies while crushing enemies.",
     "experience_penalty": 10,
     "class_type": "beginner",
     "core_stats": ["strength", "constitution"],
