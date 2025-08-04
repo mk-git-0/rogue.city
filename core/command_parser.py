@@ -94,6 +94,7 @@ class CommandParser:
         # Magic & Class Ability commands
         self.commands['cast'] = self.cmd_cast
         self.commands['meditate'] = self.cmd_meditate
+        self.commands['spells'] = self.cmd_spells
         self.commands['turn'] = self.cmd_turn_undead
         self.commands['lay'] = self.cmd_lay_hands
         self.commands['sing'] = self.cmd_sing
@@ -172,6 +173,7 @@ class CommandParser:
         self.aliases['c'] = 'cast'
         self.aliases['ca'] = 'cast'
         self.aliases['med'] = 'meditate'
+        self.aliases['sp'] = 'spells'
         self.aliases['tu'] = 'turn'
         self.aliases['lay hands'] = 'lay'
         self.aliases['lh'] = 'lay'
@@ -1075,24 +1077,48 @@ class CommandParser:
             self.game.ui_manager.log_error("No character loaded.")
             return True
         
+        player = self.game.current_player
+        
         if not args:
             self.game.ui_manager.log_error("Cast what spell?")
+            if hasattr(player, 'known_spells') and player.known_spells:
+                self.game.ui_manager.log_info(f"Known spells: {', '.join(player.known_spells)}")
             return True
         
-        # Initialize magic system if needed
-        if not hasattr(self.game, 'magic_system'):
-            from .magic_command_system import MagicCommandSystem
-            self.game.magic_system = MagicCommandSystem(self.game.dice_system, self.game.ui_manager)
+        # Check if player can cast spells
+        if not player.is_spellcaster():
+            self.game.ui_manager.log_error("You don't know how to cast spells.")
+            return True
+        
+        # Initialize spell system if needed
+        if not hasattr(self.game, 'spell_system'):
+            from core.spell_system import SpellSystem
+            self.game.spell_system = SpellSystem(self.game.dice_system, self.game.ui_manager)
         
         # Parse spell name and target
-        if len(args) == 1:
-            spell_name = args[0]
-            target_name = None
-        else:
-            spell_name = args[0]
-            target_name = ' '.join(args[1:])
+        spell_name = args[0].lower().replace(' ', '_')
+        target_name = ' '.join(args[1:]) if len(args) > 1 else None
         
-        self.game.magic_system.attempt_cast_spell(self.game.current_player, spell_name, target_name)
+        # Check if in combat and use combat spell casting
+        if hasattr(self.game, 'combat_system') and self.game.combat_system.is_active():
+            success = self.game.combat_system.cast_spell_in_combat(spell_name, target_name)
+        else:
+            # Out of combat spell casting
+            target = None
+            if target_name:
+                if target_name.lower() in ['self', 'me']:
+                    target = player
+                else:
+                    # Mock target for testing - in real game would resolve from current area
+                    target = {'name': target_name, 'type': 'enemy'}
+            
+            # Attempt to cast the spell
+            success, message, effects_data = self.game.spell_system.cast_spell(
+                player, spell_name, target, self.game.combat_system if hasattr(self.game, 'combat_system') else None
+            )
+            
+            if not success:
+                self.game.ui_manager.log_error(message)
         
         return True
     
@@ -1102,12 +1128,67 @@ class CommandParser:
             self.game.ui_manager.log_error("No character loaded.")
             return True
         
+        player = self.game.current_player
+        
+        # Check if player can meditate
+        if not player.is_spellcaster():
+            self.game.ui_manager.log_error("You don't know how to meditate.")
+            return True
+        
         # Initialize magic system if needed
         if not hasattr(self.game, 'magic_system'):
-            from .magic_command_system import MagicCommandSystem
-            self.game.magic_system = MagicCommandSystem(self.game.dice_system, self.game.ui_manager)
+            from core.magic_system import MagicSystem
+            self.game.magic_system = MagicSystem()
         
-        self.game.magic_system.attempt_meditation(self.game.current_player)
+        success, message, recovery = self.game.magic_system.meditate(player)
+        
+        if success:
+            self.game.ui_manager.log_success(message)
+        else:
+            self.game.ui_manager.log_error(message)
+        
+        return True
+    
+    def cmd_spells(self, args: List[str]) -> bool:
+        """Show known spells and mana status."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        player = self.game.current_player
+        
+        if not player.is_spellcaster():
+            self.game.ui_manager.log_error("You don't know any spells.")
+            return True
+        
+        # Show mana status
+        mana_status = f"Mana: {player.current_mana}/{player.max_mana}"
+        mana_percent = int(player.get_mana_percentage() * 100)
+        self.game.ui_manager.log_info(f"{mana_status} ({mana_percent}%)")
+        
+        # Show known spells
+        if not player.known_spells:
+            self.game.ui_manager.log_info("You don't know any spells yet.")
+            return True
+        
+        self.game.ui_manager.log_info("Known Spells:")
+        
+        # Initialize spell system to get spell details
+        if not hasattr(self.game, 'spell_system'):
+            from core.spell_system import SpellSystem
+            self.game.spell_system = SpellSystem()
+        
+        for spell_name in player.known_spells:
+            spell_data = self.game.spell_system.get_spell_data(spell_name)
+            if spell_data:
+                mana_cost = spell_data.get('mana_cost', '?')
+                level = spell_data.get('level', '?')
+                school = spell_data.get('school', '?').title()
+                description = spell_data.get('description', 'Unknown spell')
+                self.game.ui_manager.log_info(f"  {spell_data['name']} (Level {level} {school}, {mana_cost} mana)")
+                self.game.ui_manager.log_info(f"    {description}")
+            else:
+                self.game.ui_manager.log_info(f"  {spell_name} (Unknown spell)")
         
         return True
     

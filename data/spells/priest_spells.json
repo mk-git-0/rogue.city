@@ -1,0 +1,77 @@
+{
+  "cure_light_wounds": {
+    "name": "Cure Light Wounds",
+    "level": 1,
+    "school": "priest",
+    "mana_cost": 3,
+    "description": "Channels divine energy to heal minor wounds",
+    "target_type": "single_ally",
+    "duration": "instant",
+    "healing": "1d8+1",
+    "special": "Can target self if no target specified"
+  },
+  "cure_serious_wounds": {
+    "name": "Cure Serious Wounds",
+    "level": 2,
+    "school": "priest",
+    "mana_cost": 4,
+    "description": "Channels powerful divine energy to heal moderate wounds",
+    "target_type": "single_ally",
+    "duration": "instant",
+    "healing": "2d8+2",
+    "special": "Can target self if no target specified"
+  },
+  "heal": {
+    "name": "Heal",
+    "level": 6,
+    "school": "priest",
+    "mana_cost": 12,
+    "description": "Channels overwhelming divine power to completely heal all wounds",
+    "target_type": "single_ally",
+    "duration": "instant",
+    "healing": "Full HP restoration",
+    "special": "Restores target to maximum hit points"
+  },
+  "bless": {
+    "name": "Bless",
+    "level": 1,
+    "school": "priest",
+    "mana_cost": 2,
+    "description": "Calls upon divine favor to enhance combat abilities",
+    "target_type": "single_ally",
+    "duration": "10 minutes",
+    "effect": "+1 attack and damage bonus"
+  },
+  "sanctuary": {
+    "name": "Sanctuary",
+    "level": 1,
+    "school": "priest",
+    "mana_cost": 2,
+    "description": "Surrounds the target with divine protection that deters attacks",
+    "target_type": "single_ally",
+    "duration": "5 minutes",
+    "effect": "Protection from attacks",
+    "special": "Attackers must make Will save to target protected creature"
+  },
+  "turn_undead": {
+    "name": "Turn Undead",
+    "level": 2,
+    "school": "priest",
+    "mana_cost": 4,
+    "description": "Channels divine power to repel or destroy undead creatures",
+    "target_type": "all_enemies",
+    "duration": "instant",
+    "special": "Affects only undead creatures, may cause them to flee or be destroyed"
+  },
+  "spiritual_hammer": {
+    "name": "Spiritual Hammer",
+    "level": 2,
+    "school": "priest",
+    "mana_cost": 4,
+    "description": "Creates a spectral hammer that strikes enemies with divine force",
+    "target_type": "single_enemy",
+    "duration": "instant",
+    "damage": "1d8 divine",
+    "special": "Magical weapon attack"
+  }
+}

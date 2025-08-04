@@ -338,6 +338,128 @@ class CombatSystem:
         self.ui_manager.log_error("You cannot flee from this battle!")
         return False
         
+    def cast_spell_in_combat(self, spell_name: str, target_name: str = None) -> bool:
+        """
+        Cast a spell during combat.
+        
+        Args:
+            spell_name: Name of spell to cast
+            target_name: Name of target (for targeted spells)
+            
+        Returns:
+            True if spell was cast successfully
+        """
+        if not self.is_active() or not self.current_character.is_alive():
+            return False
+            
+        # Check if character can cast spells
+        if not self.current_character.is_spellcaster():
+            self.ui_manager.log_error("You don't know how to cast spells.")
+            return False
+            
+        # Initialize spell system if needed
+        if not hasattr(self, 'spell_system'):
+            from core.spell_system import SpellSystem
+            self.spell_system = SpellSystem(self.dice_system, self.ui_manager)
+            
+        # Resolve target for combat
+        target = None
+        if target_name:
+            if target_name.lower() in ['self', 'me']:
+                target = self.current_character
+            else:
+                # Find enemy target
+                for enemy_id, enemy in self.enemies.items():
+                    if enemy.is_alive():
+                        enemy_name = enemy.name.lower()
+                        target_lower = target_name.lower()
+                        if enemy_name == target_lower or target_lower in enemy_name:
+                            target = enemy
+                            break
+                            
+                if not target:
+                    self.ui_manager.log_error(f"Enemy '{target_name}' not found.")
+                    return False
+                    
+        # Cast the spell
+        success, message, effects_data = self.spell_system.cast_spell(
+            self.current_character, spell_name, target, self
+        )
+        
+        if success:
+            # Apply spell effects
+            self._apply_spell_effects(effects_data)
+            
+        return success
+        
+    def _apply_spell_effects(self, effects_data: Dict[str, Any]):
+        """Apply spell effects during combat"""
+        effect_type = effects_data.get('type')
+        
+        if effect_type == 'damage':
+            # Apply damage to target
+            damage = effects_data.get('damage', 0)
+            target = effects_data.get('target')
+            damage_type = effects_data.get('damage_type', 'magical')
+            
+            if hasattr(target, 'current_hp'):  # Enemy target
+                actual_damage = target.take_damage(damage)
+                self.ui_manager.log_success(f"{target.name} takes {actual_damage} {damage_type} damage!")
+                
+                # Check if enemy died
+                if not target.is_alive():
+                    self.ui_manager.log_success(f"{target.name} has been slain!")
+                    self._check_combat_end()
+                    
+        elif effect_type == 'healing':
+            # Apply healing to target
+            healing = effects_data.get('healing')
+            target = effects_data.get('target')
+            
+            if healing == 'full':
+                # Full heal
+                if hasattr(target, 'current_hp') and hasattr(target, 'max_hp'):
+                    old_hp = target.current_hp
+                    target.current_hp = target.max_hp
+                    actual_healing = target.current_hp - old_hp
+                    self.ui_manager.log_success(f"{target.name if hasattr(target, 'name') else 'You'} fully healed for {actual_healing} HP!")
+            else:
+                # Normal healing
+                if hasattr(target, 'heal'):
+                    actual_healing = target.heal(healing)
+                    target_name = target.name if hasattr(target, 'name') else 'You'
+                    self.ui_manager.log_success(f"{target_name} healed for {actual_healing} HP!")
+                    
+        elif effect_type == 'buff':
+            # Apply temporary buff
+            effect_name = effects_data.get('effect')
+            duration = effects_data.get('duration', 1)
+            target = effects_data.get('target')
+            
+            self.ui_manager.log_info(f"Spell effect '{effect_name}' applied for {duration} rounds.")
+            # TODO: Implement buff tracking system
+            
+        elif effect_type == 'turn_undead':
+            # Turn undead effect
+            turning_dc = effects_data.get('turning_dc', 10)
+            undead_affected = 0
+            
+            for enemy_id, enemy in self.enemies.items():
+                if enemy.is_alive() and hasattr(enemy, 'creature_type') and enemy.creature_type == 'undead':
+                    # Roll save vs turning
+                    save_roll = self.dice_system.roll("1d20")
+                    if save_roll < turning_dc:
+                        enemy.current_hp = 0  # Destroy weak undead
+                        self.ui_manager.log_success(f"{enemy.name} is destroyed by divine power!")
+                        undead_affected += 1
+                    else:
+                        self.ui_manager.log_info(f"{enemy.name} resists the turning attempt.")
+                        
+            if undead_affected > 0:
+                self._check_combat_end()
+            else:
+                self.ui_manager.log_info("No undead creatures were affected.")
+        
     def get_combat_status(self) -> Dict[str, Any]:
         """
         Get current combat status.

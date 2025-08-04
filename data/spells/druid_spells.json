@@ -1,0 +1,64 @@
+{
+  "goodberry": {
+    "name": "Goodberry",
+    "level": 1,
+    "school": "druid",
+    "mana_cost": 2,
+    "description": "Creates magical berries that provide nourishment and minor healing",
+    "target_type": "none",
+    "duration": "24 hours",
+    "special": "Creates 2-10 berries based on level, each heals 1 HP"
+  },
+  "cure_poison": {
+    "name": "Cure Poison",
+    "level": 2,
+    "school": "druid",
+    "mana_cost": 4,
+    "description": "Neutralizes poison in the target's system",
+    "target_type": "single_ally",
+    "duration": "instant",
+    "effect": "Removes all poison effects"
+  },
+  "barkskin": {
+    "name": "Barkskin",
+    "level": 2,
+    "school": "druid",
+    "mana_cost": 4,
+    "description": "The target's skin becomes tough and bark-like, providing natural armor",
+    "target_type": "single_ally",
+    "duration": "1 hour",
+    "effect": "+2 natural AC bonus"
+  },
+  "call_lightning": {
+    "name": "Call Lightning",
+    "level": 3,
+    "school": "druid",
+    "mana_cost": 6,
+    "description": "Calls down a bolt of lightning from the sky (more powerful outdoors)",
+    "target_type": "single_enemy",
+    "duration": "instant",
+    "damage": "3d6 electric (outdoors) or 2d6 electric (indoors)",
+    "special": "More powerful when cast outdoors"
+  },
+  "plant_growth": {
+    "name": "Plant Growth",
+    "level": 3,
+    "school": "druid",
+    "mana_cost": 6,
+    "description": "Causes plants to grow rapidly and entangle enemies in the area",
+    "target_type": "area",
+    "duration": "10 minutes",
+    "effect": "Entangles enemies",
+    "special": "Area effect, Dexterity save to avoid entanglement"
+  },
+  "speak_with_animals": {
+    "name": "Speak with Animals",
+    "level": 1,
+    "school": "druid",
+    "mana_cost": 2,
+    "description": "Allows communication with natural animals and beasts",
+    "target_type": "none",
+    "duration": "30 minutes",
+    "special": "Enables conversation with animal NPCs and creatures"
+  }
+}

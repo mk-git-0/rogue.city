@@ -1,0 +1,91 @@
+{
+  "spell_schools": {
+    "mage": {
+      "name": "Arcane Magic",
+      "description": "Raw magical energy shaped through intellect and study",
+      "primary_stat": "intelligence",
+      "classes": ["mage", "warlock", "necromancer", "bard"],
+      "spell_types": ["evocation", "transmutation", "conjuration", "enchantment", "illusion"],
+      "specialties": ["damage spells", "utility magic", "protection spells"]
+    },
+    "priest": {
+      "name": "Divine Magic",
+      "description": "Holy power channeled through faith and divine connection",
+      "primary_stat": "wisdom",
+      "classes": ["priest", "paladin"],
+      "spell_types": ["healing", "blessing", "protection", "turning"],
+      "specialties": ["healing magic", "blessed weapons", "undead turning"]
+    },
+    "druid": {
+      "name": "Nature Magic",
+      "description": "Natural forces harnessed through harmony with the world",
+      "primary_stat": "wisdom", 
+      "classes": ["druid", "ranger"],
+      "spell_types": ["nature", "animal", "weather", "growth"],
+      "specialties": ["nature communication", "weather control", "animal powers"]
+    }
+  },
+  "class_spell_access": {
+    "mage": {
+      "schools": ["mage"],
+      "max_spell_level": 9,
+      "starting_spells": ["magic_missile", "light"],
+      "spells_per_level": 2,
+      "mana_modifier": 1.5
+    },
+    "priest": {
+      "schools": ["priest"],
+      "max_spell_level": 7,
+      "starting_spells": ["cure_light_wounds", "bless"],
+      "spells_per_level": 1,
+      "mana_modifier": 1.25
+    },
+    "druid": {
+      "schools": ["druid"],
+      "max_spell_level": 7,
+      "starting_spells": ["goodberry", "speak_with_animals"],
+      "spells_per_level": 1,
+      "mana_modifier": 1.25
+    },
+    "warlock": {
+      "schools": ["mage"],
+      "max_spell_level": 5,
+      "starting_spells": ["magic_missile"],
+      "spells_per_level": 1,
+      "mana_modifier": 1.0,
+      "spell_focus": "combat"
+    },
+    "necromancer": {
+      "schools": ["mage"],
+      "max_spell_level": 8,
+      "starting_spells": ["magic_missile", "detect_magic"],
+      "spells_per_level": 1,
+      "mana_modifier": 1.2,
+      "spell_focus": "death"
+    },
+    "paladin": {
+      "schools": ["priest"],
+      "max_spell_level": 4,
+      "starting_spells": ["cure_light_wounds"],
+      "spells_per_level": 1,
+      "mana_modifier": 0.75,
+      "spell_focus": "healing"
+    },
+    "ranger": {
+      "schools": ["druid"],
+      "max_spell_level": 3,
+      "starting_spells": ["goodberry"],
+      "spells_per_level": 1,
+      "mana_modifier": 0.5,
+      "spell_focus": "utility"
+    },
+    "bard": {
+      "schools": ["mage"],
+      "max_spell_level": 6,
+      "starting_spells": ["light"],
+      "spells_per_level": 1,
+      "mana_modifier": 0.8,
+      "spell_focus": "enchantment"
+    }
+  }
+}

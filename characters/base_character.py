@@ -51,6 +51,14 @@ class BaseCharacter(ABC):
         self.armor_class = 10  # Base AC is 10
         self.base_attack_bonus = 0
         
+        # Magic system integration
+        self.max_mana = 0
+        self.current_mana = 0
+        self.known_spells = []
+        
+        # Initialize magic system for spellcasting classes
+        self._initialize_magic_system()
+        
         # Calculate initial derived stats after class modifiers are applied
         self.calculate_derived_stats()
         
@@ -93,6 +101,20 @@ class BaseCharacter(ABC):
                 self.apply_class_modifiers(class_data)
         except (ImportError, Exception):
             pass
+            
+    def _initialize_magic_system(self):
+        """Initialize magic system for spellcasting classes"""
+        try:
+            from core.magic_system import MagicSystem
+            magic_system = MagicSystem()
+            
+            if magic_system.is_spellcaster(self.character_class):
+                # Get starting spells for this class
+                self.known_spells = magic_system.get_starting_spells(self.character_class).copy()
+            else:
+                self.known_spells = []
+        except ImportError:
+            self.known_spells = []
         
     def apply_class_modifiers(self, class_data: Dict[str, Any]):
         """Apply class-specific stat modifiers to base stats"""
@@ -144,6 +166,27 @@ class BaseCharacter(ABC):
         # Attack bonus: level + primary stat modifier
         str_modifier = (self.stats['strength'] - 10) // 2
         self.base_attack_bonus = self.level + str_modifier
+        
+        # Mana calculation for spellcasting classes
+        self._calculate_mana()
+        
+    def _calculate_mana(self):
+        """Calculate mana pool for spellcasting classes"""
+        try:
+            from core.magic_system import MagicSystem
+            magic_system = MagicSystem()
+            
+            if magic_system.is_spellcaster(self.character_class):
+                self.max_mana = magic_system.calculate_max_mana(self)
+                # Set current mana to max if this is first calculation
+                if self.current_mana == 0:
+                    self.current_mana = self.max_mana
+            else:
+                self.max_mana = 0
+                self.current_mana = 0
+        except ImportError:
+            self.max_mana = 0
+            self.current_mana = 0
         
     @abstractmethod
     def get_hit_die_value(self) -> int:
@@ -266,12 +309,25 @@ class BaseCharacter(ABC):
         # Recalculate derived stats for new level
         self.calculate_derived_stats()
         
+        # Learn new spells for spellcasting classes
+        new_spells = self._learn_spells_on_levelup()
+        
         return {
             'old_level': old_level,
             'new_level': self.level,
             'hp_gained': self.max_hp - old_max_hp,
-            'stat_points_gained': 1
+            'stat_points_gained': 1,
+            'new_spells': new_spells
         }
+        
+    def _learn_spells_on_levelup(self) -> List[str]:
+        """Learn new spells when leveling up"""
+        try:
+            from core.spell_system import SpellSystem
+            spell_system = SpellSystem()
+            return spell_system.learn_spell_on_levelup(self)
+        except ImportError:
+            return []
         
     def get_stat_modifier(self, stat_name: str) -> int:
         """Get D&D style stat modifier for a given stat"""
@@ -327,8 +383,44 @@ class BaseCharacter(ABC):
                 self.equipment_system.equip_item(item.item_id)
     
     def restore_mana(self, amount: int) -> int:
-        """Restore mana (for mage classes). Override in mage subclass."""
-        return 0  # Base classes don't have mana
+        """Restore mana for spellcasting classes"""
+        if self.max_mana <= 0:
+            return 0  # Non-spellcasting classes
+            
+        if self.current_mana >= self.max_mana:
+            return 0  # Already at full mana
+            
+        old_mana = self.current_mana
+        self.current_mana = min(self.max_mana, self.current_mana + amount)
+        return self.current_mana - old_mana
+        
+    def spend_mana(self, amount: int) -> bool:
+        """Spend mana for spell casting"""
+        if self.current_mana < amount:
+            return False
+        self.current_mana -= amount
+        return True
+        
+    def get_mana_percentage(self) -> float:
+        """Get mana as percentage (0.0 to 1.0)"""
+        if self.max_mana <= 0:
+            return 0.0
+        return self.current_mana / self.max_mana
+        
+    def is_spellcaster(self) -> bool:
+        """Check if this character can cast spells"""
+        return self.max_mana > 0
+        
+    def knows_spell(self, spell_name: str) -> bool:
+        """Check if character knows a specific spell"""
+        return spell_name.lower() in [spell.lower() for spell in self.known_spells]
+        
+    def learn_spell(self, spell_name: str) -> bool:
+        """Learn a new spell"""
+        if not self.knows_spell(spell_name):
+            self.known_spells.append(spell_name)
+            return True
+        return False
         
     def get_special_abilities(self) -> Dict[str, Any]:
         """Get class-specific special abilities (override in subclasses)"""
@@ -466,6 +558,11 @@ class BaseCharacter(ABC):
             'unallocated_stats': self.unallocated_stats,
             'creation_complete': self.creation_complete,
             'alignment_data': self.alignment_manager.save_to_dict(),
+            'magic_data': {
+                'max_mana': self.max_mana,
+                'current_mana': self.current_mana,
+                'known_spells': self.known_spells.copy()
+            },
             'save_timestamp': time.time()
         }
         

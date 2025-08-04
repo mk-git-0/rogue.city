@@ -1,0 +1,75 @@
+{
+  "magic_missile": {
+    "name": "Magic Missile",
+    "level": 1,
+    "school": "mage",
+    "mana_cost": 2,
+    "description": "Launches unerring darts of magical force that automatically hit their target",
+    "target_type": "single_enemy",
+    "duration": "instant",
+    "damage": "1d4+1 per missile",
+    "special": "Number of missiles based on caster level (1-5)"
+  },
+  "light": {
+    "name": "Light",
+    "level": 0,
+    "school": "mage",
+    "mana_cost": 1,
+    "description": "Creates a bright light that illuminates the surrounding area",
+    "target_type": "none",
+    "duration": "1 hour",
+    "special": "Illuminates dark areas"
+  },
+  "fireball": {
+    "name": "Fireball",
+    "level": 3,
+    "school": "mage",
+    "mana_cost": 6,
+    "description": "Hurls a blazing sphere that explodes in a fiery blast",
+    "target_type": "single_enemy",
+    "duration": "instant",
+    "damage": "8d6 fire",
+    "special": "Area effect, Dexterity save for half damage"
+  },
+  "lightning_bolt": {
+    "name": "Lightning Bolt",
+    "level": 3,
+    "school": "mage",
+    "mana_cost": 6,
+    "description": "Unleashes a powerful bolt of electricity that strikes in a line",
+    "target_type": "single_enemy",
+    "duration": "instant",
+    "damage": "8d6 electric",
+    "special": "Line effect, Dexterity save for half damage"
+  },
+  "shield": {
+    "name": "Shield",
+    "level": 1,
+    "school": "mage",
+    "mana_cost": 2,
+    "description": "Creates an invisible barrier that deflects attacks",
+    "target_type": "self",
+    "duration": "10 minutes",
+    "effect": "+4 AC bonus"
+  },
+  "mage_armor": {
+    "name": "Mage Armor",
+    "level": 1,
+    "school": "mage",
+    "mana_cost": 2,
+    "description": "Surrounds the caster with protective magical force",
+    "target_type": "self",
+    "duration": "1 hour",
+    "effect": "+2 AC bonus"
+  },
+  "detect_magic": {
+    "name": "Detect Magic",
+    "level": 0,
+    "school": "mage",
+    "mana_cost": 1,
+    "description": "Reveals the presence of magical auras within the area",
+    "target_type": "none",
+    "duration": "10 minutes",
+    "special": "Detects magical items and effects"
+  }
+}

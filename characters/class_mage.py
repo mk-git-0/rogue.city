@@ -44,13 +44,9 @@ class Mage(BaseCharacter):
     
     def __init__(self, name: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
         """Initialize Mage character with spell and mana systems"""
-        # Initialize mana attributes before calling parent __init__
-        self.max_mana = 0
-        self.current_mana = 0
         super().__init__(name, 'mage', race_id, alignment)
         
-        # Spell system attributes
-        self.known_spells = self._get_starting_spells()
+        # Mage-specific spell attributes  
         self.spell_slots_used = {}  # Track spell usage per day
         self.spell_critical_chance = 20  # 20% chance for spell crits
         
@@ -123,19 +119,8 @@ class Mage(BaseCharacter):
         }
         
     def calculate_derived_stats(self):
-        """Override to include comprehensive mana and spell calculations"""
+        """Override to include mage-specific calculations"""
         super().calculate_derived_stats()
-        
-        # Enhanced mana calculation: 6 + (INT modifier × level) + (WIS modifier × level/2)
-        int_modifier = max(0, (self.stats['intelligence'] - 10) // 2)
-        wis_modifier = max(0, (self.stats['wisdom'] - 10) // 2)
-        level_for_mana = max(1, self.level)  # Minimum level 1 for mana calculation
-        
-        self.max_mana = 6 + (int_modifier * level_for_mana) + (wis_modifier * level_for_mana // 2)
-        
-        # Set current mana to max if this is first calculation
-        if self.current_mana == 0:
-            self.current_mana = self.max_mana
             
         # Mages use INT modifier for spell attack bonus
         int_modifier = (self.stats['intelligence'] - 10) // 2
@@ -147,22 +132,7 @@ class Mage(BaseCharacter):
             for element in self.elemental_resistances:
                 self.elemental_resistances[element] = base_resistance
         
-    # === SPELL SYSTEM ===
-    
-    def _get_starting_spells(self) -> List[str]:
-        """Get starting spells for new mage"""
-        return ['magic_missile', 'light']  # Traditional starting spells
-    
-    def get_known_spells(self) -> List[str]:
-        """Get list of known spells"""
-        return self.known_spells.copy()
-    
-    def learn_spell(self, spell_name: str) -> bool:
-        """Learn a new spell"""
-        if spell_name not in self.known_spells:
-            self.known_spells.append(spell_name)
-            return True
-        return False
+    # === MAGE SPELL SYSTEM ===
     
     def can_learn_new_spell(self) -> bool:
         """Check if mage can learn a new spell this level"""
@@ -192,29 +162,7 @@ class Mage(BaseCharacter):
         # Return spells not yet known
         return [spell for spell in available if spell not in self.known_spells]
     
-    # === MANA SYSTEM ===
-    
-    def get_mana_percentage(self) -> float:
-        """Get mana as percentage (0.0 to 1.0)"""
-        if self.max_mana <= 0:
-            return 0.0
-        return self.current_mana / self.max_mana
-        
-    def spend_mana(self, amount: int) -> bool:
-        """Spend mana for spellcasting"""
-        if self.current_mana < amount:
-            return False
-        self.current_mana -= amount
-        return True
-        
-    def restore_mana(self, amount: int) -> int:
-        """Restore mana, return actual amount restored"""
-        if self.current_mana >= self.max_mana:
-            return 0
-            
-        old_mana = self.current_mana
-        self.current_mana = min(self.max_mana, self.current_mana + amount)
-        return self.current_mana - old_mana
+    # === MAGE MANA SYSTEM ===
         
     def regenerate_mana(self) -> int:
         """Enhanced mana regeneration for mages"""
@@ -409,18 +357,20 @@ class Mage(BaseCharacter):
         mage.unallocated_stats = data.get('unallocated_stats', 0)
         mage.creation_complete = data.get('creation_complete', True)
         
-        # Restore mage-specific data
-        if 'mana' in data:
+        # Restore magic data (mana and spells) - handled by base class now
+        if 'magic_data' in data:
+            mage.max_mana = data['magic_data'].get('max_mana', 0)
+            mage.current_mana = data['magic_data'].get('current_mana', 0)
+            mage.known_spells = data['magic_data'].get('known_spells', [])
+        elif 'mana' in data and 'spells' in data:
+            # Legacy save format
             mage.max_mana = data['mana']['max_mana']
             mage.current_mana = data['mana']['current_mana']
-        else:
-            # Recalculate mana if not in save data
-            mage.calculate_derived_stats()
-        
-        # Restore spell data
-        if 'spells' in data:
-            mage.known_spells = data['spells'].get('known_spells', mage._get_starting_spells())
+            mage.known_spells = data['spells'].get('known_spells', ['magic_missile', 'light'])
             mage.spell_slots_used = data['spells'].get('spell_slots_used', {})
+        else:
+            # Recalculate if not in save data
+            mage.calculate_derived_stats()
         
         # Restore magical attributes
         if 'magical_attributes' in data:
