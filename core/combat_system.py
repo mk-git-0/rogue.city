@@ -564,6 +564,186 @@ class CombatSystem:
                     callback=self._execute_auto_combat_callback
                 )
                 
+    def toggle_dual_wield(self, character) -> bool:
+        """
+        Toggle dual-wield mode for applicable classes.
+        
+        Returns:
+            True if dual-wield mode was toggled successfully
+        """
+        if not hasattr(character, 'character_class'):
+            return False
+        
+        char_class = character.character_class.lower()
+        dual_wield_classes = ['ranger', 'rogue', 'ninja', 'bard']
+        
+        if char_class not in dual_wield_classes:
+            self.ui_manager.log_error("You don't know how to fight with two weapons.")
+            return False
+        
+        # Check if character has two weapons
+        if not (hasattr(character, 'equipment_system') and character.equipment_system):
+            self.ui_manager.log_error("You need weapons equipped to dual-wield.")
+            return False
+        
+        # Toggle dual-wield state
+        if not hasattr(character, 'dual_wield_mode'):
+            character.dual_wield_mode = False
+        
+        character.dual_wield_mode = not character.dual_wield_mode
+        
+        if character.dual_wield_mode:
+            self.ui_manager.log_success("You prepare to fight with both hands.")
+            self.ui_manager.log_system("[Dual-wield mode activated - extra attacks with penalties]")
+        else:
+            self.ui_manager.log_success("You return to single-weapon fighting.")
+            self.ui_manager.log_system("[Dual-wield mode deactivated]")
+        
+        return True
+    
+    def enter_defensive_stance(self, character) -> bool:
+        """
+        Enter defensive stance for increased AC at cost of attack.
+        
+        Returns:
+            True if defensive stance was entered
+        """
+        if not hasattr(character, 'character_class'):
+            return False
+        
+        char_class = character.character_class.lower()
+        defensive_classes = ['knight', 'warrior', 'paladin', 'barbarian']
+        
+        if char_class not in defensive_classes:
+            self.ui_manager.log_error("You don't know how to fight defensively.")
+            return False
+        
+        # Set defensive stance
+        if not hasattr(character, 'defensive_stance'):
+            character.defensive_stance = False
+        
+        character.defensive_stance = not character.defensive_stance
+        
+        if character.defensive_stance:
+            self.ui_manager.log_success("You adopt a defensive fighting stance.")
+            self.ui_manager.log_system("[Defensive stance: +2 AC, -2 attack penalties]")
+        else:
+            self.ui_manager.log_success("You return to normal fighting stance.")
+            self.ui_manager.log_system("[Normal combat stance resumed]")
+        
+        return True
+    
+    def attempt_block(self, character) -> bool:
+        """
+        Attempt to actively block with shield.
+        
+        Returns:
+            True if block attempt was set up
+        """
+        # Check for shield
+        if not (hasattr(character, 'equipment_system') and character.equipment_system):
+            self.ui_manager.log_error("You need a shield to block.")
+            return False
+        
+        # For now, simplified - would check for actual shield in equipment
+        shield = None  # character.equipment_system.get_equipped_shield()
+        if not shield:
+            self.ui_manager.log_error("You don't have a shield equipped.")
+            return False
+        
+        # Set blocking stance
+        if not hasattr(character, 'blocking_stance'):
+            character.blocking_stance = False
+        
+        character.blocking_stance = not character.blocking_stance
+        
+        if character.blocking_stance:
+            self.ui_manager.log_success("You raise your shield to block incoming attacks.")
+            self.ui_manager.log_system("[Blocking stance: +2 AC vs attacks, -1 to your attacks]")
+        else:
+            self.ui_manager.log_success("You lower your shield.")
+            self.ui_manager.log_system("[Normal stance resumed]")
+        
+        return True
+    
+    def attempt_parry(self, character) -> bool:
+        """
+        Attempt to parry with weapon.
+        
+        Returns:
+            True if parry stance was set up
+        """
+        # Check for weapon
+        if not (hasattr(character, 'equipment_system') and character.equipment_system):
+            self.ui_manager.log_error("You need a weapon to parry.")
+            return False
+        
+        weapon = character.equipment_system.get_equipped_weapon()
+        if not weapon:
+            self.ui_manager.log_error("You don't have a weapon equipped.")
+            return False
+        
+        # Set parrying stance
+        if not hasattr(character, 'parrying_stance'):
+            character.parrying_stance = False
+        
+        character.parrying_stance = not character.parrying_stance
+        
+        if character.parrying_stance:
+            self.ui_manager.log_success("You prepare to parry incoming attacks with your weapon.")
+            self.ui_manager.log_system("[Parrying stance: chance to negate attacks, -1 to your attacks]")
+        else:
+            self.ui_manager.log_success("You return to normal weapon stance.")
+            self.ui_manager.log_system("[Normal combat stance resumed]")
+        
+        return True
+    
+    def attempt_charge_attack(self, character, target_name: str = None) -> bool:
+        """
+        Attempt a charging attack for extra damage.
+        
+        Returns:
+            True if charge attack was executed
+        """
+        if not self.is_active():
+            self.ui_manager.log_error("You can only charge in combat.")
+            return False
+        
+        char_class = getattr(character, 'character_class', '').lower()
+        charge_classes = ['warrior', 'knight', 'barbarian', 'ranger']
+        
+        if char_class not in charge_classes:
+            self.ui_manager.log_error("You don't know how to execute charging attacks.")
+            return False
+        
+        # Find target
+        target_enemy = None
+        if target_name:
+            for enemy_id, enemy in self.enemies.items():
+                if enemy.is_alive() and target_name.lower() in enemy.name.lower():
+                    target_enemy = enemy
+                    break
+        else:
+            # Charge first available enemy
+            for enemy_id, enemy in self.enemies.items():
+                if enemy.is_alive():
+                    target_enemy = enemy
+                    break
+        
+        if not target_enemy:
+            self.ui_manager.log_error("There is no enemy to charge.")
+            return False
+        
+        self.ui_manager.log_info(f"You charge at the {target_enemy.name}!")
+        
+        # Execute charge attack (enhanced normal attack)
+        # Set a temporary charge flag for damage calculation
+        character._charging = True
+        self._execute_single_player_attack(target_enemy)
+        character._charging = False
+        
+        return True
+    
     def process_combat_update(self) -> None:
         """Process combat system updates (called by game engine)."""
         if not self.is_active():

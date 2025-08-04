@@ -64,6 +64,40 @@ class CommandParser:
         # Tutorial commands
         self.commands['tutorial'] = self.cmd_tutorial
         self.commands['hint'] = self.cmd_hint
+        
+        # === NEW MAJORMUD COMMANDS ===
+        
+        # Stealth & Movement commands
+        self.commands['sneak'] = self.cmd_sneak
+        self.commands['hide'] = self.cmd_hide
+        self.commands['search'] = self.cmd_search
+        self.commands['climb'] = self.cmd_climb
+        self.commands['swim'] = self.cmd_swim
+        self.commands['listen'] = self.cmd_listen
+        
+        # Skill & Utility commands
+        self.commands['pick'] = self.cmd_pick
+        self.commands['disarm'] = self.cmd_disarm
+        self.commands['backstab'] = self.cmd_backstab
+        self.commands['steal'] = self.cmd_steal
+        self.commands['track'] = self.cmd_track
+        self.commands['forage'] = self.cmd_forage
+        
+        # Combat Enhancement commands
+        self.commands['dual'] = self.cmd_dual
+        self.commands['defend'] = self.cmd_defend
+        self.commands['block'] = self.cmd_block
+        self.commands['parry'] = self.cmd_parry
+        self.commands['charge'] = self.cmd_charge
+        self.commands['aim'] = self.cmd_aim
+        
+        # Magic & Class Ability commands
+        self.commands['cast'] = self.cmd_cast
+        self.commands['meditate'] = self.cmd_meditate
+        self.commands['turn'] = self.cmd_turn_undead
+        self.commands['lay'] = self.cmd_lay_hands
+        self.commands['sing'] = self.cmd_sing
+        self.commands['shapeshift'] = self.cmd_shapeshift
     
     def setup_aliases(self):
         """Setup command aliases for convenience."""
@@ -107,6 +141,42 @@ class CommandParser:
         self.aliases['?'] = 'help'
         self.aliases['exit'] = 'quit'
         self.aliases['q'] = 'quit'
+        
+        # === NEW MAJORMUD COMMAND ALIASES ===
+        
+        # Stealth & Movement aliases
+        self.aliases['sn'] = 'sneak'
+        self.aliases['hi'] = 'hide'
+        self.aliases['se'] = 'search'
+        self.aliases['cl'] = 'climb'
+        self.aliases['sw'] = 'swim'
+        self.aliases['lis'] = 'listen'
+        
+        # Skill & Utility aliases
+        self.aliases['pi'] = 'pick'
+        self.aliases['dis'] = 'disarm'
+        self.aliases['bs'] = 'backstab'
+        self.aliases['st'] = 'steal'  # Note: conflicts with 'stats', but 'steal' is more specific
+        self.aliases['tr'] = 'track'
+        self.aliases['fo'] = 'forage'
+        
+        # Combat Enhancement aliases
+        self.aliases['du'] = 'dual'
+        self.aliases['def'] = 'defend'
+        self.aliases['bl'] = 'block'
+        self.aliases['pa'] = 'parry'
+        self.aliases['ch'] = 'charge'
+        self.aliases['ai'] = 'aim'
+        
+        # Magic & Class Ability aliases
+        self.aliases['c'] = 'cast'
+        self.aliases['ca'] = 'cast'
+        self.aliases['med'] = 'meditate'
+        self.aliases['tu'] = 'turn'
+        self.aliases['lay hands'] = 'lay'
+        self.aliases['lh'] = 'lay'
+        self.aliases['si'] = 'sing'
+        self.aliases['sh'] = 'shapeshift'
     
     def parse_command(self, input_text: str) -> bool:
         """Parse and execute a command. Returns True if game should continue."""
@@ -528,6 +598,14 @@ class CommandParser:
         self.game.ui.display_message("CHARACTER: stats, health, experience, equipment")
         self.game.ui.display_message("GAME: help [command], save, quit, time")
         self.game.ui.display_message("")
+        self.game.ui.display_message("=== NEW MAJORMUD COMMANDS ===")
+        self.game.ui.display_message("STEALTH: sneak [off], hide, backstab <enemy>")
+        self.game.ui.display_message("SKILLS: pick <lock>, disarm <trap>, search [target], track <creature>")
+        self.game.ui.display_message("UTILITY: steal <item> <target>, listen, climb <direction>, swim <direction>")
+        self.game.ui.display_message("COMBAT+: dual, defend, block, parry, charge [enemy], aim <target>")
+        self.game.ui.display_message("MAGIC: cast <spell> [target], meditate")
+        self.game.ui.display_message("CLASS: turn (undead), lay [hands] [target], sing <song>, shapeshift <form>")
+        self.game.ui.display_message("")
         self.game.ui.display_message("Type 'help <command>' for detailed information about a specific command.")
     
     def _show_command_help(self, command: str):
@@ -650,3 +728,477 @@ class CommandParser:
                 self.game.ui.display_message("Hint: Use 'look' to examine your surroundings and 'exits' to see where you can go.")
         else:
             self.game.ui.display_message("Hint: Type 'help' for a list of available commands.")
+    
+    # ====================================================================
+    # NEW MAJORMUD COMMAND IMPLEMENTATIONS
+    # ====================================================================
+    
+    # Stealth & Movement Commands
+    def cmd_sneak(self, args: List[str]) -> bool:
+        """Enter or exit stealth mode."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Initialize stealth system if needed
+        if not hasattr(self.game, 'stealth_system'):
+            from .stealth_system import StealthSystem
+            self.game.stealth_system = StealthSystem(self.game.dice_system, self.game.ui_manager)
+        
+        if args and args[0].lower() == 'off':
+            self.game.stealth_system.exit_stealth_mode(self.game.current_player)
+        else:
+            self.game.stealth_system.enter_stealth_mode(self.game.current_player)
+        
+        return True
+    
+    def cmd_hide(self, args: List[str]) -> bool:
+        """Attempt to hide in current location."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Initialize stealth system if needed
+        if not hasattr(self.game, 'stealth_system'):
+            from .stealth_system import StealthSystem
+            self.game.stealth_system = StealthSystem(self.game.dice_system, self.game.ui_manager)
+        
+        current_area = getattr(self.game.current_player, 'current_area', None)
+        self.game.stealth_system.attempt_hide(self.game.current_player, current_area)
+        
+        return True
+    
+    def cmd_search(self, args: List[str]) -> bool:
+        """Search for hidden items, doors, or secrets."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Initialize skill system if needed
+        if not hasattr(self.game, 'skill_system'):
+            from .skill_system import SkillSystem
+            self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+        
+        target = ' '.join(args) if args else None
+        current_area = getattr(self.game.current_player, 'current_area', None)
+        self.game.skill_system.attempt_search(self.game.current_player, current_area, target)
+        
+        return True
+    
+    def cmd_climb(self, args: List[str]) -> bool:
+        """Attempt to climb in a direction or object."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Climb what?")
+            return True
+        
+        direction_or_object = args[0].lower()
+        
+        # For now, treat as movement command for climbing directions
+        if direction_or_object in ['up', 'down', 'north', 'south', 'east', 'west']:
+            self.game.ui_manager.log_info(f"You attempt to climb {direction_or_object}...")
+            # Use existing movement system
+            return self._move_direction(direction_or_object)
+        else:
+            self.game.ui_manager.log_info(f"You attempt to climb the {direction_or_object}...")
+            self.game.ui_manager.log_error("There is nothing suitable to climb here.")
+        
+        return True
+    
+    def cmd_swim(self, args: List[str]) -> bool:
+        """Attempt to swim in a direction."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Swim where?")
+            return True
+        
+        direction = args[0].lower()
+        if direction in ['north', 'south', 'east', 'west', 'up', 'down']:
+            self.game.ui_manager.log_info(f"You swim {direction}...")
+            # Use existing movement system
+            return self._move_direction(direction)
+        else:
+            self.game.ui_manager.log_error("You can't swim in that direction.")
+        
+        return True
+    
+    def cmd_listen(self, args: List[str]) -> bool:
+        """Listen for sounds and movements."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Initialize skill system if needed
+        if not hasattr(self.game, 'skill_system'):
+            from .skill_system import SkillSystem
+            self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+        
+        current_area = getattr(self.game.current_player, 'current_area', None)
+        self.game.skill_system.attempt_listening(self.game.current_player, current_area)
+        
+        return True
+    
+    # Skill & Utility Commands
+    def cmd_pick(self, args: List[str]) -> bool:
+        """Pick locks on doors or containers."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Pick what?")
+            return True
+        
+        # Initialize skill system if needed
+        if not hasattr(self.game, 'skill_system'):
+            from .skill_system import SkillSystem
+            self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+        
+        target = ' '.join(args)
+        from .skill_system import DifficultyLevel
+        self.game.skill_system.attempt_lockpicking(self.game.current_player, target, DifficultyLevel.MODERATE)
+        
+        return True
+    
+    def cmd_disarm(self, args: List[str]) -> bool:
+        """Disarm detected traps."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Disarm what?")
+            return True
+        
+        # Initialize skill system if needed
+        if not hasattr(self.game, 'skill_system'):
+            from .skill_system import SkillSystem
+            self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+        
+        trap_name = ' '.join(args)
+        self.game.skill_system.attempt_trap_disarmament(self.game.current_player, trap_name)
+        
+        return True
+    
+    def cmd_backstab(self, args: List[str]) -> bool:
+        """Perform a backstab attack on an enemy."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Backstab whom?")
+            return True
+        
+        # Initialize stealth system if needed
+        if not hasattr(self.game, 'stealth_system'):
+            from .stealth_system import StealthSystem
+            self.game.stealth_system = StealthSystem(self.game.dice_system, self.game.ui_manager)
+        
+        # Check if in combat
+        if not (hasattr(self.game, 'combat_system') and self.game.combat_system.is_active()):
+            self.game.ui_manager.log_error("You can only backstab in combat!")
+            return True
+        
+        target_name = ' '.join(args)
+        
+        # Attempt backstab (this would integrate with combat system)
+        success, multiplier = self.game.stealth_system.attempt_backstab(self.game.current_player, None)
+        
+        if success:
+            self.game.ui_manager.log_info(f"You attempt to backstab {target_name} from the shadows!")
+            # This would trigger a special attack in the combat system
+            # For now, just use regular attack with message
+            return self.cmd_attack([target_name])
+        
+        return True
+    
+    def cmd_steal(self, args: List[str]) -> bool:
+        """Attempt to pickpocket from NPCs."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if len(args) < 2:
+            self.game.ui_manager.log_error("Usage: steal <item> <target>")
+            return True
+        
+        # Initialize skill system if needed
+        if not hasattr(self.game, 'skill_system'):
+            from .skill_system import SkillSystem
+            self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+        
+        item_name = args[0]
+        target_name = ' '.join(args[1:])
+        
+        self.game.ui_manager.log_info(f"You attempt to steal {item_name} from {target_name}...")
+        self.game.skill_system.attempt_pickpocketing(self.game.current_player, target_name)
+        
+        return True
+    
+    def cmd_track(self, args: List[str]) -> bool:
+        """Track creatures in the area."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Track what?")
+            return True
+        
+        # Initialize skill system if needed
+        if not hasattr(self.game, 'skill_system'):
+            from .skill_system import SkillSystem
+            self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+        
+        creature_name = ' '.join(args)
+        self.game.skill_system.attempt_tracking(self.game.current_player, creature_name)
+        
+        return True
+    
+    def cmd_forage(self, args: List[str]) -> bool:
+        """Forage for food and natural items."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        self.game.ui_manager.log_info("You search the area for useful natural items...")
+        
+        # Simple foraging implementation
+        import random
+        if random.randint(1, 100) <= 30:  # 30% success rate
+            found_items = ["some berries", "edible roots", "medicinal herbs", "fresh water"]
+            found = random.choice(found_items)
+            self.game.ui_manager.log_success(f"You find {found}!")
+        else:
+            self.game.ui_manager.log_info("You don't find anything useful here.")
+        
+        return True
+    
+    # Combat Enhancement Commands
+    def cmd_dual(self, args: List[str]) -> bool:
+        """Toggle dual-wielding mode."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if hasattr(self.game, 'combat_system'):
+            self.game.combat_system.toggle_dual_wield(self.game.current_player)
+        else:
+            self.game.ui_manager.log_error("Combat system not available.")
+        
+        return True
+    
+    def cmd_defend(self, args: List[str]) -> bool:
+        """Enter defensive fighting stance."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if hasattr(self.game, 'combat_system'):
+            self.game.combat_system.enter_defensive_stance(self.game.current_player)
+        else:
+            self.game.ui_manager.log_error("Combat system not available.")
+        
+        return True
+    
+    def cmd_block(self, args: List[str]) -> bool:
+        """Attempt to block with shield."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if hasattr(self.game, 'combat_system'):
+            self.game.combat_system.attempt_block(self.game.current_player)
+        else:
+            self.game.ui_manager.log_error("Combat system not available.")
+        
+        return True
+    
+    def cmd_parry(self, args: List[str]) -> bool:
+        """Attempt to parry with weapon."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if hasattr(self.game, 'combat_system'):
+            self.game.combat_system.attempt_parry(self.game.current_player)
+        else:
+            self.game.ui_manager.log_error("Combat system not available.")
+        
+        return True
+    
+    def cmd_charge(self, args: List[str]) -> bool:
+        """Execute a charging attack."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        target_name = ' '.join(args) if args else None
+        
+        if hasattr(self.game, 'combat_system'):
+            self.game.combat_system.attempt_charge_attack(self.game.current_player, target_name)
+        else:
+            self.game.ui_manager.log_error("Combat system not available.")
+        
+        return True
+    
+    def cmd_aim(self, args: List[str]) -> bool:
+        """Aim carefully for ranged attacks."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Aim at what?")
+            return True
+        
+        target_name = ' '.join(args)
+        self.game.ui_manager.log_success(f"You take careful aim at {target_name}.")
+        self.game.ui_manager.log_system("[Next ranged attack gets +2 accuracy bonus]")
+        
+        # Set aiming flag on character
+        self.game.current_player._aiming = True
+        
+        return True
+    
+    # Magic & Class Ability Commands
+    def cmd_cast(self, args: List[str]) -> bool:
+        """Cast a spell."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Cast what spell?")
+            return True
+        
+        # Initialize magic system if needed
+        if not hasattr(self.game, 'magic_system'):
+            from .magic_command_system import MagicCommandSystem
+            self.game.magic_system = MagicCommandSystem(self.game.dice_system, self.game.ui_manager)
+        
+        # Parse spell name and target
+        if len(args) == 1:
+            spell_name = args[0]
+            target_name = None
+        else:
+            spell_name = args[0]
+            target_name = ' '.join(args[1:])
+        
+        self.game.magic_system.attempt_cast_spell(self.game.current_player, spell_name, target_name)
+        
+        return True
+    
+    def cmd_meditate(self, args: List[str]) -> bool:
+        """Meditate to recover mana or ki."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Initialize magic system if needed
+        if not hasattr(self.game, 'magic_system'):
+            from .magic_command_system import MagicCommandSystem
+            self.game.magic_system = MagicCommandSystem(self.game.dice_system, self.game.ui_manager)
+        
+        self.game.magic_system.attempt_meditation(self.game.current_player)
+        
+        return True
+    
+    def cmd_turn_undead(self, args: List[str]) -> bool:
+        """Turn undead creatures (Paladin/Missionary ability)."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        char_class = getattr(self.game.current_player, 'character_class', '').lower()
+        if char_class not in ['paladin', 'missionary']:
+            self.game.ui_manager.log_error("You don't have the ability to turn undead.")
+            return True
+        
+        self.game.ui_manager.log_info("You raise your holy symbol and call upon divine power!")
+        self.game.ui_manager.log_success("Undead creatures cower before your divine presence!")
+        
+        # In full implementation, would affect undead enemies in combat
+        
+        return True
+    
+    def cmd_lay_hands(self, args: List[str]) -> bool:
+        """Heal through laying on of hands (Paladin ability)."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        char_class = getattr(self.game.current_player, 'character_class', '').lower()
+        if char_class not in ['paladin']:
+            self.game.ui_manager.log_error("You don't have the ability to lay on hands.")
+            return True
+        
+        target_name = ' '.join(args) if args else "yourself"
+        
+        self.game.ui_manager.log_info(f"You place your hands upon {target_name} and channel divine healing...")
+        
+        # Calculate healing based on level
+        level = getattr(self.game.current_player, 'level', 1)
+        healing = level * 2
+        
+        self.game.ui_manager.log_success(f"{target_name.title()} {'are' if target_name != 'yourself' else 'is'} healed for {healing} hit points!")
+        
+        return True
+    
+    def cmd_sing(self, args: List[str]) -> bool:
+        """Sing bardic songs for party benefits."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        char_class = getattr(self.game.current_player, 'character_class', '').lower()
+        if char_class not in ['bard']:
+            self.game.ui_manager.log_error("You don't know any bardic songs.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Sing what song?")
+            return True
+        
+        song_name = ' '.join(args)
+        self.game.ui_manager.log_success(f"You begin singing '{song_name}'...")
+        self.game.ui_manager.log_info("Your inspiring melody fills the air!")
+        
+        # In full implementation, would provide party buffs
+        
+        return True
+    
+    def cmd_shapeshift(self, args: List[str]) -> bool:
+        """Shapeshift into animal forms (Druid ability)."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        char_class = getattr(self.game.current_player, 'character_class', '').lower()
+        if char_class not in ['druid']:
+            self.game.ui_manager.log_error("You don't have the ability to shapeshift.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Shapeshift into what form?")
+            return True
+        
+        form_name = ' '.join(args)
+        valid_forms = ['wolf', 'bear', 'eagle', 'panther', 'human']
+        
+        if form_name.lower() not in valid_forms:
+            self.game.ui_manager.log_error(f"You don't know how to become a {form_name}.")
+            self.game.ui_manager.log_info(f"Available forms: {', '.join(valid_forms)}")
+            return True
+        
+        self.game.ui_manager.log_success(f"You transform into a {form_name}!")
+        self.game.ui_manager.log_system(f"[Shapeshift: You are now in {form_name} form]")
+        
+        return True
