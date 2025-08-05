@@ -1,0 +1,206 @@
+{
+  "class_skill_access": {
+    "thief": {
+      "description": "Masters of stealth and burglary with exceptional skill at locks and traps.",
+      "primary_skills": ["stealth", "hiding", "lockpicking", "thievery", "pickpocketing", "trap_detection", "trap_disarmament"],
+      "secondary_skills": ["search", "perception", "listening", "climbing", "dodging"],
+      "skill_bonuses": {
+        "stealth": 8,
+        "hiding": 8,
+        "thievery": 10,
+        "lockpicking": 10,
+        "pickpocketing": 12,
+        "trap_detection": 8,
+        "trap_disarmament": 10,
+        "search": 6,
+        "perception": 6,
+        "listening": 6,
+        "climbing": 8,
+        "dodging": 4
+      }
+    },
+    "rogue": {
+      "description": "Versatile fighters with stealth capabilities and precision combat skills.",
+      "primary_skills": ["stealth", "hiding", "lockpicking", "pickpocketing", "dodging", "parrying"],
+      "secondary_skills": ["trap_detection", "trap_disarmament", "search", "perception", "listening", "climbing"],
+      "skill_bonuses": {
+        "stealth": 6,
+        "hiding": 6,
+        "lockpicking": 8,
+        "pickpocketing": 10,
+        "trap_detection": 6,
+        "trap_disarmament": 8,
+        "search": 8,
+        "perception": 8,
+        "listening": 8,
+        "climbing": 6,
+        "dodging": 6,
+        "parrying": 4
+      }
+    },
+    "ninja": {
+      "description": "Shadow warriors with supreme stealth and martial arts expertise.",
+      "primary_skills": ["stealth", "hiding", "dodging", "climbing", "meditation"],
+      "secondary_skills": ["lockpicking", "trap_detection", "trap_disarmament", "listening", "search"],
+      "skill_bonuses": {
+        "stealth": 10,
+        "hiding": 10,
+        "lockpicking": 6,
+        "trap_detection": 10,
+        "trap_disarmament": 12,
+        "climbing": 12,
+        "listening": 10,
+        "search": 8,
+        "dodging": 8,
+        "meditation": 6
+      }
+    },
+    "ranger": {
+      "description": "Wilderness experts with unmatched tracking and outdoor survival skills.",
+      "primary_skills": ["tracking", "foraging", "perception", "listening"],
+      "secondary_skills": ["stealth", "hiding", "search", "climbing", "swimming", "dodging"],
+      "skill_bonuses": {
+        "stealth": 4,
+        "hiding": 4,
+        "tracking": 15,
+        "search": 10,
+        "foraging": 12,
+        "climbing": 8,
+        "swimming": 10,
+        "listening": 12,
+        "perception": 8,
+        "dodging": 4
+      }
+    },
+    "knight": {
+      "description": "Noble warriors trained in defensive combat and martial discipline.",
+      "primary_skills": ["blocking", "parrying"],
+      "secondary_skills": ["climbing", "swimming", "perception"],
+      "skill_bonuses": {
+        "blocking": 8,
+        "parrying": 6,
+        "climbing": 4,
+        "swimming": 4,
+        "perception": 4
+      }
+    },
+    "warrior": {
+      "description": "Professional soldiers with combat expertise and weapon mastery.",
+      "primary_skills": ["blocking", "parrying", "dodging"],
+      "secondary_skills": ["climbing", "swimming", "perception"],
+      "skill_bonuses": {
+        "blocking": 6,
+        "parrying": 8,
+        "climbing": 6,
+        "swimming": 6,
+        "perception": 4,
+        "dodging": 4
+      }
+    },
+    "paladin": {
+      "description": "Holy warriors combining combat prowess with divine magic.",
+      "primary_skills": ["blocking", "spell_casting", "meditation"],
+      "secondary_skills": ["parrying", "perception", "search"],
+      "skill_bonuses": {
+        "blocking": 6,
+        "parrying": 4,
+        "spell_casting": 4,
+        "meditation": 6,
+        "perception": 6,
+        "search": 4
+      }
+    },
+    "barbarian": {
+      "description": "Savage warriors with natural survival instincts and physical prowess.",
+      "primary_skills": ["climbing", "swimming", "tracking", "foraging"],
+      "secondary_skills": ["listening", "perception"],
+      "skill_bonuses": {
+        "climbing": 8,
+        "swimming": 8,
+        "tracking": 6,
+        "foraging": 6,
+        "listening": 6,
+        "perception": 4
+      }
+    },
+    "mage": {
+      "description": "Arcane scholars with mastery over magical forces and spell research.",
+      "primary_skills": ["spell_casting", "meditation"],
+      "secondary_skills": ["search", "perception"],
+      "skill_bonuses": {
+        "spell_casting": 12,
+        "meditation": 10,
+        "search": 6,
+        "perception": 8
+      }
+    },
+    "priest": {
+      "description": "Divine spellcasters with healing powers and spiritual wisdom.",
+      "primary_skills": ["spell_casting", "meditation"],
+      "secondary_skills": ["perception", "search"],
+      "skill_bonuses": {
+        "spell_casting": 10,
+        "meditation": 12,
+        "perception": 8,
+        "search": 6
+      }
+    },
+    "mystic": {
+      "description": "Warrior-monks combining martial arts with inner spiritual power.",
+      "primary_skills": ["meditation", "dodging", "perception"],
+      "secondary_skills": ["climbing", "swimming"],
+      "skill_bonuses": {
+        "meditation": 10,
+        "dodging": 8,
+        "perception": 10,
+        "climbing": 6,
+        "swimming": 6
+      }
+    },
+    "spellsword": {
+      "description": "Warrior-mages blending martial combat with battle magic.",
+      "primary_skills": ["spell_casting", "parrying"],
+      "secondary_skills": ["dodging", "perception"],
+      "skill_bonuses": {
+        "spell_casting": 8,
+        "parrying": 6,
+        "dodging": 4,
+        "perception": 6
+      }
+    },
+    "necromancer": {
+      "description": "Dark mages who command death magic and study forbidden knowledge.",
+      "primary_skills": ["spell_casting", "meditation", "search"],
+      "secondary_skills": ["perception"],
+      "skill_bonuses": {
+        "spell_casting": 12,
+        "meditation": 8,
+        "search": 8,
+        "perception": 6
+      }
+    },
+    "warlock": {
+      "description": "Battle mages wielding destructive magic and combat prowess.",
+      "primary_skills": ["spell_casting", "meditation"],
+      "secondary_skills": ["parrying", "perception"],
+      "skill_bonuses": {
+        "spell_casting": 10,
+        "meditation": 6,
+        "parrying": 4,
+        "perception": 6
+      }
+    },
+    "witchhunter": {
+      "description": "Anti-magic specialists trained to detect and destroy magical threats.",
+      "primary_skills": ["search", "perception", "tracking"],
+      "secondary_skills": ["dodging", "parrying"],
+      "skill_bonuses": {
+        "search": 10,
+        "perception": 12,
+        "tracking": 8,
+        "dodging": 6,
+        "parrying": 6
+      }
+    }
+  }
+}

@@ -230,7 +230,7 @@ class SkillSystem:
         skill_bonus = self.get_skill_bonus(character, skill_type)
         
         # Roll d20
-        roll = self.dice_system.roll_single_die(20)
+        roll = self.dice_system.roll_die(20, 1)
         total = roll + skill_bonus + circumstance_bonus
         
         # Track skill usage for experience
@@ -281,17 +281,12 @@ class SkillSystem:
             total_bonus += character.level // 2  # +1 per 2 levels
         
         # Experience bonus from practice
-        if hasattr(character, 'get_skill_experience'):
-            experience = character.get_skill_experience(skill_type.value)
+        char_id = self._get_character_id(character)
+        if (char_id in self.skill_experience and 
+            skill_type in self.skill_experience[char_id]):
+            experience = self.skill_experience[char_id][skill_type]
             # Experience bonus: +1 per 10 uses, max +5
             total_bonus += min(5, experience // 10)
-        else:
-            # Fallback to system tracking
-            char_id = self._get_character_id(character)
-            if (char_id in self.skill_experience and 
-                skill_type in self.skill_experience[char_id]):
-                experience = self.skill_experience[char_id][skill_type]
-                total_bonus += min(5, experience // 10)
         
         # Equipment bonus
         total_bonus += self._get_equipment_bonus(character, skill_type)
@@ -300,38 +295,32 @@ class SkillSystem:
     
     def _get_equipment_bonus(self, character, skill_type: SkillType) -> int:
         """Calculate bonus from equipment for a skill."""
-        if not hasattr(character, 'inventory_system') or character.inventory_system is None:
+        if not hasattr(character, 'inventory_system'):
             return 0
         
         bonus = 0
         
         # Check inventory for skill-enhancing tools
-        if hasattr(character.inventory_system, 'items'):
-            for item in character.inventory_system.items:
-                item_name = item.name.lower()
-                for tool_name, tool_bonuses in self.skill_tools.items():
-                    if tool_name in item_name and skill_type in tool_bonuses:
-                        bonus += tool_bonuses[skill_type]
-                        break
+        for item in character.inventory_system.items:
+            item_name = item.name.lower()
+            for tool_name, tool_bonuses in self.skill_tools.items():
+                if tool_name in item_name and skill_type in tool_bonuses:
+                    bonus += tool_bonuses[skill_type]
+                    break
         
         return bonus
     
     def _track_skill_usage(self, character, skill_type: SkillType) -> None:
         """Track skill usage for practice-based improvement."""
-        # Use character's built-in tracking if available
-        if hasattr(character, 'track_skill_usage'):
-            character.track_skill_usage(skill_type.value)
-        else:
-            # Fallback to system tracking
-            char_id = self._get_character_id(character)
-            
-            if char_id not in self.skill_experience:
-                self.skill_experience[char_id] = {}
-            
-            if skill_type not in self.skill_experience[char_id]:
-                self.skill_experience[char_id][skill_type] = 0
-            
-            self.skill_experience[char_id][skill_type] += 1
+        char_id = self._get_character_id(character)
+        
+        if char_id not in self.skill_experience:
+            self.skill_experience[char_id] = {}
+        
+        if skill_type not in self.skill_experience[char_id]:
+            self.skill_experience[char_id][skill_type] = 0
+        
+        self.skill_experience[char_id][skill_type] += 1
     
     def _get_character_id(self, character) -> str:
         """Get unique identifier for character."""
@@ -343,7 +332,12 @@ class SkillSystem:
     
     def attempt_lockpicking(self, character, target_name: str = "lock", 
                            difficulty: SkillDifficulty = SkillDifficulty.MODERATE) -> bool:
-        """Attempt to pick a lock using the comprehensive skill system."""
+        """
+        Attempt to pick a lock using the comprehensive skill system.
+        
+        Returns:
+            True if lockpicking was successful
+        """
         if not self.can_use_skill(character, SkillType.LOCKPICKING):
             self.ui_manager.log_error("You don't know how to pick locks.")
             return False
@@ -371,51 +365,113 @@ class SkillSystem:
             return False
     
     def attempt_trap_detection(self, character, area=None) -> List[str]:
-        """Attempt to detect traps using the new skill system."""
-        self.ui_manager.log_info("You carefully examine the area for traps...")
+        """
+        Attempt to detect traps in the area.
         
-        # Make perception/trap detection check
-        success, total_roll, result_desc = self.make_skill_check(
-            character, SkillType.TRAP_DETECTION, SkillDifficulty.MODERATE)
+        Returns:
+            List of detected trap descriptions
+        """
+        if not self.can_use_skill(character, SkillType.TRAP_DETECTION):
+            # Anyone can try to detect obvious traps, but with penalties
+            skill_bonus = -20
+        else:
+            skill_bonus = self._get_skill_bonus(character, SkillType.TRAP_DETECTION)
+        
+        self.ui_manager.log_info("You carefully examine the area for traps...")
         
         detected_traps = []
         
-        if success:
-            # Simulate finding traps based on area (this would integrate with actual area trap data)
-            if area and hasattr(area, 'traps'):
-                for trap in area.traps:
+        # Check for traps (this would be expanded with actual trap data)
+        # For now, simulate trap detection
+        if area and hasattr(area, 'traps'):
+            for trap in area.traps:
+                detection_chance = max(10, 60 + skill_bonus - trap.get('concealment', 50))
+                roll = random.randint(1, 100)
+                
+                if roll <= detection_chance:
                     detected_traps.append(trap['description'])
                     self.ui_manager.log_error(f"*** TRAP DETECTED: {trap['description']} ***")
-            elif result_desc == "Critical Success!":
-                self.ui_manager.log_success("You detect an extremely well-hidden pressure plate!")
-                detected_traps.append("hidden pressure plate")
+        
+        # Track attempt
+        self._track_skill_attempt(character, SkillType.TRAP_DETECTION)
         
         if not detected_traps:
             self.ui_manager.log_info("You don't detect any traps here.")
         
         return detected_traps
     
+    def attempt_trap_disarmament(self, character, trap_name: str) -> bool:
+        """
+        Attempt to disarm a detected trap.
+        
+        Returns:
+            True if trap was successfully disarmed
+        """
+        if not self.can_use_skill(character, SkillType.TRAP_DISARMAMENT):
+            self.ui_manager.log_error("You don't know how to safely disarm traps.")
+            return False
+        
+        self.ui_manager.log_info(f"You carefully work on disarming the {trap_name}...")
+        
+        # Calculate skill bonus
+        skill_bonus = self._get_skill_bonus(character, SkillType.TRAP_DISARMAMENT)
+        tool_bonus = self._get_tool_bonus(character, SkillType.TRAP_DISARMAMENT)
+        
+        # Make skill check (traps are generally harder than locks)
+        base_difficulty = 70  # Base trap difficulty
+        success_chance = max(5, skill_bonus + tool_bonus - base_difficulty)
+        roll = random.randint(1, 100)
+        
+        # Track attempt
+        self._track_skill_attempt(character, SkillType.TRAP_DISARMAMENT)
+        
+        if roll <= success_chance:
+            self.ui_manager.log_success(f"You successfully disarm the {trap_name}.")
+            return True
+        elif roll >= 90:  # Critical failure - trigger trap
+            self.ui_manager.log_critical(f"You accidentally trigger the {trap_name}!")
+            # TODO: Apply trap effects to character
+            return False
+        else:
+            self.ui_manager.log_error(f"You cannot figure out how to safely disarm the {trap_name}.")
+            return False
+    
     def attempt_search(self, character, area=None, target: str = None) -> List[str]:
-        """Search for hidden items using the new skill system."""
+        """
+        Search for hidden items, doors, or secrets.
+        
+        Returns:
+            List of found items/secrets
+        """
+        search_bonus = self._get_skill_bonus(character, SkillType.SEARCH)
+        
         if target:
             self.ui_manager.log_info(f"You search the {target} carefully...")
         else:
             self.ui_manager.log_info("You carefully search the area...")
         
-        # Make search check
-        success, total_roll, result_desc = self.make_skill_check(
-            character, SkillType.SEARCH, SkillDifficulty.MODERATE)
-        
         found_items = []
         
-        if success:
-            # Simulate finding things (this would integrate with actual hidden content)
-            if result_desc == "Critical Success!":
-                found = "You discover a secret compartment behind a loose stone!"
-                found_items.append(found)
-                self.ui_manager.log_success(found)
-            elif result_desc == "Exceptional Success!":
-                found = "You find a hidden lever concealed behind the tapestry!"
+        # Make search check
+        base_chance = 40 + search_bonus
+        roll = random.randint(1, 100)
+        
+        # Track attempt
+        self._track_skill_attempt(character, SkillType.SEARCH)
+        
+        if roll <= base_chance:
+            # Simulate finding things (this would be expanded with actual hidden content)
+            possible_finds = [
+                "You find a hidden lever behind the tapestry!",
+                "You notice loose stones that might conceal something.",
+                "You discover a small cache of coins hidden in the wall.",
+                "You find a secret compartment in the floor.",
+                "You notice suspicious scratches on the wall.",
+                "You discover a hidden passage behind the bookshelf!"
+            ]
+            
+            if random.randint(1, 100) <= 30:  # 30% chance to find something
+                found = random.choice(possible_finds)
                 found_items.append(found)
                 self.ui_manager.log_success(found)
             else:
@@ -426,47 +482,174 @@ class SkillSystem:
         return found_items
     
     def attempt_tracking(self, character, creature_name: str) -> bool:
-        """Attempt to track a creature using the new skill system."""
+        """
+        Attempt to track a specific creature.
+        
+        Returns:
+            True if tracks were found
+        """
         if not self.can_use_skill(character, SkillType.TRACKING):
             self.ui_manager.log_error("You don't know how to track creatures.")
             return False
         
         self.ui_manager.log_info(f"You search for signs of {creature_name}...")
         
-        # Make tracking check
-        success, total_roll, result_desc = self.make_skill_check(
-            character, SkillType.TRACKING, SkillDifficulty.MODERATE)
+        # Calculate tracking bonus
+        tracking_bonus = self._get_skill_bonus(character, SkillType.TRACKING)
+        wisdom_bonus = character.get_stat_modifier('wisdom') * 2 if hasattr(character, 'get_stat_modifier') else 0
         
-        if success:
+        # Make tracking check
+        base_chance = 50 + tracking_bonus + wisdom_bonus
+        roll = random.randint(1, 100)
+        
+        # Track attempt
+        self._track_skill_attempt(character, SkillType.TRACKING)
+        
+        if roll <= base_chance:
             direction = random.choice(['north', 'south', 'east', 'west'])
-            if result_desc == "Critical Success!":
-                self.ui_manager.log_success(f"You find very fresh tracks of a {creature_name} leading {direction}. They passed here recently!")
-            else:
-                self.ui_manager.log_success(f"You find tracks of a {creature_name} leading {direction}.")
+            self.ui_manager.log_success(f"You find fresh tracks of a {creature_name} leading {direction}.")
             return True
         else:
             self.ui_manager.log_info(f"You cannot find any tracks of a {creature_name} here.")
             return False
     
     def attempt_pickpocketing(self, character, target_name: str) -> bool:
-        """Attempt to pickpocket using the new skill system."""
+        """
+        Attempt to pickpocket from an NPC.
+        
+        Returns:
+            True if pickpocketing was successful
+        """
         if not self.can_use_skill(character, SkillType.PICKPOCKETING):
             self.ui_manager.log_error("You don't know how to pickpocket.")
             return False
         
-        # Pickpocketing is very difficult
-        success, total_roll, result_desc = self.make_skill_check(
-            character, SkillType.PICKPOCKETING, SkillDifficulty.HARD)
+        # Calculate pickpocket bonus
+        skill_bonus = self._get_skill_bonus(character, SkillType.PICKPOCKETING)
+        dex_bonus = character.get_stat_modifier('dexterity') * 3 if hasattr(character, 'get_stat_modifier') else 0
         
-        if success:
+        # Make pickpocket check (very difficult)
+        base_chance = 30 + skill_bonus + dex_bonus
+        roll = random.randint(1, 100)
+        
+        # Track attempt
+        self._track_skill_attempt(character, SkillType.PICKPOCKETING)
+        
+        if roll <= base_chance:
             self.ui_manager.log_success(f"You successfully pickpocket something from {target_name}.")
             return True
-        else:
-            if result_desc == "Critical Failure!":
-                self.ui_manager.log_critical(f"{target_name} notices your attempt!")
-            else:
-                self.ui_manager.log_info(f"You cannot find an opportunity to pickpocket {target_name}.")
+        elif roll >= 85:  # High chance of getting caught
+            self.ui_manager.log_critical(f"{target_name} notices your attempt!")
             return False
+        else:
+            self.ui_manager.log_info(f"You cannot find an opportunity to pickpocket {target_name}.")
+            return False
+    
+    def attempt_listening(self, character, area=None) -> List[str]:
+        """
+        Listen for sounds and movements.
+        
+        Returns:
+            List of heard sounds/information
+        """
+        listening_bonus = self._get_skill_bonus(character, SkillType.LISTENING)
+        wisdom_bonus = character.get_stat_modifier('wisdom') * 2 if hasattr(character, 'get_stat_modifier') else 0
+        
+        self.ui_manager.log_info("You listen carefully...")
+        
+        # Make listening check
+        base_chance = 60 + listening_bonus + wisdom_bonus
+        roll = random.randint(1, 100)
+        
+        # Track attempt
+        self._track_skill_attempt(character, SkillType.LISTENING)
+        
+        heard_sounds = []
+        
+        if roll <= base_chance:
+            # Simulate hearing things
+            possible_sounds = [
+                "You hear footsteps echoing from the north.",
+                "You detect the sound of running water nearby.",
+                "You hear faint voices coming from beyond the wall.",
+                "You notice the subtle sound of metal scraping stone.",
+                "You hear the distant sound of combat.",
+                "You detect heavy breathing coming from the shadows."
+            ]
+            
+            if random.randint(1, 100) <= 40:  # 40% chance to hear something
+                sound = random.choice(possible_sounds)
+                heard_sounds.append(sound)
+                self.ui_manager.log_success(sound)
+            else:
+                self.ui_manager.log_info("You hear only normal ambient sounds.")
+        else:
+            self.ui_manager.log_info("You don't hear anything unusual.")
+        
+        return heard_sounds
+    
+    def _get_skill_bonus(self, character, skill_type: SkillType) -> int:
+        """Calculate character's bonus for a specific skill."""
+        total_bonus = 0
+        
+        # Class skill bonus
+        if hasattr(character, 'character_class'):
+            char_class = character.character_class.lower()
+            if char_class in self.class_skills and skill_type in self.class_skills[char_class]:
+                total_bonus += self.class_skills[char_class][skill_type]
+        
+        # Attribute bonuses based on skill type
+        if hasattr(character, 'get_stat_modifier'):
+            if skill_type in [SkillType.LOCKPICKING, SkillType.TRAP_DISARMAMENT, SkillType.PICKPOCKETING]:
+                total_bonus += character.get_stat_modifier('dexterity') * 2
+            elif skill_type in [SkillType.SEARCH, SkillType.TRAP_DETECTION]:
+                total_bonus += character.get_stat_modifier('intelligence') * 2
+            elif skill_type in [SkillType.TRACKING, SkillType.LISTENING]:
+                total_bonus += character.get_stat_modifier('wisdom') * 2
+            elif skill_type in [SkillType.CLIMBING, SkillType.SWIMMING]:
+                total_bonus += character.get_stat_modifier('strength') + character.get_stat_modifier('dexterity')
+        
+        # Level bonus (small)
+        if hasattr(character, 'level'):
+            total_bonus += character.level // 3
+        
+        # Experience bonus (characters get better with practice)
+        char_id = self._get_character_id(character)
+        if char_id in self.skill_attempts and skill_type in self.skill_attempts[char_id]:
+            attempts = self.skill_attempts[char_id][skill_type]
+            experience_bonus = min(10, attempts // 5)  # +1 bonus per 5 attempts, max +10
+            total_bonus += experience_bonus
+        
+        return total_bonus
+    
+    def _get_tool_bonus(self, character, skill_type: SkillType) -> int:
+        """Calculate bonus from tools/equipment for a skill."""
+        if not hasattr(character, 'inventory_system'):
+            return 0
+        
+        bonus = 0
+        
+        # Check inventory for useful tools
+        for item in character.inventory_system.items:
+            item_name = item.name.lower()
+            for tool_name, tool_bonuses in self.skill_tools.items():
+                if tool_name in item_name and skill_type in tool_bonuses:
+                    bonus += tool_bonuses[skill_type]
+                    break
+        
+        return bonus
+    
+    def _track_skill_attempt(self, character, skill_type: SkillType) -> None:
+        """Track skill attempts for experience/learning."""
+        char_id = self._get_character_id(character)
+        
+        if char_id not in self.skill_attempts:
+            self.skill_attempts[char_id] = {}
+        
+        if skill_type not in self.skill_attempts[char_id]:
+            self.skill_attempts[char_id][skill_type] = 0
+        
+        self.skill_attempts[char_id][skill_type] += 1
     
     def _break_lockpicks(self, character) -> None:
         """Handle breaking lockpicks on critical failure."""
@@ -479,35 +662,28 @@ class SkillSystem:
                 character.inventory_system.remove_item(item)
                 break
     
+    def _get_character_id(self, character) -> str:
+        """Get unique identifier for character."""
+        if hasattr(character, 'name'):
+            return character.name
+        return str(id(character))
+    
     def get_skill_summary(self, character) -> Dict[str, int]:
-        """Get summary of character's skill bonuses for display."""
+        """Get summary of character's skill bonuses."""
         skills = {}
         
         for skill_type in SkillType:
             if self.can_use_skill(character, skill_type):
-                bonus = self.get_skill_bonus(character, skill_type)
+                bonus = self._get_skill_bonus(character, skill_type)
                 if bonus > 0:
                     skills[skill_type.value] = bonus
         
         return skills
-    
-    def display_character_skills(self, character) -> None:
-        """Display character's skills in a formatted way."""
-        skills = self.get_skill_summary(character)
-        
-        if not skills:
-            self.ui_manager.log_info("You have no trained skills.")
-            return
-        
-        self.ui_manager.log_info("=== YOUR SKILLS ===")
-        for skill_name, bonus in sorted(skills.items()):
-            skill_display = skill_name.replace('_', ' ').title()
-            self.ui_manager.log_info(f"{skill_display}: +{bonus}")
 
 
 # Test function for skill system
 def _test_skill_system():
-    """Test the comprehensive skill system."""
+    """Test skill system functionality."""
     from .dice_system import DiceSystem
     
     class MockUIManager:
@@ -548,16 +724,10 @@ def _test_skill_system():
     assert skill_system.can_use_skill(warrior, SkillType.SEARCH)  # Universal skill
     
     # Test skill bonus calculation
-    lockpick_bonus = skill_system.get_skill_bonus(thief, SkillType.LOCKPICKING)
+    lockpick_bonus = skill_system._get_skill_bonus(thief, SkillType.LOCKPICKING)
     assert lockpick_bonus > 0
     
-    # Test skill check
-    success, total, desc = skill_system.make_skill_check(thief, SkillType.LOCKPICKING)
-    assert isinstance(success, bool)
-    assert isinstance(total, int)
-    assert isinstance(desc, str)
-    
-    print("Comprehensive skill system tests passed!")
+    print("Skill system tests passed!")
 
 
 if __name__ == "__main__":

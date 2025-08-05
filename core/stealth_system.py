@@ -25,10 +25,11 @@ class StealthSystem:
     - Stealth detection and breaking
     """
     
-    def __init__(self, dice_system, ui_manager):
+    def __init__(self, dice_system, ui_manager, skill_system=None):
         """Initialize the stealth system."""
         self.dice_system = dice_system
         self.ui_manager = ui_manager
+        self.skill_system = skill_system
         
         # Stealth state tracking
         self.character_stealth_states: Dict[str, StealthState] = {}
@@ -77,20 +78,43 @@ class StealthSystem:
             self.ui_manager.log_error("Your heavy armor makes it impossible to move stealthily.")
             return False
         
-        # Calculate stealth skill check
-        stealth_bonus = self._get_stealth_skill_bonus(character)
-        base_chance = 60 + stealth_bonus - stealth_penalty
-        
-        # Roll for stealth success
-        roll = random.randint(1, 100)
-        if roll <= base_chance:
-            self.character_stealth_states[char_id] = StealthState.SNEAKING
-            self.ui_manager.log_success("You attempt to move stealthily.")
-            self.ui_manager.log_system("[Stealth mode activated - movement uses stealth checks]")
-            return True
+        # Use skill system if available, otherwise fall back to old method
+        if self.skill_system:
+            from .skill_system import SkillType, SkillDifficulty
+            
+            # Apply armor penalty as circumstance modifier
+            circumstance_penalty = -stealth_penalty // 10  # Convert to reasonable penalty
+            success, total_roll, result_desc = self.skill_system.make_skill_check(
+                character, SkillType.STEALTH, SkillDifficulty.MODERATE, circumstance_penalty)
+            
+            if success:
+                self.character_stealth_states[char_id] = StealthState.SNEAKING
+                if result_desc == "Critical Success!":
+                    self.ui_manager.log_success("You blend perfectly into the shadows!")
+                else:
+                    self.ui_manager.log_success("You attempt to move stealthily.")
+                self.ui_manager.log_system("[Stealth mode activated - movement uses stealth checks]")
+                return True
+            else:
+                if result_desc == "Critical Failure!":
+                    self.ui_manager.log_error("You trip over your own feet making a loud noise!")
+                else:
+                    self.ui_manager.log_error("You fail to move quietly.")
+                return False
         else:
-            self.ui_manager.log_error("You fail to move quietly.")
-            return False
+            # Fallback to old method
+            stealth_bonus = self._get_stealth_skill_bonus(character)
+            base_chance = 60 + stealth_bonus - stealth_penalty
+            
+            roll = random.randint(1, 100)
+            if roll <= base_chance:
+                self.character_stealth_states[char_id] = StealthState.SNEAKING
+                self.ui_manager.log_success("You attempt to move stealthily.")
+                self.ui_manager.log_system("[Stealth mode activated - movement uses stealth checks]")
+                return True
+            else:
+                self.ui_manager.log_error("You fail to move quietly.")
+                return False
     
     def exit_stealth_mode(self, character) -> bool:
         """Exit stealth mode."""
@@ -124,30 +148,60 @@ class StealthSystem:
             self.ui_manager.log_info("You are already hiding.")
             return True
         
-        # Calculate hide skill check
-        stealth_bonus = self._get_stealth_skill_bonus(character)
-        stealth_penalty = self._get_stealth_penalty(character)
-        
-        # Area-based hiding bonuses/penalties
-        area_bonus = 0
-        if area and hasattr(area, 'description'):
-            description = area.description.lower()
-            if any(word in description for word in ['shadow', 'dark', 'corner', 'alcove']):
-                area_bonus = 10
-            elif any(word in description for word in ['bright', 'open', 'lit', 'exposed']):
-                area_bonus = -10
-        
-        base_chance = 70 + stealth_bonus - stealth_penalty + area_bonus
-        
-        # Roll for hide success
-        roll = random.randint(1, 100)
-        if roll <= base_chance:
-            self.character_stealth_states[char_id] = StealthState.HIDDEN
-            self.ui_manager.log_success("You find a good hiding spot and conceal yourself.")
-            return True
+        # Use skill system if available, otherwise fall back to old method
+        if self.skill_system:
+            from .skill_system import SkillType, SkillDifficulty
+            
+            # Calculate circumstance modifiers
+            stealth_penalty = self._get_stealth_penalty(character)
+            area_bonus = 0
+            if area and hasattr(area, 'description'):
+                description = area.description.lower()
+                if any(word in description for word in ['shadow', 'dark', 'corner', 'alcove']):
+                    area_bonus = 2  # Convert to D20 scale
+                elif any(word in description for word in ['bright', 'open', 'lit', 'exposed']):
+                    area_bonus = -2
+            
+            circumstance_modifier = area_bonus - (stealth_penalty // 10)
+            success, total_roll, result_desc = self.skill_system.make_skill_check(
+                character, SkillType.HIDING, SkillDifficulty.MODERATE, circumstance_modifier)
+            
+            if success:
+                self.character_stealth_states[char_id] = StealthState.HIDDEN
+                if result_desc == "Critical Success!":
+                    self.ui_manager.log_success("You vanish completely into the perfect hiding spot!")
+                else:
+                    self.ui_manager.log_success("You find a good hiding spot and conceal yourself.")
+                return True
+            else:
+                if result_desc == "Critical Failure!":
+                    self.ui_manager.log_error("You knock something over while trying to hide!")
+                else:
+                    self.ui_manager.log_error("You cannot find a suitable place to hide here.")
+                return False
         else:
-            self.ui_manager.log_error("You cannot find a suitable place to hide here.")
-            return False
+            # Fallback to old method
+            stealth_bonus = self._get_stealth_skill_bonus(character)
+            stealth_penalty = self._get_stealth_penalty(character)
+            
+            area_bonus = 0
+            if area and hasattr(area, 'description'):
+                description = area.description.lower()
+                if any(word in description for word in ['shadow', 'dark', 'corner', 'alcove']):
+                    area_bonus = 10
+                elif any(word in description for word in ['bright', 'open', 'lit', 'exposed']):
+                    area_bonus = -10
+            
+            base_chance = 70 + stealth_bonus - stealth_penalty + area_bonus
+            
+            roll = random.randint(1, 100)
+            if roll <= base_chance:
+                self.character_stealth_states[char_id] = StealthState.HIDDEN
+                self.ui_manager.log_success("You find a good hiding spot and conceal yourself.")
+                return True
+            else:
+                self.ui_manager.log_error("You cannot find a suitable place to hide here.")
+                return False
     
     def attempt_backstab(self, attacker, target, combat_system=None) -> Tuple[bool, int]:
         """

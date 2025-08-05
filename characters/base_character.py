@@ -70,6 +70,9 @@ class BaseCharacter(ABC):
         self.inventory_system = None
         self.equipment_system = None
         
+        # Skill tracking for practice-based improvement
+        self.skill_experience = {}  # Dict[skill_name, usage_count]
+        
         # Character creation tracking
         self.unallocated_stats = 10  # Points to spend during creation
         self.creation_complete = False
@@ -421,6 +424,16 @@ class BaseCharacter(ABC):
             self.known_spells.append(spell_name)
             return True
         return False
+    
+    def track_skill_usage(self, skill_name: str) -> None:
+        """Track skill usage for practice-based improvement"""
+        if skill_name not in self.skill_experience:
+            self.skill_experience[skill_name] = 0
+        self.skill_experience[skill_name] += 1
+    
+    def get_skill_experience(self, skill_name: str) -> int:
+        """Get the experience (usage count) for a specific skill"""
+        return self.skill_experience.get(skill_name, 0)
         
     def get_special_abilities(self) -> Dict[str, Any]:
         """Get class-specific special abilities (override in subclasses)"""

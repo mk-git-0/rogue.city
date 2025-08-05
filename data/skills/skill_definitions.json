@@ -1,0 +1,272 @@
+{
+  "skill_definitions": {
+    "stealth": {
+      "name": "Stealth",
+      "description": "The ability to move without being detected, blending into shadows and avoiding notice.",
+      "primary_stat": "dexterity",
+      "secondary_stat": "wisdom",
+      "universal": false,
+      "difficulty_modifiers": {
+        "light_armor": 0,
+        "medium_armor": -2,
+        "heavy_armor": -5,
+        "darkness": 2,
+        "bright_light": -2,
+        "crowded_area": -1,
+        "empty_area": 1
+      }
+    },
+    "hiding": {
+      "name": "Hiding",
+      "description": "The ability to conceal oneself in a location, remaining motionless and undetected.",
+      "primary_stat": "dexterity",
+      "secondary_stat": "wisdom",
+      "universal": false,
+      "difficulty_modifiers": {
+        "shadows": 2,
+        "corners": 1,
+        "open_area": -3,
+        "bright_light": -2,
+        "furniture": 1
+      }
+    },
+    "lockpicking": {
+      "name": "Lockpicking",
+      "description": "The art of opening locks without the proper key using specialized tools.",
+      "primary_stat": "dexterity",
+      "secondary_stat": "intelligence",
+      "universal": false,
+      "difficulty_modifiers": {
+        "simple_lock": -5,
+        "complex_lock": 5,
+        "masterwork_lock": 10,
+        "rusted_lock": -2,
+        "well_maintained": 2
+      }
+    },
+    "thievery": {
+      "name": "Thievery",
+      "description": "General criminal skills including sleight of hand and misdirection.",
+      "primary_stat": "dexterity",
+      "secondary_stat": "intelligence",
+      "universal": false
+    },
+    "pickpocketing": {
+      "name": "Pickpocketing",
+      "description": "The skill of stealing items from others without their knowledge.",
+      "primary_stat": "dexterity",
+      "secondary_stat": "intelligence",
+      "universal": false,
+      "difficulty_modifiers": {
+        "distracted_target": 2,
+        "alert_target": -3,
+        "crowded_area": 1,
+        "isolated": -2,
+        "valuable_item": 3
+      }
+    },
+    "trap_detection": {
+      "name": "Trap Detection",
+      "description": "The ability to notice and identify dangerous traps and snares.",
+      "primary_stat": "intelligence",
+      "secondary_stat": "wisdom",
+      "universal": false,
+      "difficulty_modifiers": {
+        "obvious_trap": -5,
+        "well_hidden": 5,
+        "magical_trap": 7,
+        "mechanical_trap": 0,
+        "recent_trap": -2
+      }
+    },
+    "trap_disarmament": {
+      "name": "Trap Disarmament",
+      "description": "The skill of safely disabling traps once they have been detected.",
+      "primary_stat": "intelligence",
+      "secondary_stat": "dexterity",
+      "universal": false,
+      "difficulty_modifiers": {
+        "simple_mechanism": -3,
+        "complex_mechanism": 5,
+        "time_pressure": 3,
+        "proper_tools": -2,
+        "improvised_tools": 2
+      }
+    },
+    "search": {
+      "name": "Search",
+      "description": "The ability to carefully examine areas for hidden objects, doors, or secrets.",
+      "primary_stat": "wisdom",
+      "secondary_stat": "intelligence",
+      "universal": true,
+      "difficulty_modifiers": {
+        "well_lit": 1,
+        "darkness": -2,
+        "cluttered": -1,
+        "organized": 1,
+        "time_taken": 2
+      }
+    },
+    "perception": {
+      "name": "Perception",
+      "description": "General awareness and ability to notice details in the environment.",
+      "primary_stat": "wisdom",
+      "secondary_stat": "intelligence",
+      "universal": true,
+      "difficulty_modifiers": {
+        "distractions": -2,
+        "focused": 1,
+        "familiar_area": 1,
+        "foreign_area": -1
+      }
+    },
+    "listening": {
+      "name": "Listening",
+      "description": "The ability to detect and identify sounds, conversations, and movements.",
+      "primary_stat": "wisdom",
+      "secondary_stat": "dexterity",
+      "universal": true,
+      "difficulty_modifiers": {
+        "quiet_environment": 2,
+        "noisy_environment": -3,
+        "stone_walls": -1,
+        "wooden_walls": 0,
+        "distance": -1
+      }
+    },
+    "tracking": {
+      "name": "Tracking",
+      "description": "The skill of following trails left by creatures and identifying their passage.",
+      "primary_stat": "wisdom",
+      "secondary_stat": "intelligence",
+      "universal": false,
+      "difficulty_modifiers": {
+        "soft_ground": 2,
+        "hard_ground": -2,
+        "recent_tracks": 1,
+        "old_tracks": -3,
+        "weather": -2,
+        "large_creature": 1,
+        "small_creature": -1
+      }
+    },
+    "foraging": {
+      "name": "Foraging",
+      "description": "The ability to find food, herbs, and useful materials in natural environments.",
+      "primary_stat": "wisdom",
+      "secondary_stat": "intelligence",
+      "universal": false,
+      "difficulty_modifiers": {
+        "forest": 1,
+        "plains": 0,
+        "desert": -3,
+        "mountains": -1,
+        "swamp": 2,
+        "season_appropriate": 1,
+        "barren_area": -5
+      }
+    },
+    "climbing": {
+      "name": "Climbing",
+      "description": "The ability to scale walls, cliffs, and other vertical or steep surfaces.",
+      "primary_stat": "strength",
+      "secondary_stat": "dexterity",
+      "universal": true,
+      "difficulty_modifiers": {
+        "rope": 3,
+        "handholds": 2,
+        "smooth_surface": -5,
+        "wet_surface": -2,
+        "windy": -2,
+        "heavy_load": -3
+      }
+    },
+    "swimming": {
+      "name": "Swimming",
+      "description": "The ability to move through water and stay afloat in aquatic environments.",
+      "primary_stat": "strength",
+      "secondary_stat": "constitution",
+      "universal": true,
+      "difficulty_modifiers": {
+        "calm_water": 1,
+        "rough_water": -3,
+        "current": -2,
+        "armor": -5,
+        "heavy_load": -3,
+        "cold_water": -1
+      }
+    },
+    "dodging": {
+      "name": "Dodging",
+      "description": "The ability to avoid attacks through quick movement and reflexes.",
+      "primary_stat": "dexterity",
+      "secondary_stat": "constitution",
+      "universal": false,
+      "difficulty_modifiers": {
+        "light_armor": 1,
+        "heavy_armor": -3,
+        "multiple_attackers": -2,
+        "confined_space": -2,
+        "open_ground": 1
+      }
+    },
+    "blocking": {
+      "name": "Blocking",
+      "description": "The skill of using shields and weapons to deflect incoming attacks.",
+      "primary_stat": "strength",
+      "secondary_stat": "dexterity",
+      "universal": false,
+      "difficulty_modifiers": {
+        "large_shield": 2,
+        "small_shield": 0,
+        "no_shield": -5,
+        "multiple_attackers": -3,
+        "ranged_attack": -2
+      }
+    },
+    "parrying": {
+      "name": "Parrying",
+      "description": "The art of deflecting attacks using weapons or martial techniques.",
+      "primary_stat": "dexterity",
+      "secondary_stat": "strength",
+      "universal": false,
+      "difficulty_modifiers": {
+        "weapon_advantage": 2,
+        "weapon_disadvantage": -2,
+        "unarmed": -3,
+        "dual_wielding": 1,
+        "off_balance": -2
+      }
+    },
+    "spell_casting": {
+      "name": "Spell Casting",
+      "description": "The ability to manipulate magical energies and cast spells effectively.",
+      "primary_stat": "intelligence",
+      "secondary_stat": "wisdom",
+      "universal": false,
+      "difficulty_modifiers": {
+        "familiar_spell": 1,
+        "new_spell": -2,
+        "combat_casting": -3,
+        "distraction": -2,
+        "magical_focus": 2,
+        "anti_magic": -5
+      }
+    },
+    "meditation": {
+      "name": "Meditation",
+      "description": "The practice of focusing the mind to recover mana and achieve mental clarity.",
+      "primary_stat": "wisdom",
+      "secondary_stat": "constitution",
+      "universal": false,
+      "difficulty_modifiers": {
+        "quiet_environment": 2,
+        "distractions": -3,
+        "comfortable": 1,
+        "uncomfortable": -2,
+        "sacred_ground": 3,
+        "cursed_ground": -3
+      }
+    }
+  }
+}

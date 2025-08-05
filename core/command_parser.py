@@ -99,6 +99,9 @@ class CommandParser:
         self.commands['lay'] = self.cmd_lay_hands
         self.commands['sing'] = self.cmd_sing
         self.commands['shapeshift'] = self.cmd_shapeshift
+        
+        # Skill display commands
+        self.commands['skills'] = self.cmd_skills
     
     def setup_aliases(self):
         """Setup command aliases for convenience."""
@@ -745,7 +748,11 @@ class CommandParser:
         # Initialize stealth system if needed
         if not hasattr(self.game, 'stealth_system'):
             from .stealth_system import StealthSystem
-            self.game.stealth_system = StealthSystem(self.game.dice_system, self.game.ui_manager)
+            # Initialize skill system if needed
+            if not hasattr(self.game, 'skill_system'):
+                from .skill_system import SkillSystem
+                self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+            self.game.stealth_system = StealthSystem(self.game.dice_system, self.game.ui_manager, self.game.skill_system)
         
         if args and args[0].lower() == 'off':
             self.game.stealth_system.exit_stealth_mode(self.game.current_player)
@@ -763,7 +770,11 @@ class CommandParser:
         # Initialize stealth system if needed
         if not hasattr(self.game, 'stealth_system'):
             from .stealth_system import StealthSystem
-            self.game.stealth_system = StealthSystem(self.game.dice_system, self.game.ui_manager)
+            # Initialize skill system if needed
+            if not hasattr(self.game, 'skill_system'):
+                from .skill_system import SkillSystem
+                self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+            self.game.stealth_system = StealthSystem(self.game.dice_system, self.game.ui_manager, self.game.skill_system)
         
         current_area = getattr(self.game.current_player, 'current_area', None)
         self.game.stealth_system.attempt_hide(self.game.current_player, current_area)
@@ -863,8 +874,8 @@ class CommandParser:
             self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
         
         target = ' '.join(args)
-        from .skill_system import DifficultyLevel
-        self.game.skill_system.attempt_lockpicking(self.game.current_player, target, DifficultyLevel.MODERATE)
+        from .skill_system import SkillDifficulty
+        self.game.skill_system.attempt_lockpicking(self.game.current_player, target, SkillDifficulty.MODERATE)
         
         return True
     
@@ -1281,5 +1292,21 @@ class CommandParser:
         
         self.game.ui_manager.log_success(f"You transform into a {form_name}!")
         self.game.ui_manager.log_system(f"[Shapeshift: You are now in {form_name} form]")
+        
+        return True
+    
+    def cmd_skills(self, args: List[str]) -> bool:
+        """Display character's skill bonuses and abilities."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Initialize skill system if needed
+        if not hasattr(self.game, 'skill_system'):
+            from .skill_system import SkillSystem
+            self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
+        
+        # Display character skills using the skill system
+        self.game.skill_system.display_character_skills(self.game.current_player)
         
         return True
