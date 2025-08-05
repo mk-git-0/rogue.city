@@ -304,6 +304,10 @@ class Warrior(BaseCharacter):
         if 'alignment_data' in data:
             warrior.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            warrior.load_currency_data(data['currency_data'])
+        
         # Restore warrior-specific attributes
         warrior_data = data.get('warrior_data', {})
         warrior.weapon_specialization = warrior_data.get('weapon_specialization')

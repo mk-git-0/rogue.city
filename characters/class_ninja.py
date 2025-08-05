@@ -746,6 +746,10 @@ class Ninja(BaseCharacter):
         if 'alignment_data' in data:
             ninja.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            ninja.load_currency_data(data['currency_data'])
+        
         # Restore ninja-specific attributes
         ninja_data = data.get('ninja_data', {})
         ninja.shadow_step_uses_used = ninja_data.get('shadow_step_uses_used', 0)

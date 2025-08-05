@@ -574,6 +574,10 @@ class Ranger(BaseCharacter):
         if 'alignment_data' in data:
             ranger.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            ranger.load_currency_data(data['currency_data'])
+        
         # Restore ranger-specific attributes
         ranger_data = data.get('ranger_data', {})
         ranger.favored_enemies = ranger_data.get('favored_enemies', ['humanoid'])

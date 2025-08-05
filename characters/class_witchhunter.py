@@ -729,6 +729,10 @@ class Witchhunter(BaseCharacter):
         if 'alignment_data' in data:
             witchhunter.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            witchhunter.load_currency_data(data['currency_data'])
+        
         # Restore witchhunter-specific attributes
         witchhunter_data = data.get('witchhunter_data', {})
         witchhunter.spell_turning_used = witchhunter_data.get('spell_turning_used', 0)

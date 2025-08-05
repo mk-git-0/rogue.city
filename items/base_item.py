@@ -26,6 +26,12 @@ class BaseItem:
         self.value = value
         self.rarity = rarity
         
+        # Item condition system (percentage 0-100)
+        self.condition_percentage: float = 100.0  # Perfect condition by default
+        
+        # Alignment restrictions (None means no restrictions)
+        self.alignment_restriction: Optional[str] = None  # 'good', 'evil', 'neutral'
+        
         # Class restrictions (empty list means no restrictions)
         self.class_restrictions: List[str] = []
         
@@ -52,6 +58,82 @@ class BaseItem:
         """Check if this item can be used by the given character level."""
         return character_level >= self.level_requirement
     
+    def can_be_used_by_alignment(self, character_alignment: str) -> tuple[bool, str]:
+        """Check if this item can be used by the given character alignment."""
+        if not self.alignment_restriction:
+            return True, ""
+        
+        if self.alignment_restriction.lower() != character_alignment.lower():
+            if self.alignment_restriction.lower() == "good" and character_alignment.lower() == "evil":
+                return False, "This holy item burns your evil hands!"
+            elif self.alignment_restriction.lower() == "evil" and character_alignment.lower() == "good":
+                return False, "This cursed item sears your pure soul!"
+            else:
+                return False, f"This item requires {self.alignment_restriction} alignment."
+        
+        return True, ""
+    
+    def get_condition(self) -> str:
+        """Get current condition as string"""
+        try:
+            from core.item_condition_system import ItemConditionSystem
+            condition_system = ItemConditionSystem()
+            return condition_system.format_condition_display(self.condition_percentage)
+        except ImportError:
+            return f"{self.condition_percentage:.0f}%"
+    
+    def is_broken(self) -> bool:
+        """Check if item is broken and unusable"""
+        return self.condition_percentage < 10.0
+    
+    def can_be_equipped(self) -> bool:
+        """Check if item can be equipped (not broken)"""
+        return not self.is_broken()
+    
+    def get_effective_value(self) -> int:
+        """Get item value adjusted for condition"""
+        try:
+            from core.item_condition_system import ItemConditionSystem
+            condition_system = ItemConditionSystem()
+            condition = condition_system.get_condition_from_percentage(self.condition_percentage)
+            modifier = condition_system.get_value_modifier(condition)
+            return int(self.value * modifier)
+        except ImportError:
+            # Fallback calculation
+            condition_modifier = self.condition_percentage / 100.0
+            return int(self.value * condition_modifier)
+    
+    def get_effective_stat_bonuses(self) -> Dict[str, int]:
+        """Get stat bonuses adjusted for condition"""
+        if self.is_broken():
+            return {stat: 0 for stat in self.stat_bonuses.keys()}
+        
+        try:
+            from core.item_condition_system import ItemConditionSystem
+            condition_system = ItemConditionSystem()
+            condition = condition_system.get_condition_from_percentage(self.condition_percentage)
+            effectiveness = condition_system.get_effectiveness_modifier(condition)
+            
+            return {
+                stat: int(bonus * effectiveness) 
+                for stat, bonus in self.stat_bonuses.items()
+            }
+        except ImportError:
+            # Fallback calculation
+            effectiveness = self.condition_percentage / 100.0
+            return {
+                stat: int(bonus * effectiveness) 
+                for stat, bonus in self.stat_bonuses.items()
+            }
+    
+    def apply_condition_damage(self, damage_amount: float):
+        """Apply damage to item condition"""
+        self.condition_percentage = max(0.0, self.condition_percentage - damage_amount)
+    
+    def repair_item(self, repair_amount: float):
+        """Repair item condition"""
+        self.condition_percentage = min(100.0, self.condition_percentage + repair_amount)
+    
     def get_tooltip_text(self) -> str:
         """Generate tooltip text showing item details."""
         lines = []
@@ -60,12 +142,16 @@ class BaseItem:
         lines.append(f"Weight: {self.weight} lbs")
         lines.append(f"Value: {self.value} gold")
         lines.append(f"Rarity: {self.rarity.value.title()}")
+        lines.append(f"Condition: {self.get_condition()}")
         
         if self.level_requirement > 1:
             lines.append(f"Level Required: {self.level_requirement}")
         
         if self.class_restrictions:
             lines.append(f"Classes: {', '.join(self.class_restrictions)}")
+        
+        if self.alignment_restriction:
+            lines.append(f"Alignment: {self.alignment_restriction.title()} only")
         
         # Show stat bonuses if any
         bonuses = [f"{stat.title()}: +{bonus}" for stat, bonus in self.stat_bonuses.items() if bonus > 0]
@@ -91,7 +177,9 @@ class BaseItem:
             'rarity': self.rarity.value,
             'class_restrictions': self.class_restrictions,
             'level_requirement': self.level_requirement,
-            'stat_bonuses': self.stat_bonuses
+            'stat_bonuses': self.stat_bonuses,
+            'condition_percentage': self.condition_percentage,
+            'alignment_restriction': self.alignment_restriction
         }
     
     @classmethod
@@ -113,6 +201,8 @@ class BaseItem:
             'strength': 0, 'dexterity': 0, 'constitution': 0,
             'intelligence': 0, 'wisdom': 0, 'charisma': 0
         })
+        item.condition_percentage = data.get('condition_percentage', 100.0)
+        item.alignment_restriction = data.get('alignment_restriction')
         
         return item
 

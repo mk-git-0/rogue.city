@@ -511,6 +511,10 @@ class Paladin(BaseCharacter):
         if 'alignment_data' in data:
             paladin.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            paladin.load_currency_data(data['currency_data'])
+        
         # Restore paladin-specific attributes
         paladin_data = data.get('paladin_data', {})
         paladin.lay_on_hands_used = paladin_data.get('lay_on_hands_used', 0)

@@ -395,6 +395,10 @@ class Rogue(BaseCharacter):
         if 'alignment_data' in data:
             rogue.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            rogue.load_currency_data(data['currency_data'])
+        
         # Recalculate rogue-specific attributes
         rogue.magic_resistance = rogue._calculate_magic_resistance()
         rogue.stealth_bonus = rogue._calculate_stealth_bonus()

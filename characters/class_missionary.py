@@ -577,6 +577,10 @@ class Missionary(BaseCharacter):
         if 'alignment_data' in data:
             missionary.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            missionary.load_currency_data(data['currency_data'])
+        
         # Restore missionary-specific attributes
         missionary_data = data.get('missionary_data', {})
         missionary.healing_used = missionary_data.get('healing_used', 0)

@@ -382,6 +382,10 @@ class Mage(BaseCharacter):
         # Load alignment data
         if 'alignment_data' in data:
             mage.load_alignment_data(data['alignment_data'])
+        
+        # Load currency data
+        if 'currency_data' in data:
+            mage.load_currency_data(data['currency_data'])
             
         return mage
         

@@ -371,6 +371,10 @@ class Knight(BaseCharacter):
         if 'alignment_data' in data:
             knight.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            knight.load_currency_data(data['currency_data'])
+        
         # Restore knight-specific state
         knight.defensive_stance_active = data.get('defensive_stance_active', False)
         knight.protecting_allies = data.get('protecting_allies', [])

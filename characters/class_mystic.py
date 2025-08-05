@@ -458,6 +458,10 @@ class Mystic(BaseCharacter):
         if 'alignment_data' in data:
             mystic.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            mystic.load_currency_data(data['currency_data'])
+        
         # Restore mystic-specific attributes
         mystic.max_ki = mystic._calculate_max_ki()
         mystic.current_ki = data.get('current_ki', mystic.max_ki)

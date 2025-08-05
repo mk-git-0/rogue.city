@@ -718,6 +718,10 @@ class Thief(BaseCharacter):
         if 'alignment_data' in data:
             thief.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            thief.load_currency_data(data['currency_data'])
+        
         # Restore thief-specific attributes
         thief_data = data.get('thief_data', {})
         thief.is_hidden = thief_data.get('is_hidden', False)

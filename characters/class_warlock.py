@@ -681,6 +681,10 @@ class Warlock(BaseCharacter):
         if 'alignment_data' in data:
             warlock.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            warlock.load_currency_data(data['currency_data'])
+        
         # Restore warlock-specific attributes
         warlock_data = data.get('warlock_data', {})
         warlock.battle_spells_used = warlock_data.get('battle_spells_used', {})

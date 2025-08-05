@@ -784,6 +784,10 @@ class Druid(BaseCharacter):
         if 'alignment_data' in data:
             druid.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            druid.load_currency_data(data['currency_data'])
+        
         # Restore druid-specific attributes
         druid_data = data.get('druid_data', {})
         druid.shapeshifting_uses_used = druid_data.get('shapeshifting_uses_used', 0)

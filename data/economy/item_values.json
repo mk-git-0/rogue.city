@@ -1,0 +1,56 @@
+{
+  "weapons": {
+    "rusty_dagger": 5,
+    "training_sword": 10,
+    "wooden_staff": 8,
+    "hand_wraps": 12,
+    "iron_sword": 50,
+    "steel_dagger": 35,
+    "oak_staff": 45,
+    "mystic_wraps": 60
+  },
+  "armor": {
+    "leather_scraps": 8,
+    "cloth_robes": 6,
+    "padded_armor": 15,
+    "simple_garb": 10,
+    "leather_armor": 40,
+    "chain_mail": 80,
+    "mage_robes": 50,
+    "mystic_robes": 100
+  },
+  "consumables": {
+    "minor_health_potion": 15,
+    "major_health_potion": 50,
+    "minor_mana_potion": 20,
+    "major_mana_potion": 60,
+    "rations": 2,
+    "herbal_remedy": 8,
+    "antidote": 25,
+    "poison_vial": 30
+  },
+  "tools": {
+    "lockpicks": 20,
+    "thieves_tools": 40,
+    "repair_kit": 10,
+    "rope": 5
+  },
+  "base_modifiers": {
+    "rarity_multipliers": {
+      "common": 1.0,
+      "uncommon": 1.5,
+      "rare": 2.5,
+      "epic": 4.0,
+      "legendary": 8.0
+    },
+    "condition_multipliers": {
+      "perfect": 1.0,
+      "excellent": 0.95,
+      "good": 0.80,
+      "fair": 0.60,
+      "poor": 0.40,
+      "damaged": 0.20,
+      "broken": 0.10
+    }
+  }
+}

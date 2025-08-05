@@ -424,6 +424,10 @@ class Bard(BaseCharacter):
         if 'alignment_data' in data:
             bard.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            bard.load_currency_data(data['currency_data'])
+        
         # Restore bard-specific attributes
         bard_data = data.get('bard_data', {})
         bard.bardic_songs_used = bard_data.get('bardic_songs_used', 0)

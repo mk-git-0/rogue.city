@@ -56,8 +56,14 @@ class BaseCharacter(ABC):
         self.current_mana = 0
         self.known_spells = []
         
+        # Currency system integration
+        self.currency = None  # Will be initialized when currency system is available
+        
         # Initialize magic system for spellcasting classes
         self._initialize_magic_system()
+        
+        # Initialize currency system
+        self._initialize_currency_system()
         
         # Calculate initial derived stats after class modifiers are applied
         self.calculate_derived_stats()
@@ -118,6 +124,20 @@ class BaseCharacter(ABC):
                 self.known_spells = []
         except ImportError:
             self.known_spells = []
+    
+    def _initialize_currency_system(self):
+        """Initialize currency system for new characters"""
+        try:
+            from core.currency_system import Currency, CurrencySystem
+            currency_system = CurrencySystem()
+            
+            # For new characters, generate starting gold
+            if self.currency is None:
+                self.currency = currency_system.calculate_starting_gold(self.character_class, self.level)
+        except ImportError:
+            # Fallback if currency system not available
+            from core.currency_system import Currency
+            self.currency = Currency(gold=50)  # Default starting gold
         
     def apply_class_modifiers(self, class_data: Dict[str, Any]):
         """Apply class-specific stat modifiers to base stats"""
@@ -509,6 +529,23 @@ class BaseCharacter(ABC):
             self.alignment_manager = AlignmentManager(Alignment.NEUTRAL)
             self.alignment_manager.character_name = self.name
     
+    def load_currency_data(self, currency_data: Dict):
+        """Load currency data from save file"""
+        try:
+            from core.currency_system import Currency
+            if currency_data:
+                self.currency = Currency(
+                    currency_data.get('gold', 0),
+                    currency_data.get('silver', 0),
+                    currency_data.get('copper', 0)
+                )
+            else:
+                # Default currency for legacy characters
+                self.currency = Currency(gold=50)
+        except ImportError:
+            from core.currency_system import Currency
+            self.currency = Currency(gold=50)
+    
     def get_character_display(self) -> str:
         """Get detailed character information for display"""
         lines = []
@@ -522,6 +559,8 @@ class BaseCharacter(ABC):
         exp_display = f" (+{exp_penalty}% exp)" if exp_penalty > 0 else ""
         lines.append(f"Level: {self.level}           Experience: {self.experience}/{self.calculate_required_experience()}{exp_display}")
         lines.append(f"HP: {self.current_hp}/{self.max_hp}          AC: {self.armor_class}")
+        if self.currency:
+            lines.append(f"Wealth: {self.currency}")
         lines.append("")
         
         # Reputation section
@@ -575,6 +614,11 @@ class BaseCharacter(ABC):
                 'max_mana': self.max_mana,
                 'current_mana': self.current_mana,
                 'known_spells': self.known_spells.copy()
+            },
+            'currency_data': {
+                'gold': self.currency.gold if self.currency else 0,
+                'silver': self.currency.silver if self.currency else 0,
+                'copper': self.currency.copper if self.currency else 0
             },
             'save_timestamp': time.time()
         }

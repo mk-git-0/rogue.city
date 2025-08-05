@@ -1,0 +1,246 @@
+{
+  "merchants": [
+    {
+      "merchant_id": "grex_trader",
+      "name": "Grex the Trader",
+      "merchant_type": "general_store",
+      "area_id": "tutorial_cave",
+      "room_id": "cave_exit",
+      "alignment": "NEUTRAL",
+      "inventory": {
+        "minor_health_potion": 5,
+        "rations": 3,
+        "training_sword": 1,
+        "leather_scraps": 2,
+        "rusty_dagger": 2
+      },
+      "buy_categories": ["weapon", "armor", "consumable", "accessory"],
+      "sell_markup": 1.2,
+      "buy_markdown": 0.4,
+      "wealth": {
+        "gold": 200,
+        "silver": 0,
+        "copper": 0
+      },
+      "greeting": "Ah, a new adventurer! Let me help you get properly equipped.",
+      "description": "Grex is a weathered trader who helps new adventurers get started on their journey.",
+      "is_hidden": false,
+      "discovery_skill": null,
+      "discovery_difficulty": 10,
+      "reputation_requirements": {},
+      "class_restrictions": []
+    },
+    {
+      "merchant_id": "forest_peddler",
+      "name": "Wandering Peddler",
+      "merchant_type": "traveling",
+      "area_id": "forest",
+      "room_id": "clearing",
+      "alignment": "NEUTRAL",
+      "inventory": {
+        "rations": 2,
+        "minor_health_potion": 3,
+        "rope": 1,
+        "leather_scraps": 1
+      },
+      "buy_categories": ["weapon", "armor", "consumable"],
+      "sell_markup": 1.3,
+      "buy_markdown": 0.5,
+      "wealth": {
+        "gold": 150,
+        "silver": 0,
+        "copper": 0
+      },
+      "greeting": "Greetings, traveler! Care to see my wares?",
+      "description": "A traveling merchant with a pack full of useful supplies.",
+      "is_hidden": false,
+      "discovery_skill": null,
+      "discovery_difficulty": 10,
+      "reputation_requirements": {},
+      "class_restrictions": []
+    },
+    {
+      "merchant_id": "rogue_city_weaponsmith",
+      "name": "Thorvald the Weaponsmith",
+      "merchant_type": "weapon_shop",
+      "area_id": "rogue_city",
+      "room_id": "weapon_quarter",
+      "alignment": "NEUTRAL",
+      "inventory": {
+        "iron_sword": 3,
+        "steel_dagger": 4,
+        "training_sword": 2,
+        "rusty_dagger": 5,
+        "wooden_staff": 2,
+        "hand_wraps": 3
+      },
+      "buy_categories": ["weapon"],
+      "sell_markup": 1.1,
+      "buy_markdown": 0.7,
+      "wealth": {
+        "gold": 500,
+        "silver": 0,
+        "copper": 0
+      },
+      "greeting": "Welcome to my forge! I have the finest blades in all the realm!",
+      "description": "A master weaponsmith known throughout the city for his excellent craftsmanship.",
+      "is_hidden": false,
+      "discovery_skill": null,
+      "discovery_difficulty": 10,
+      "reputation_requirements": {},
+      "class_restrictions": []
+    },
+    {
+      "merchant_id": "rogue_city_armorer",
+      "name": "Marta the Armorer",
+      "merchant_type": "armor_shop",
+      "area_id": "rogue_city",
+      "room_id": "armor_district",
+      "alignment": "NEUTRAL",
+      "inventory": {
+        "leather_armor": 3,
+        "chain_mail": 2,
+        "padded_armor": 4,
+        "leather_scraps": 6,
+        "cloth_robes": 3
+      },
+      "buy_categories": ["armor"],
+      "sell_markup": 1.1,
+      "buy_markdown": 0.7,
+      "wealth": {
+        "gold": 400,
+        "silver": 0,
+        "copper": 0
+      },
+      "greeting": "Quality armor and protection, guaranteed to keep you alive!",
+      "description": "A skilled armorer who takes pride in protecting adventurers.",
+      "is_hidden": false,
+      "discovery_skill": null,
+      "discovery_difficulty": 10,
+      "reputation_requirements": {},
+      "class_restrictions": []
+    },
+    {
+      "merchant_id": "rogue_city_mage_shop",
+      "name": "Mystral the Enchanter",
+      "merchant_type": "magic_shop",
+      "area_id": "rogue_city",
+      "room_id": "mage_quarter",
+      "alignment": "NEUTRAL",
+      "inventory": {
+        "minor_mana_potion": 5,
+        "major_mana_potion": 2,
+        "mage_robes": 2,
+        "mystic_robes": 1,
+        "oak_staff": 2,
+        "mystic_wraps": 1
+      },
+      "buy_categories": ["consumable"],
+      "sell_markup": 1.15,
+      "buy_markdown": 0.65,
+      "wealth": {
+        "gold": 600,
+        "silver": 0,
+        "copper": 0
+      },
+      "greeting": "Welcome, seeker of arcane knowledge! Magical items and mystical wares await!",
+      "description": "A mysterious enchanter dealing in magical items and spell components.",
+      "is_hidden": false,
+      "discovery_skill": null,
+      "discovery_difficulty": 10,
+      "reputation_requirements": {},
+      "class_restrictions": ["barbarian"]
+    },
+    {
+      "merchant_id": "rogue_city_blacksmith",
+      "name": "Gareth the Blacksmith",
+      "merchant_type": "blacksmith",
+      "area_id": "rogue_city",
+      "room_id": "smithy",
+      "alignment": "NEUTRAL",
+      "inventory": {
+        "iron_sword": 2,
+        "chain_mail": 1,
+        "repair_kit": 10
+      },
+      "buy_categories": ["weapon", "armor"],
+      "sell_markup": 1.1,
+      "buy_markdown": 0.8,
+      "wealth": {
+        "gold": 800,
+        "silver": 0,
+        "copper": 0
+      },
+      "greeting": "Need repairs or quality metalwork? You've come to the right place!",
+      "description": "The city's master blacksmith, capable of repairing and crafting the finest equipment.",
+      "is_hidden": false,
+      "discovery_skill": null,
+      "discovery_difficulty": 10,
+      "reputation_requirements": {},
+      "class_restrictions": []
+    },
+    {
+      "merchant_id": "rogue_city_black_market",
+      "name": "Shadow Fence",
+      "merchant_type": "black_market",
+      "area_id": "rogue_city",
+      "room_id": "undercity_hideout",
+      "alignment": "EVIL",
+      "inventory": {
+        "steel_dagger": 3,
+        "lockpicks": 5,
+        "thieves_tools": 3,
+        "poison_vial": 2,
+        "minor_health_potion": 4
+      },
+      "buy_categories": ["weapon", "armor", "consumable", "accessory"],
+      "sell_markup": 0.8,
+      "buy_markdown": 0.8,
+      "wealth": {
+        "gold": 300,
+        "silver": 0,
+        "copper": 0
+      },
+      "greeting": "You didn't see me, and I didn't see you... What do you need?",
+      "description": "A mysterious figure dealing in questionable goods and asking no questions.",
+      "is_hidden": true,
+      "discovery_skill": "search",
+      "discovery_difficulty": 15,
+      "reputation_requirements": {
+        "town_guard": -10
+      },
+      "class_restrictions": []
+    },
+    {
+      "merchant_id": "rogue_city_alchemist",
+      "name": "Vex the Alchemist",
+      "merchant_type": "alchemist",
+      "area_id": "rogue_city",
+      "room_id": "alchemy_shop",
+      "alignment": "NEUTRAL",
+      "inventory": {
+        "minor_health_potion": 8,
+        "major_health_potion": 4,
+        "minor_mana_potion": 6,
+        "major_mana_potion": 3,
+        "herbal_remedy": 5,
+        "antidote": 3
+      },
+      "buy_categories": ["consumable"],
+      "sell_markup": 1.15,
+      "buy_markdown": 0.75,
+      "wealth": {
+        "gold": 400,
+        "silver": 0,
+        "copper": 0
+      },
+      "greeting": "Potions, elixirs, and alchemical supplies! All brewed with the finest ingredients!",
+      "description": "A skilled alchemist who creates powerful potions and remedies.",
+      "is_hidden": false,
+      "discovery_skill": null,
+      "discovery_difficulty": 10,
+      "reputation_requirements": {},
+      "class_restrictions": []
+    }
+  ]
+}

@@ -784,6 +784,10 @@ class Necromancer(BaseCharacter):
         if 'alignment_data' in data:
             necromancer.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            necromancer.load_currency_data(data['currency_data'])
+        
         # Restore necromancer-specific attributes
         necromancer_data = data.get('necromancer_data', {})
         necromancer.death_spells_used = necromancer_data.get('death_spells_used', {})

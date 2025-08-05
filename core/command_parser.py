@@ -102,6 +102,14 @@ class CommandParser:
         
         # Skill display commands
         self.commands['skills'] = self.cmd_skills
+        
+        # Commerce & Economy commands
+        self.commands['buy'] = self.cmd_buy
+        self.commands['sell'] = self.cmd_sell
+        self.commands['list'] = self.cmd_list
+        self.commands['appraise'] = self.cmd_appraise
+        self.commands['repair'] = self.cmd_repair
+        self.commands['wealth'] = self.cmd_wealth
     
     def setup_aliases(self):
         """Setup command aliases for convenience."""
@@ -182,6 +190,19 @@ class CommandParser:
         self.aliases['lh'] = 'lay'
         self.aliases['si'] = 'sing'
         self.aliases['sh'] = 'shapeshift'
+        
+        # Commerce & Economy aliases
+        self.aliases['b'] = 'buy'
+        self.aliases['purchase'] = 'buy'
+        self.aliases['s'] = 'sell'  # Note: conflicts with 'south', context determines usage
+        self.aliases['trade'] = 'sell'
+        self.aliases['ls'] = 'list'
+        self.aliases['shop'] = 'list'
+        self.aliases['app'] = 'appraise'
+        self.aliases['value'] = 'appraise'
+        self.aliases['fix'] = 'repair'
+        self.aliases['money'] = 'wealth'
+        self.aliases['gold'] = 'wealth'
     
     def parse_command(self, input_text: str) -> bool:
         """Parse and execute a command. Returns True if game should continue."""
@@ -1310,3 +1331,340 @@ class CommandParser:
         self.game.skill_system.display_character_skills(self.game.current_player)
         
         return True
+    
+    # Commerce & Economy Commands
+    def cmd_buy(self, args: List[str]) -> bool:
+        """Buy item from a merchant."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Check if we're near a merchant
+        merchants = self._get_nearby_merchants()
+        if not merchants:
+            self.game.ui_manager.log_error("There are no merchants here.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Buy what? Use 'list' to see what's for sale.")
+            return True
+        
+        # Get the active merchant (first one found)
+        merchant = merchants[0]
+        
+        # Initialize merchant system if needed
+        if not hasattr(self.game, 'merchant_system'):
+            from .merchant_system import MerchantSystem
+            self.game.merchant_system = MerchantSystem(self.game)
+        
+        # Parse item name and quantity
+        item_name = ' '.join(args).lower()
+        quantity = 1
+        
+        # Check if quantity specified (e.g., "buy 3 potions")
+        if args[0].isdigit():
+            try:
+                quantity = int(args[0])
+                item_name = ' '.join(args[1:]).lower()
+            except (ValueError, IndexError):
+                self.game.ui_manager.log_error("Invalid quantity.")
+                return True
+        
+        # Find item in merchant's inventory
+        item_id = self._find_item_in_merchant_inventory(merchant, item_name)
+        if not item_id:
+            self.game.ui_manager.log_error(f"{merchant.name} doesn't sell '{item_name}'.")
+            return True
+        
+        # Attempt purchase
+        success, message = self.game.merchant_system.attempt_purchase(
+            self.game.current_player, merchant, item_id, quantity
+        )
+        
+        if success:
+            self.game.ui_manager.log_success(message)
+        else:
+            self.game.ui_manager.log_error(message)
+        
+        return True
+    
+    def cmd_sell(self, args: List[str]) -> bool:
+        """Sell item to a merchant."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Check if we're near a merchant
+        merchants = self._get_nearby_merchants()
+        if not merchants:
+            self.game.ui_manager.log_error("There are no merchants here.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Sell what? Use 'inventory' to see what you have.")
+            return True
+        
+        # Get the active merchant (first one found)
+        merchant = merchants[0]
+        
+        # Initialize merchant system if needed
+        if not hasattr(self.game, 'merchant_system'):
+            from .merchant_system import MerchantSystem
+            self.game.merchant_system = MerchantSystem(self.game)
+        
+        # Parse item name and quantity
+        item_name = ' '.join(args).lower()
+        quantity = 1
+        
+        # Check if quantity specified
+        if args[0].isdigit():
+            try:
+                quantity = int(args[0])
+                item_name = ' '.join(args[1:]).lower()
+            except (ValueError, IndexError):
+                self.game.ui_manager.log_error("Invalid quantity.")
+                return True
+        
+        # Find item in player's inventory
+        item_id = self._find_item_in_player_inventory(item_name)
+        if not item_id:
+            self.game.ui_manager.log_error(f"You don't have '{item_name}'.")
+            return True
+        
+        # Attempt sale
+        success, message = self.game.merchant_system.attempt_sale(
+            self.game.current_player, merchant, item_id, quantity
+        )
+        
+        if success:
+            self.game.ui_manager.log_success(message)
+        else:
+            self.game.ui_manager.log_error(message)
+        
+        return True
+    
+    def cmd_list(self, args: List[str]) -> bool:
+        """List merchant's inventory and prices."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Check if we're near a merchant
+        merchants = self._get_nearby_merchants()
+        if not merchants:
+            self.game.ui_manager.log_error("There are no merchants here.")
+            return True
+        
+        # Get the active merchant (first one found)
+        merchant = merchants[0]
+        
+        # Initialize merchant system if needed
+        if not hasattr(self.game, 'merchant_system'):
+            from .merchant_system import MerchantSystem
+            self.game.merchant_system = MerchantSystem(self.game)
+        
+        # Display merchant inventory
+        inventory_display = self.game.merchant_system.get_merchant_inventory_display(
+            merchant, self.game.current_player
+        )
+        self.game.ui_manager.log_info(inventory_display)
+        
+        return True
+    
+    def cmd_appraise(self, args: List[str]) -> bool:
+        """Get an item's value estimate from a merchant."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Appraise what?")
+            return True
+        
+        item_name = ' '.join(args).lower()
+        
+        # Find item in player's inventory
+        item_id = self._find_item_in_player_inventory(item_name)
+        if not item_id:
+            self.game.ui_manager.log_error(f"You don't have '{item_name}'.")
+            return True
+        
+        # Get the item
+        item = self.game.current_player.inventory_system.get_item(item_id)
+        if not item:
+            self.game.ui_manager.log_error("Item not found.")
+            return True
+        
+        # Check if we're near a merchant for better appraisal
+        merchants = self._get_nearby_merchants()
+        if merchants:
+            merchant = merchants[0]
+            
+            # Initialize merchant system if needed
+            if not hasattr(self.game, 'merchant_system'):
+                from .merchant_system import MerchantSystem
+                self.game.merchant_system = MerchantSystem(self.game)
+            
+            buy_price = self.game.merchant_system.calculate_sell_price(
+                item, merchant, self.game.current_player
+            )
+            
+            if buy_price.total_copper() > 0:
+                self.game.ui_manager.log_info(
+                    f"{merchant.name} examines your {item.name}.\n"
+                    f"{merchant.name} says: \"I can offer you {buy_price} for this {item.name}.\""
+                )
+            else:
+                self.game.ui_manager.log_info(
+                    f"{merchant.name} examines your {item.name}.\n"
+                    f"{merchant.name} says: \"I don't buy {item.item_type.value}s.\""
+                )
+        else:
+            # Basic appraisal without merchant
+            base_value = item.get_effective_value()
+            condition = item.get_condition()
+            
+            self.game.ui_manager.log_info(
+                f"You examine your {item.name}.\n"
+                f"Base value: {base_value} gold\n"
+                f"Condition: {condition}\n"
+                f"A merchant might pay around {int(base_value * 0.6)} gold for this."
+            )
+        
+        return True
+    
+    def cmd_repair(self, args: List[str]) -> bool:
+        """Repair a damaged item at a blacksmith."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        # Check if we're near a blacksmith
+        merchants = self._get_nearby_merchants()
+        blacksmiths = [m for m in merchants if m.merchant_type.value == "blacksmith"]
+        if not blacksmiths:
+            self.game.ui_manager.log_error("You need to find a blacksmith to repair items.")
+            return True
+        
+        if not args:
+            self.game.ui_manager.log_error("Repair what?")
+            return True
+        
+        item_name = ' '.join(args).lower()
+        
+        # Find item in player's inventory
+        item_id = self._find_item_in_player_inventory(item_name)
+        if not item_id:
+            self.game.ui_manager.log_error(f"You don't have '{item_name}'.")
+            return True
+        
+        # Get the item
+        item = self.game.current_player.inventory_system.get_item(item_id)
+        if not item:
+            self.game.ui_manager.log_error("Item not found.")
+            return True
+        
+        # Check if item needs repair
+        if item.condition_percentage >= 100.0:
+            self.game.ui_manager.log_info(f"Your {item.name} is already in perfect condition.")
+            return True
+        
+        # Calculate repair cost
+        from .item_condition_system import ItemConditionSystem
+        condition_system = ItemConditionSystem()
+        repair_cost = condition_system.calculate_repair_cost(
+            item.value, item.condition_percentage, 100.0
+        )
+        
+        # Check if player can afford repair
+        from .currency_system import Currency
+        cost_currency = Currency(gold=repair_cost)
+        
+        if not self.game.current_player.currency.can_afford(cost_currency):
+            self.game.ui_manager.log_error(
+                f"Repair costs {cost_currency}, but you only have {self.game.current_player.currency}."
+            )
+            return True
+        
+        # Perform repair
+        blacksmith = blacksmiths[0]
+        self.game.current_player.currency.subtract(cost_currency)
+        item.repair_item(100.0 - item.condition_percentage)  # Repair to perfect
+        
+        self.game.ui_manager.log_success(
+            f"{blacksmith.name} repairs your {item.name} for {cost_currency}.\n"
+            f"Your {item.name} is now in perfect condition!"
+        )
+        
+        return True
+    
+    def cmd_wealth(self, args: List[str]) -> bool:
+        """Display character's current wealth."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        
+        currency = self.game.current_player.currency
+        if currency:
+            self.game.ui_manager.log_info(f"Your wealth: {currency}")
+            if currency.total_copper() >= 100:
+                self.game.ui_manager.log_info(f"Total value: {currency.display_total_gold()}")
+        else:
+            self.game.ui_manager.log_info("You have no money.")
+        
+        return True
+    
+    # Helper methods for commerce commands
+    def _get_nearby_merchants(self) -> List:
+        """Get merchants in the current location."""
+        if not hasattr(self.game, 'merchant_system'):
+            from .merchant_system import MerchantSystem
+            self.game.merchant_system = MerchantSystem(self.game)
+        
+        if not self.game.current_player.current_area or not self.game.current_player.current_room:
+            return []
+        
+        merchants = self.game.merchant_system.get_merchants_in_area(
+            self.game.current_player.current_area,
+            self.game.current_player.current_room
+        )
+        
+        # Filter out hidden merchants the player hasn't discovered
+        discovered_merchants = []
+        for merchant in merchants:
+            if merchant.is_hidden:
+                if self.game.merchant_system.is_merchant_discovered(
+                    self.game.current_player.name, merchant.merchant_id
+                ):
+                    discovered_merchants.append(merchant)
+            else:
+                discovered_merchants.append(merchant)
+        
+        return discovered_merchants
+    
+    def _find_item_in_merchant_inventory(self, merchant, item_name: str) -> Optional[str]:
+        """Find item ID in merchant's inventory by name."""
+        from .item_factory import ItemFactory
+        item_factory = ItemFactory()
+        
+        for item_id in merchant.inventory:
+            if merchant.inventory[item_id] > 0:
+                item = item_factory.create_item(item_id)
+                if item and item_name in item.name.lower():
+                    return item_id
+        
+        return None
+    
+    def _find_item_in_player_inventory(self, item_name: str) -> Optional[str]:
+        """Find item ID in player's inventory by name."""
+        if not self.game.current_player.inventory_system:
+            return None
+        
+        # Get all items in inventory
+        for item_id, quantity in self.game.current_player.inventory_system.items.items():
+            if quantity > 0:
+                item = self.game.current_player.inventory_system.get_item(item_id)
+                if item and item_name in item.name.lower():
+                    return item_id
+        
+        return None

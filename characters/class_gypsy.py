@@ -632,6 +632,10 @@ class Gypsy(BaseCharacter):
         if 'alignment_data' in data:
             gypsy.load_alignment_data(data['alignment_data'])
         
+        # Load currency data
+        if 'currency_data' in data:
+            gypsy.load_currency_data(data['currency_data'])
+        
         # Restore gypsy-specific attributes
         gypsy_data = data.get('gypsy_data', {})
         gypsy.fortune_uses_used = gypsy_data.get('fortune_uses_used', 0)
