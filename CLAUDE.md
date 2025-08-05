@@ -37,6 +37,11 @@ This is a Python-based text RPG (Rogue City) inspired by MajorMUD, built with a 
 - **SkillSystem** (`skill_system.py`): Lockpicking, trap detection/disarmament, search, tracking, pickpocketing with skill checks
 - **MagicCommandSystem** (`magic_command_system.py`): Spellcasting framework, mana management, meditation for all magic classes
 
+#### Economy & Commerce Systems
+- **CurrencySystem** (`currency_system.py`): Gold/Silver/Copper piece currency with automatic conversion and class-based starting wealth
+- **MerchantSystem** (`merchant_system.py`): NPC merchants, trading, dynamic pricing based on reputation and alignment
+- **ItemConditionSystem** (`item_condition_system.py`): Equipment durability, condition tracking, and repair mechanics
+
 ### Game State Architecture
 - Game states: MENU, PLAYING, COMBAT, INVENTORY, CHARACTER_SHEET, QUIT
 - All data stored in JSON format in `data/` subdirectories
@@ -151,6 +156,14 @@ Complete authentic MajorMUD command implementation with class restrictions and s
 - **`sing`** (`si`): Bardic songs for party buffs - Bard only  
 - **`shapeshift`** (`sh`): Animal transformation - Druid only
 
+#### Commerce & Economy Commands
+- **`buy`** (`b`, `purchase`): Purchase items from merchants with quantity support
+- **`sell`** (`s`, `trade`): Sell items to merchants for gold pieces
+- **`list`** (`ls`, `shop`): Display merchant inventory with dynamic pricing
+- **`appraise`** (`app`, `value`): Get item value estimates from merchants or basic appraisal
+- **`repair`** (`fix`): Restore damaged equipment at blacksmiths for a fee
+- **`wealth`** (`money`, `gold`): Display character's current currency
+
 #### Command System Features
 - **Class Restrictions**: Commands only available to appropriate classes
 - **Skill Checks**: DEX/INT/WIS modifiers + class bonuses + tool bonuses + experience
@@ -174,6 +187,10 @@ Complete authentic MajorMUD command implementation with class restrictions and s
 - **Skills ↔ Character Stats**: All skill checks use appropriate ability modifiers (DEX, INT, WIS)
 - **Magic ↔ Character Classes**: Mana pools calculated from class type and primary casting stat
 - **Combat Stances ↔ AC/Attack**: Defensive stances modify armor class and attack bonuses dynamically
+- **Economy ↔ Character Classes**: Starting wealth calculated based on class background and level
+- **Economy ↔ Alignment/Reputation**: Merchant pricing and trading availability affected by character reputation
+- **Economy ↔ Items**: Item condition affects value and effectiveness, repair costs calculated dynamically
+- **Economy ↔ Areas**: Merchants placed strategically in game world with location-appropriate inventories
 
 ## File Structure Patterns
 
@@ -185,12 +202,14 @@ All game content stored as human-readable JSON:
 - `alignments/` - Alignment definitions with benefits, restrictions, and faction relationships
 - `items/` - Weapons, armor, consumables
 - `enemies/` - Monster definitions and AI
-- `saves/` - Character save files (includes race_id and alignment_data for new characters)
+- `saves/` - Character save files (includes race_id, alignment_data, and currency_data)
 - `config/` - Game configuration
+- `merchants/` - Merchant definitions, inventories, and pricing configurations
+- `economy/` - Item values, repair costs, and economic balance data
 
 ### Character Files (`characters/`)
 Character system with race, class, and alignment hierarchies:
-- `base_character.py` - Abstract character foundation with race and alignment integration
+- `base_character.py` - Abstract character foundation with race, alignment, and currency integration
 - `base_race.py` - Abstract race class with stat modifiers and abilities
 - `alignment_manager.py` - Individual character alignment tracking and reputation management
 - `class_*.py` - Complete 16-class system (4 core + 12 additional classes) with alignment support and experience penalty system
