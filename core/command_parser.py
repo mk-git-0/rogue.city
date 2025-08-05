@@ -110,6 +110,15 @@ class CommandParser:
         self.commands['appraise'] = self.cmd_appraise
         self.commands['repair'] = self.cmd_repair
         self.commands['wealth'] = self.cmd_wealth
+        
+        # Social & Conversation commands
+        self.commands['talk'] = self.cmd_talk
+        self.commands['say'] = self.cmd_say
+        self.commands['tell'] = self.cmd_tell
+        self.commands['ask'] = self.cmd_ask
+        self.commands['greet'] = self.cmd_greet
+        self.commands['whisper'] = self.cmd_whisper
+        self.commands['broadcast'] = self.cmd_broadcast
     
     def setup_aliases(self):
         """Setup command aliases for convenience."""
@@ -203,6 +212,18 @@ class CommandParser:
         self.aliases['fix'] = 'repair'
         self.aliases['money'] = 'wealth'
         self.aliases['gold'] = 'wealth'
+        
+        # Social & Conversation aliases  
+        self.aliases['t'] = 'talk'
+        self.aliases['speak'] = 'talk'
+        self.aliases['chat'] = 'talk'
+        self.aliases['"'] = 'say'  # Support for say "message"
+        self.aliases['tel'] = 'tell'
+        self.aliases['as'] = 'ask'
+        self.aliases['gr'] = 'greet'
+        self.aliases['wh'] = 'whisper'
+        self.aliases['br'] = 'broadcast'
+        self.aliases['shout'] = 'broadcast'
     
     def parse_command(self, input_text: str) -> bool:
         """Parse and execute a command. Returns True if game should continue."""
@@ -1668,3 +1689,131 @@ class CommandParser:
                     return item_id
         
         return None
+
+    # === SOCIAL & CONVERSATION COMMANDS ===
+    
+    def cmd_talk(self, args: List[str]) -> str:
+        """Talk to an NPC to start a conversation."""
+        if not args:
+            return "Talk to whom?"
+        
+        target_name = ' '.join(args).lower()
+        
+        # Initialize conversation engine if not already done
+        if not hasattr(self.game, 'conversation_engine'):
+            from core.conversation_engine import ConversationEngine
+            self.game.conversation_engine = ConversationEngine(self.game)
+        
+        try:
+            return self.game.conversation_engine.handle_talk_command(
+                self.game.current_player, target_name
+            )
+        except Exception as e:
+            return f"Could not talk to {target_name}. {str(e)}"
+    
+    def cmd_say(self, args: List[str]) -> str:
+        """Say something out loud in the current area."""
+        if not args:
+            return "Say what?"
+        
+        message = ' '.join(args)
+        player_name = self.game.current_player.name
+        
+        # Remove quotes if present
+        if message.startswith('"') and message.endswith('"'):
+            message = message[1:-1]
+        
+        return f"You say: \"{message}\""
+    
+    def cmd_tell(self, args: List[str]) -> str:
+        """Tell something specific to an NPC."""
+        if len(args) < 2:
+            return "Usage: tell <person> <message>"
+        
+        target_name = args[0].lower()
+        message = ' '.join(args[1:])
+        
+        # Initialize conversation engine if not already done
+        if not hasattr(self.game, 'conversation_engine'):
+            from core.conversation_engine import ConversationEngine
+            self.game.conversation_engine = ConversationEngine(self.game)
+        
+        try:
+            return self.game.conversation_engine.handle_tell_command(
+                self.game.current_player, target_name, message
+            )
+        except Exception as e:
+            return f"Could not tell {target_name} anything. {str(e)}"
+    
+    def cmd_ask(self, args: List[str]) -> str:
+        """Ask an NPC about a specific topic."""
+        if len(args) < 3 or args[1].lower() != 'about':
+            return "Usage: ask <person> about <topic>"
+        
+        target_name = args[0].lower()
+        topic = ' '.join(args[2:]).lower()
+        
+        # Initialize conversation engine if not already done
+        if not hasattr(self.game, 'conversation_engine'):
+            from core.conversation_engine import ConversationEngine
+            self.game.conversation_engine = ConversationEngine(self.game)
+        
+        try:
+            return self.game.conversation_engine.handle_ask_command(
+                self.game.current_player, target_name, topic
+            )
+        except Exception as e:
+            return f"Could not ask {target_name} about {topic}. {str(e)}"
+    
+    def cmd_greet(self, args: List[str]) -> str:
+        """Formally greet an NPC."""
+        if not args:
+            return "Greet whom?"
+        
+        target_name = ' '.join(args).lower()
+        
+        # Initialize conversation engine if not already done
+        if not hasattr(self.game, 'conversation_engine'):
+            from core.conversation_engine import ConversationEngine
+            self.game.conversation_engine = ConversationEngine(self.game)
+        
+        try:
+            return self.game.conversation_engine.handle_greet_command(
+                self.game.current_player, target_name
+            )
+        except Exception as e:
+            return f"Could not greet {target_name}. {str(e)}"
+    
+    def cmd_whisper(self, args: List[str]) -> str:
+        """Whisper something to an NPC."""
+        if len(args) < 2:
+            return "Usage: whisper <person> <message>"
+        
+        target_name = args[0].lower()
+        message = ' '.join(args[1:])
+        
+        # Initialize conversation engine if not already done
+        if not hasattr(self.game, 'conversation_engine'):
+            from core.conversation_engine import ConversationEngine
+            self.game.conversation_engine = ConversationEngine(self.game)
+        
+        try:
+            return self.game.conversation_engine.handle_whisper_command(
+                self.game.current_player, target_name, message
+            )
+        except Exception as e:
+            return f"Could not whisper to {target_name}. {str(e)}"
+    
+    def cmd_broadcast(self, args: List[str]) -> str:
+        """Broadcast a message publicly."""
+        if not args:
+            return "Broadcast what?"
+        
+        message = ' '.join(args)
+        player_name = self.game.current_player.name
+        
+        # Remove quotes if present
+        if message.startswith('"') and message.endswith('"'):
+            message = message[1:-1]
+        
+        return f"{player_name} broadcasts: \"{message}\""

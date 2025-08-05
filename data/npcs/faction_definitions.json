@@ -1,0 +1,167 @@
+{
+  "town_guards": {
+    "name": "Town Guard",
+    "type": "lawful",
+    "alignment": "GOOD",
+    "description": "The peacekeepers of Rogue City, dedicated to maintaining law and order.",
+    "allies": ["priests", "nobles", "merchants"],
+    "enemies": ["thieves_guild", "necromancers", "cultists"],
+    "neutral": ["scholars", "common_folk"],
+    "decay_rate": 1,
+    "action_multiplier": 1.2
+  },
+  "merchants": {
+    "name": "Merchant Guild",
+    "type": "merchant",
+    "alignment": "NEUTRAL",
+    "description": "Traders and shopkeepers focused on commerce and profit.",
+    "allies": ["town_guards", "nobles"],
+    "enemies": [],
+    "neutral": ["thieves_guild", "priests", "scholars", "common_folk"],
+    "decay_rate": 0,
+    "action_multiplier": 0.8
+  },
+  "priests": {
+    "name": "Temple of Light",
+    "type": "religious",
+    "alignment": "GOOD",
+    "description": "Servants of divine powers dedicated to healing and protecting the innocent.",
+    "allies": ["town_guards", "paladins"],
+    "enemies": ["thieves_guild", "necromancers", "cultists", "demons"],
+    "neutral": ["merchants", "scholars"],
+    "decay_rate": 0,
+    "action_multiplier": 1.5
+  },
+  "thieves_guild": {
+    "name": "Thieves Guild",
+    "type": "criminal",
+    "alignment": "EVIL",
+    "description": "A shadow organization dealing in theft, information, and illicit services.",
+    "allies": ["assassins", "smugglers"],
+    "enemies": ["town_guards", "priests", "paladins"],
+    "neutral": ["merchants", "common_folk"],
+    "decay_rate": 2,
+    "action_multiplier": 1.3
+  },
+  "scholars": {
+    "name": "Academy of Learning",
+    "type": "magical",
+    "alignment": "NEUTRAL",
+    "description": "Seekers of knowledge and magical understanding.",
+    "allies": [],
+    "enemies": [],
+    "neutral": ["town_guards", "merchants", "priests", "thieves_guild", "nobles"],
+    "decay_rate": 0,
+    "action_multiplier": 1.0
+  },
+  "nobles": {
+    "name": "Noble Houses",
+    "type": "neutral",
+    "alignment": "NEUTRAL",
+    "description": "The wealthy and influential families who shape politics and society.",
+    "allies": ["town_guards", "merchants"],
+    "enemies": ["thieves_guild"],
+    "neutral": ["priests", "scholars", "common_folk"],
+    "decay_rate": 1,
+    "action_multiplier": 1.1
+  },
+  "common_folk": {
+    "name": "Common Citizens",
+    "type": "neutral",
+    "alignment": "NEUTRAL",
+    "description": "The everyday people of Rogue City - farmers, crafters, workers.",
+    "allies": [],
+    "enemies": [],
+    "neutral": ["town_guards", "merchants", "priests", "thieves_guild", "scholars", "nobles"],
+    "decay_rate": 1,
+    "action_multiplier": 0.9
+  },
+  "paladins": {
+    "name": "Order of Paladins",
+    "type": "religious",
+    "alignment": "GOOD",
+    "description": "Holy warriors dedicated to justice and fighting evil.",
+    "allies": ["priests", "town_guards"],
+    "enemies": ["thieves_guild", "necromancers", "cultists", "demons"],
+    "neutral": ["merchants", "scholars"],
+    "decay_rate": 0,
+    "action_multiplier": 2.0
+  },
+  "necromancers": {
+    "name": "Circle of Necromancers",
+    "type": "magical",
+    "alignment": "EVIL",
+    "description": "Dark practitioners of death magic and forbidden arts.",
+    "allies": ["cultists", "demons"],
+    "enemies": ["priests", "paladins", "town_guards"],
+    "neutral": ["scholars"],
+    "decay_rate": 1,
+    "action_multiplier": 1.8
+  },
+  "cultists": {
+    "name": "Shadow Cult",
+    "type": "religious",
+    "alignment": "EVIL",
+    "description": "Worshippers of dark powers and chaos.",
+    "allies": ["necromancers", "demons"],
+    "enemies": ["priests", "paladins", "town_guards"],
+    "neutral": [],
+    "decay_rate": 2,
+    "action_multiplier": 1.5
+  },
+  "assassins": {
+    "name": "Assassins Guild",
+    "type": "criminal",
+    "alignment": "EVIL",
+    "description": "Professional killers operating in the shadows.",
+    "allies": ["thieves_guild"],
+    "enemies": ["town_guards", "priests", "paladins"],
+    "neutral": ["merchants"],
+    "decay_rate": 3,
+    "action_multiplier": 1.7
+  },
+  "smugglers": {
+    "name": "Smugglers Network",
+    "type": "criminal",
+    "alignment": "NEUTRAL",
+    "description": "Traders in contraband and forbidden goods.",
+    "allies": ["thieves_guild"],
+    "enemies": ["town_guards"],
+    "neutral": ["merchants", "common_folk"],
+    "decay_rate": 2,
+    "action_multiplier": 1.2
+  },
+  "demons": {
+    "name": "Demonic Forces",
+    "type": "chaotic",
+    "alignment": "EVIL",
+    "description": "Supernatural entities of pure evil and chaos.",
+    "allies": ["necromancers", "cultists"],
+    "enemies": ["priests", "paladins", "town_guards", "nobles", "common_folk"],
+    "neutral": [],
+    "decay_rate": 0,
+    "action_multiplier": 3.0
+  },
+  "rangers": {
+    "name": "Forest Rangers",
+    "type": "neutral",
+    "alignment": "NEUTRAL",
+    "description": "Guardians of the wilderness and natural order.",
+    "allies": [],
+    "enemies": ["necromancers", "demons"],
+    "neutral": ["town_guards", "priests", "scholars", "common_folk"],
+    "decay_rate": 1,
+    "action_multiplier": 1.0
+  },
+  "druids": {
+    "name": "Druid Circle",
+    "type": "magical",
+    "alignment": "NEUTRAL",
+    "description": "Keepers of ancient nature magic and balance.",
+    "allies": ["rangers"],
+    "enemies": ["necromancers", "demons"],
+    "neutral": ["priests", "scholars", "town_guards"],
+    "decay_rate": 0,
+    "action_multiplier": 1.3
+  }
+}

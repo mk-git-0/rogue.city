@@ -375,6 +375,10 @@ class Knight(BaseCharacter):
         if 'currency_data' in data:
             knight.load_currency_data(data['currency_data'])
         
+        # Load reputation data
+        if 'reputation_data' in data:
+            knight.load_reputation_data(data['reputation_data'])
+        
         # Restore knight-specific state
         knight.defensive_stance_active = data.get('defensive_stance_active', False)
         knight.protecting_allies = data.get('protecting_allies', [])

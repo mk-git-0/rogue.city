@@ -8,6 +8,7 @@ from abc import ABC, abstractmethod
 import time
 from core.alignment_system import Alignment
 from characters.alignment_manager import AlignmentManager
+from core.reputation_manager import ReputationManager
 
 
 class BaseCharacter(ABC):
@@ -25,6 +26,9 @@ class BaseCharacter(ABC):
         # Initialize alignment system
         self.alignment_manager = AlignmentManager(alignment)
         self.alignment_manager.character_name = name  # For reputation tracking
+        
+        # Initialize reputation manager
+        self.reputation_manager = ReputationManager(name)
         
         # Initialize race
         self._initialize_race()
@@ -546,6 +550,14 @@ class BaseCharacter(ABC):
             from core.currency_system import Currency
             self.currency = Currency(gold=50)
     
+    def load_reputation_data(self, reputation_data: Dict):
+        """Load reputation data from save file"""
+        if reputation_data:
+            self.reputation_manager.load_from_dict(reputation_data)
+        else:
+            # Initialize with default reputation for legacy characters
+            self.reputation_manager = ReputationManager(self.name)
+    
     def get_character_display(self) -> str:
         """Get detailed character information for display"""
         lines = []
@@ -610,6 +622,7 @@ class BaseCharacter(ABC):
             'unallocated_stats': self.unallocated_stats,
             'creation_complete': self.creation_complete,
             'alignment_data': self.alignment_manager.save_to_dict(),
+            'reputation_data': self.reputation_manager.save_to_dict(),
             'magic_data': {
                 'max_mana': self.max_mana,
                 'current_mana': self.current_mana,

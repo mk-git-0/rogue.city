@@ -1,0 +1,298 @@
+{
+  "town_guard_captain": {
+    "name": "Captain Aldric",
+    "greetings": {
+      "good": [
+        "Greetings, citizen. How may the guard assist you?",
+        "Well met, defender of justice!",
+        "The city is safer with people like you around."
+      ],
+      "neutral": [
+        "State your business in our town.",
+        "What brings you to speak with me?",
+        "I am Captain Aldric of the city guard."
+      ],
+      "evil": [
+        "I'll be watching you. What do you want?",
+        "Speak quickly, I have little patience for your kind.",
+        "The law has its eye on you."
+      ],
+      "friendly": [
+        "Always good to see a friend of the city!",
+        "Welcome back, trusted ally!",
+        "What can I do for you today?"
+      ],
+      "hostile": [
+        "You're not welcome here.",
+        "Get out of my sight.",
+        "I should arrest you on principle."
+      ]
+    },
+    "topics": {
+      "about_town": {
+        "name": "Tell me about this town",
+        "responses": {
+          "default": "Rogue City stands as a beacon of civilization in these frontier lands. We maintain order and protect honest folk from the dangers that lurk beyond our walls."
+        },
+        "reputation_change": 1
+      },
+      "local_threats": {
+        "name": "Are there any dangers I should know about?",
+        "alignment_required": "good",
+        "responses": {
+          "good": "Evil stirs in the ancient ruins to the north. Dark creatures have been spotted, and we've lost contact with several patrol groups. If you're thinking of investigating, gather allies and prepare well."
+        },
+        "reputation_change": 2
+      },
+      "bounties": {
+        "name": "Any work for a capable warrior?",
+        "responses": {
+          "good": "There are always tasks for those who serve justice. Speak with me again when you've proven your worth to the city.",
+          "neutral": "Perhaps. Your reputation will determine what opportunities are available.",
+          "evil": "I wouldn't trust you with the city's garbage collection."
+        }
+      },
+      "city_laws": {
+        "name": "What are the laws here?",
+        "responses": {
+          "default": "The basics: no theft, no murder, no disturbing the peace. We also prohibit the practice of necromancy and trafficking with demons. Follow these rules and you'll have no trouble with us."
+        }
+      },
+      "recent_crimes": {
+        "name": "Any recent criminal activity?",
+        "faction_required": ["town_guards", 10],
+        "responses": {
+          "default": "We've had reports of pickpockets in the market square. They seem more organized than usual - possibly part of a larger operation. Keep your valuables secure."
+        },
+        "reputation_change": 1
+      },
+      "guard_recruitment": {
+        "name": "How does one join the city guard?",
+        "alignment_required": "good",
+        "responses": {
+          "good": "We're always looking for good people who want to serve and protect. Prove your worth through deeds, maintain a clean reputation, and speak with me when you're ready for the responsibility."
+        },
+        "reputation_change": 2
+      }
+    }
+  },
+  "general_merchant": {
+    "name": "Merchant Gareth",
+    "greetings": {
+      "default": [
+        "Welcome to my shop! Browse and buy!",
+        "Good day! Looking for anything in particular?",
+        "The finest goods at fair prices!"
+      ],
+      "friendly": [
+        "Ah, my valued customer returns!",
+        "Always a pleasure to serve you!",
+        "What can I offer my good friend today?"
+      ],
+      "hostile": [
+        "I suppose I have to serve you...",
+        "Make it quick. I don't like your type.",
+        "Cash only, and no complaints."
+      ]
+    },
+    "topics": {
+      "trade_routes": {
+        "name": "Tell me about your trade routes",
+        "responses": {
+          "default": "I travel the roads between here and the capital, bringing goods both ways. It's dangerous work - bandits, monsters, weather - but profitable for those brave enough."
+        }
+      },
+      "rare_items": {
+        "name": "Do you ever come across rare items?",
+        "faction_required": ["merchants", 15],
+        "responses": {
+          "default": "Occasionally I find something special. Magic items, ancient artifacts, exotic weapons... For my trusted customers, I can keep an eye out for specific things. What are you looking for?"
+        }
+      },
+      "market_gossip": {
+        "name": "What's the word from other towns?",
+        "responses": {
+          "default": [
+            "Strange lights have been seen over the old battlefields to the east.",
+            "The harvest in the northern settlements has been poor this year.",
+            "There are rumors of a new dungeon discovered in the Whispering Woods."
+          ]
+        }
+      },
+      "business_advice": {
+        "name": "Any tips for making money?",
+        "responses": {
+          "default": "Buy low, sell high! But seriously - learn what's valuable and what's not. Some junk items are worth more than you'd think, and some 'treasures' aren't worth the metal they're made from."
+        }
+      }
+    }
+  },
+  "temple_priest": {
+    "name": "Brother Marcus",
+    "greetings": {
+      "good": [
+        "Blessings upon you, child of light!",
+        "May the divine watch over you, faithful one.",
+        "Welcome to this sacred place."
+      ],
+      "neutral": [
+        "Peace be with you, traveler.",
+        "You are welcome in this holy place.",
+        "How may I serve you today?"
+      ],
+      "evil": [
+        "The darkness clings to you...",
+        "You bring shadow into this holy place.",
+        "Repent, and perhaps find redemption."
+      ],
+      "friendly": [
+        "Ah, a true friend of the faith!",
+        "Your devotion shines brightly!",
+        "How may I aid you in your righteous path?"
+      ]
+    },
+    "topics": {
+      "divine_blessing": {
+        "name": "Could you bless me?",
+        "alignment_required": "good",
+        "responses": {
+          "good": "Of course, faithful one. May divine protection shield you from harm and guide your righteous endeavors."
+        },
+        "reputation_change": 2
+      },
+      "healing_services": {
+        "name": "Do you offer healing?",
+        "responses": {
+          "good": "For those who walk in the light, healing is freely given.",
+          "neutral": "I can tend to your wounds for a modest donation to the temple.",
+          "evil": "Even the wicked deserve mercy... sometimes. It will cost you significantly."
+        }
+      },
+      "evil_threats": {
+        "name": "What evil threatens the land?",
+        "responses": {
+          "default": "Darkness gathers in many forms - undead in ancient crypts, demons seeking entry to our world, and mortals who have sold their souls for power. We must remain vigilant."
+        }
+      },
+      "religious_instruction": {
+        "name": "Can you teach me about your faith?",
+        "responses": {
+          "good": "Gladly! Our faith teaches compassion, justice, and protection of the innocent. Through good deeds and righteous action, we serve the divine will.",
+          "neutral": "I can share the basic tenets of our faith. Perhaps you will find wisdom in our teachings.",
+          "evil": "Even you can find redemption, if you truly seek it. The path is difficult, but forgiveness awaits the genuinely repentant."
+        }
+      },
+      "temple_services": {
+        "name": "What services does the temple provide?",
+        "responses": {
+          "default": "We offer healing, blessing, spiritual guidance, and sanctuary for those in need. We also maintain records of births, marriages, and deaths for the community."
+        }
+      }
+    }
+  },
+  "guild_thief": {
+    "name": "Shadowfinger",
+    "greetings": {
+      "evil": [
+        "Well, well... another shadow seeker.",
+        "You have the look of someone who understands... opportunity.",
+        "Welcome to the darker side of business."
+      ],
+      "neutral": [
+        "Careful where you step, friend.",
+        "Not everyone here is what they seem.",
+        "You lost, or looking for something specific?"
+      ],
+      "good": [
+        "You don't belong here, do-gooder.",
+        "This place isn't for your kind.",
+        "Turn around and walk away, hero."
+      ]
+    },
+    "topics": {
+      "guild_services": {
+        "name": "What kind of services do you offer?",
+        "alignment_required": "evil",
+        "responses": {
+          "evil": "Information, special acquisitions, problem solving... We handle things the law won't touch. For the right price, of course."
+        }
+      },
+      "illegal_goods": {
+        "name": "Do you deal in... special merchandise?",
+        "alignment_required": "evil",
+        "faction_required": ["thieves_guild", 20],
+        "responses": {
+          "evil": "Depends what you're looking for. Poison, lockpicks, items that have... changed ownership recently. I might know someone who knows someone."
+        }
+      },
+      "guard_patrols": {
+        "name": "Tell me about the guard patrols",
+        "alignment_required": "evil",
+        "responses": {
+          "evil": "They change routes weekly, but there are patterns. The captain thinks he's clever, but we've been watching. Third watch is thinnest - that's when opportunity knocks."
+        },
+        "reputation_change": 3
+      },
+      "join_guild": {
+        "name": "How does one join your organization?",
+        "alignment_required": "evil",
+        "responses": {
+          "evil": "Prove you're useful and you can keep your mouth shut. We don't recruit - we select. Do something that shows your skills and your commitment to our... philosophy."
+        }
+      }
+    }
+  },
+  "library_scholar": {
+    "name": "Sage Eldwin",
+    "greetings": {
+      "default": [
+        "Ah, a seeker of knowledge! Welcome!",
+        "Knowledge is the greatest treasure. How may I help you find yours?",
+        "The pursuit of learning never ends, does it?"
+      ],
+      "friendly": [
+        "My eager student returns!",
+        "Always delighted to see a fellow scholar!",
+        "What mysteries shall we unravel today?"
+      ]
+    },
+    "topics": {
+      "ancient_history": {
+        "name": "Tell me about the ancient history of this region",
+        "responses": {
+          "default": "These lands have seen many civilizations rise and fall. The ruins to the north once housed a mighty kingdom, brought low by their dabbling in forbidden magic. Their libraries, if any survive, would contain incredible knowledge."
+        }
+      },
+      "magical_theory": {
+        "name": "Can you explain magical theory?",
+        "responses": {
+          "default": "Magic flows through all things, but most cannot perceive or manipulate it. Those with the gift can learn to channel these forces through study, practice, and understanding of fundamental principles."
+        }
+      },
+      "spell_research": {
+        "name": "Do you assist with spell research?",
+        "responses": {
+          "default": "For serious practitioners, yes. I can help decipher ancient formulae, identify magical components, and provide theoretical frameworks for new spells. Such work requires time and resources, naturally."
+        }
+      },
+      "lost_knowledge": {
+        "name": "Are there areas of lost knowledge?",
+        "responses": {
+          "default": "Oh yes! Entire schools of magic have been lost, languages forgotten, sciences abandoned. The great libraries of the past held secrets we can barely imagine. Sometimes fragments surface in ruins or private collections."
+        }
+      },
+      "book_requests": {
+        "name": "Can you help me find specific books?",
+        "responses": {
+          "default": "I maintain connections with scholars across the realm. If you seek a particular tome, I can put out inquiries, though rare books command high prices."
+        }
+      },
+      "monster_lore": {
+        "name": "What do you know about the creatures in this area?",
+        "responses": {
+          "default": "I've compiled extensive notes on local fauna - both natural and supernatural. Understanding a creature's nature, weaknesses, and behaviors can mean the difference between life and death for adventurers."
+        }
+      }
+    }
+  }
+}

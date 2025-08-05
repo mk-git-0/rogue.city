@@ -1,0 +1,255 @@
+{
+  "tutorial_hermit": {
+    "npc_id": "tutorial_hermit",
+    "name": "Eldran the Wise",
+    "npc_type": "scholar",
+    "alignment": "NEUTRAL",
+    "faction": "scholars",
+    "personality": "scholarly",
+    "description": "An elderly hermit with kind eyes and a gentle smile, wearing simple robes. His weathered hands speak of years spent writing and studying.",
+    "location": {
+      "area": "tutorial_cave",
+      "room": "hermit_chamber"
+    },
+    "services": [
+      "tutorial_guidance",
+      "basic_advice",
+      "game_mechanics_help",
+      "character_development_tips"
+    ],
+    "conversation_topics": {
+      "welcome": {
+        "name": "Greetings, wise one",
+        "responses": {
+          "default": "Welcome, young adventurer! I have made this cave my home for many years, studying the ancient arts and helping newcomers like yourself. Please, feel free to ask me anything about your journey ahead."
+        }
+      },
+      "combat_help": {
+        "name": "How do I fight monsters?",
+        "responses": {
+          "default": "Combat is an essential skill for any adventurer. Use the 'attack' command followed by the creature's name. Watch your health carefully, and don't be afraid to 'flee' if things go badly. Remember: 'auto' can help with repeated attacks."
+        }
+      },
+      "movement_help": {
+        "name": "How do I move around?",
+        "responses": {
+          "default": "Movement is simple - use the cardinal directions: 'north', 'south', 'east', 'west', and sometimes 'up' or 'down'. You can also use shortcuts like 'n', 's', 'e', 'w'. Use 'look' to see your surroundings and 'exits' to see where you can go."
+        }
+      },
+      "inventory_help": {
+        "name": "How do I manage my items?",
+        "responses": {
+          "default": "Your belongings are important! Use 'get' to pick up items, 'drop' to leave them behind, and 'inventory' to see what you carry. 'Equip' weapons and armor to use them effectively. Don't forget to 'use' consumable items when needed."
+        }
+      },
+      "character_advice": {
+        "name": "Tell me about character development",
+        "responses": {
+          "default": "Your character will grow stronger through experience. Each class has unique abilities and growth patterns. Focus on your strengths, but remember that a well-rounded adventurer survives longer than a specialized one who ignores their weaknesses."
+        }
+      },
+      "cave_warning": {
+        "name": "What should I know about this cave?",
+        "responses": {
+          "default": "This cave serves as a gentle introduction to the world beyond. You'll face a few creatures, find some useful items, and learn the basics of survival. Take your time, explore thoroughly, and don't rush into danger unprepared."
+        }
+      }
+    }
+  },
+  "forest_merchant": {
+    "npc_id": "forest_merchant",
+    "name": "Trader Willem",
+    "npc_type": "merchant",
+    "alignment": "NEUTRAL",
+    "faction": "merchants",
+    "personality": "cautious",
+    "description": "A weathered merchant with a heavy pack and keen eyes. His clothes are dusty from travel, and he keeps one hand near his coin purse.",
+    "location": {
+      "area": "forest_path",
+      "room": "forest_clearing"
+    },
+    "merchant_data": {
+      "merchant_type": "traveling",
+      "buys_items": true,
+      "sells_items": true,
+      "repair_services": false,
+      "base_markup": 1.2,
+      "inventory": [
+        "health_potion",
+        "rope",
+        "torch",
+        "rations",
+        "simple_dagger",
+        "leather_armor"
+      ]
+    },
+    "conversation_topics": {
+      "greeting": {
+        "name": "Hello, merchant",
+        "responses": {
+          "good": "Ah, a traveler with an honest face! Welcome, friend. I have goods for sale and coin for quality items.",
+          "neutral": "Greetings, traveler. Looking to trade? I have various supplies for the road ahead.",
+          "evil": "Keep your distance and state your business. I don't trust strangers who look at me like that."
+        }
+      },
+      "trade_routes": {
+        "name": "Tell me about your travels",
+        "responses": {
+          "default": "I travel the roads between settlements, bringing goods where they're needed. The northern route has been dangerous lately - bandits and worse. I stick to well-traveled paths now."
+        }
+      },
+      "road_conditions": {
+        "name": "How are the roads?",
+        "responses": {
+          "default": "Mixed, I'm afraid. The main highway is well-maintained, but the forest paths are treacherous. Wild animals have been more aggressive lately, and there are strange sounds at night."
+        }
+      },
+      "business_advice": {
+        "name": "Any trading advice?",
+        "responses": {
+          "default": "Buy low, sell high - but more importantly, know your customers. Different communities value different things. What's common in one place might be precious in another."
+        }
+      },
+      "danger_warnings": {
+        "name": "What dangers should I watch for?",
+        "responses": {
+          "default": "Bandits are the obvious threat, but not the only one. Wild beasts, unstable ruins, and... other things best left unnamed. Travel with companions when possible, and always carry healing supplies."
+        }
+      }
+    }
+  },
+  "town_guard_captain": {
+    "npc_id": "town_guard_captain_aldric",
+    "name": "Captain Aldric",
+    "npc_type": "guard",
+    "alignment": "GOOD",
+    "faction": "town_guards",
+    "personality": "stern",
+    "rank": "Captain",
+    "description": "A seasoned guard captain with graying hair and sharp eyes that miss nothing. His armor is well-maintained and bears the insignia of his rank.",
+    "location": {
+      "area": "rogue_city",
+      "room": "guard_headquarters"
+    },
+    "guard_data": {
+      "authority_level": 6,
+      "can_arrest": true,
+      "patrol_area": "rogue_city",
+      "jurisdiction": "city_wide"
+    },
+    "conversation_topics": {
+      "greeting": {
+        "name": "Captain",
+        "responses": {
+          "good": "Greetings, citizen. I'm Captain Aldric, and I'm here to serve and protect. How may the city guard assist you today?",
+          "neutral": "I'm Captain Aldric of the city guard. State your business.",
+          "evil": "Captain Aldric here. I'll be keeping an eye on you. What do you want?"
+        }
+      },
+      "city_safety": {
+        "name": "How safe is the city?",
+        "responses": {
+          "good": "Rogue City is as safe as we can make it. We maintain regular patrols and investigate all reports of criminal activity. Good citizens like yourself help us keep it that way.",
+          "neutral": "We work hard to maintain order. There are always challenges, but the guard corps is well-trained and dedicated.",
+          "evil": "Safe enough for law-abiding citizens. Those who cause trouble... well, they learn quickly that crime doesn't pay here."
+        }
+      },
+      "recent_crimes": {
+        "name": "Any recent criminal activity?",
+        "faction_required": ["town_guards", 10],
+        "responses": {
+          "default": "We've had reports of increased pickpocketing in the market district. There's also been some suspicious activity near the old warehouse - possibly smuggling. If you see anything unusual, report it immediately."
+        }
+      },
+      "bounty_work": {
+        "name": "Any bounty work available?",
+        "alignment_required": "good",
+        "responses": {
+          "good": "There might be opportunities for capable individuals who've proven their worth to the city. Demonstrate your commitment to justice, and we can discuss possibilities."
+        }
+      },
+      "guard_recruitment": {
+        "name": "How does one join the guard?",
+        "alignment_required": "good",
+        "responses": {
+          "good": "The city guard is always looking for good people who want to serve and protect. You'll need to prove your character, physical capability, and dedication to justice. Are you interested in serving?"
+        }
+      },
+      "city_laws": {
+        "name": "What are the local laws?",
+        "responses": {
+          "default": "The basics apply: no theft, no assault, no murder, no disturbing the peace. We also prohibit the practice of necromancy within city limits and the trafficking of illegal substances. Respect others and their property, and you'll have no trouble with us."
+        }
+      }
+    }
+  },
+  "tavern_keeper": {
+    "npc_id": "tavern_keeper_marcus",
+    "name": "Marcus the Barkeep",
+    "npc_type": "citizen",
+    "alignment": "NEUTRAL",
+    "faction": "common_folk",
+    "personality": "friendly",
+    "occupation": "innkeeper",
+    "description": "A stocky man with a ready smile and ale-stained apron. His eyes twinkle with good humor, and he has the easy manner of someone who's heard every story twice.",
+    "location": {
+      "area": "rogue_city",
+      "room": "the_prancing_pony"
+    },
+    "services": [
+      "local_gossip",
+      "rooms_for_rent",
+      "meals_and_drinks",
+      "message_delivery",
+      "traveler_information"
+    ],
+    "conversation_topics": {
+      "greeting": {
+        "name": "Hello, barkeep",
+        "responses": {
+          "default": "Welcome to the Prancing Pony! Pull up a stool and make yourself comfortable. What can I get you - ale, information, or just good company?"
+        }
+      },
+      "local_news": {
+        "name": "What's the local news?",
+        "responses": {
+          "default": [
+            "Old Henrik's been complaining about his chickens disappearing. Probably foxes, but he swears it's something more sinister.",
+            "The miller's daughter is getting married next month. Big celebration planned - half the town's invited.",
+            "Strange lights were seen over the northern forest last week. Probably nothing, but folks are talking.",
+            "Trade's been good lately. Caravans coming through regularly, which means stories and coin both."
+          ]
+        }
+      },
+      "traveler_tales": {
+        "name": "Any interesting traveler stories?",
+        "responses": {
+          "default": [
+            "A group of adventurers came through last week, talking about ancient ruins they'd discovered. Left before I could get the full story.",
+            "Had a scholar stay here who claimed he was researching 'temporal anomalies.' Paid his tab in very old coins.",
+            "A merchant told me the roads east have been unusually quiet - no bandits, no monsters. Makes him more nervous than if there were trouble.",
+            "Woman came through claiming to be hunting a vampire. Ordered her ale with garlic. I thought she was joking until I saw her equipment."
+          ]
+        }
+      },
+      "room_rental": {
+        "name": "Do you have rooms available?",
+        "responses": {
+          "default": "I've got clean rooms upstairs - 2 silver pieces a night, includes breakfast. Good beds, safe storage for your gear, and I keep the common room lively but not too rowdy."
+        }
+      },
+      "local_personalities": {
+        "name": "Tell me about the locals",
+        "responses": {
+          "default": "We've got all types here. Captain Aldric keeps the peace, Brother Marcus at the temple tends souls, and old Sage Eldwin has more books than sense. Most folks are friendly if you treat them fair."
+        }
+      },
+      "tavern_specials": {
+        "name": "What's good to eat and drink?",
+        "responses": {
+          "default": "My wife makes the best mutton stew this side of the capital, and our ale's brewed fresh weekly. Try the honey mead if you want something special - made with real honey from the forest apiaries."
+        }
+      }
+    }
+  }
+}
