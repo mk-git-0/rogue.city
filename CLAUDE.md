@@ -42,6 +42,14 @@ This is a Python-based text RPG (Rogue City) inspired by MajorMUD, built with a 
 - **MerchantSystem** (`merchant_system.py`): NPC merchants, trading, dynamic pricing based on reputation and alignment
 - **ItemConditionSystem** (`item_condition_system.py`): Equipment durability, condition tracking, and repair mechanics
 
+#### MajorMUD Quest System
+- **QuestSystem** (`quest_system.py`): Complete alignment-based quest line framework with Good/Neutral/Evil quest paths
+- **QuestManager** (`quest_manager.py`): Individual character quest tracking, progression, and state management
+- **QuestRewards** (`quest_rewards.py`): Class-specific rewards calculator with tier-based progression (150k-175M exp)
+- **Quest Data**: Comprehensive quest definitions in `data/quests/` with 7 initial quests across all alignments
+- **Quest NPCs**: Three primary quest givers - Chancellor Annora (Good), Hooded Traveller (Neutral), Balthazar (Evil)
+- **Quest Commands**: Complete command system (quest, accept, abandon, info, journal) with "ask <npc> missions" integration
+
 ### Game State Architecture
 - Game states: MENU, PLAYING, COMBAT, INVENTORY, CHARACTER_SHEET, QUIT
 - All data stored in JSON format in `data/` subdirectories
@@ -191,6 +199,12 @@ Complete authentic MajorMUD command implementation with class restrictions and s
 - **Economy ↔ Alignment/Reputation**: Merchant pricing and trading availability affected by character reputation
 - **Economy ↔ Items**: Item condition affects value and effectiveness, repair costs calculated dynamically
 - **Economy ↔ Areas**: Merchants placed strategically in game world with location-appropriate inventories
+- **Quest System ↔ Alignment**: Strict alignment requirements for quest availability and progression
+- **Quest System ↔ Character Classes**: Class-specific rewards with stat bonuses and special abilities
+- **Quest System ↔ NPCs**: Quest giver NPCs with alignment-based dialogue and reputation effects
+- **Quest System ↔ Economy**: Quest costs, rewards, and currency integration with dynamic pricing
+- **Quest System ↔ Character Progression**: Massive experience rewards (150k-175M) for endgame advancement
+- **Quest System ↔ Commands**: Complete quest command integration ("quest", "accept", "abandon", "ask <npc> missions")
 
 ## File Structure Patterns
 
@@ -202,10 +216,11 @@ All game content stored as human-readable JSON:
 - `alignments/` - Alignment definitions with benefits, restrictions, and faction relationships
 - `items/` - Weapons, armor, consumables
 - `enemies/` - Monster definitions and AI
-- `saves/` - Character save files (includes race_id, alignment_data, and currency_data)
+- `saves/` - Character save files (includes race_id, alignment_data, currency_data, and quest_data)
 - `config/` - Game configuration
 - `merchants/` - Merchant definitions, inventories, and pricing configurations
 - `economy/` - Item values, repair costs, and economic balance data
+- `quests/` - Complete quest system data including quest definitions, rewards, and quest giver NPCs
 
 ### Character Files (`characters/`)
 Character system with race, class, and alignment hierarchies:
