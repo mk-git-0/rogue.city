@@ -1,0 +1,130 @@
+{
+  "chancellor_annora": {
+    "name": "Chancellor Annora",
+    "description": "A noble woman in gleaming white robes, bearing the holy symbol of light. Her eyes shine with righteous purpose and unwavering determination to protect the innocent.",
+    "location": "Rogue City Temple District",
+    "alignment": "good",
+    "faction": "forces_of_light",
+    "personality": "Lawful good, noble bearing, champion of justice",
+    "dialogue": {
+      "greeting": "Greetings, traveler. I sense great potential within you. Perhaps you are the champion we have been waiting for.",
+      "quest_available": "I have a mission that requires someone of your caliber. The innocent cry out for protection, and evil must not be allowed to triumph.",
+      "quest_in_progress": "How goes your mission? The forces of light depend on your success.",
+      "quest_completed": "Excellent work, champion! Your deeds shall be remembered in the annals of righteousness.",
+      "alignment_mismatch": "I sense darkness in your heart. Return when you have found the path of light.",
+      "insufficient_level": "You show promise, but this task requires greater experience. Return when you have proven yourself further."
+    },
+    "quests_offered": ["good_quest_1", "good_quest_2", "good_quest_3"],
+    "reputation_effects": {
+      "forces_of_light": 10,
+      "town_guards": 5,
+      "priests": 8
+    }
+  },
+  "hooded_traveller": {
+    "name": "The Hooded Traveller",
+    "description": "A mysterious figure wrapped in grey robes, their face hidden in shadow. They speak in riddles about cosmic balance and the eternal dance between order and chaos.",
+    "location": "Neutral Observatory",
+    "alignment": "neutral",
+    "faction": "seekers_of_balance",
+    "personality": "Mysterious, balanced, speaks in riddles about cosmic order",
+    "dialogue": {
+      "greeting": "Balance is the key to all things, wanderer. In you, I sense the potential to walk the middle path.",
+      "quest_available": "The scales tip too far in one direction. Will you help restore equilibrium to this troubled realm?",
+      "quest_in_progress": "The wheel turns, the balance shifts. How does your journey progress?",
+      "quest_completed": "Well done. The cosmic harmony is preserved, and the wheel continues its eternal turn.",
+      "alignment_mismatch": "You have strayed too far from the path of balance. Find the center before we speak again.",
+      "insufficient_level": "Wisdom comes with experience. Return when you have walked further along life's path."
+    },
+    "quests_offered": ["neutral_quest_1", "neutral_quest_2"],
+    "reputation_effects": {
+      "seekers_of_balance": 10,
+      "all_factions": 2
+    }
+  },
+  "balthazar_dark_lord": {
+    "name": "Balthazar the Dark Lord",
+    "description": "A commanding figure in black robes adorned with silver skulls. His eyes burn with malevolent intelligence, and power radiates from his very presence. He offers strength to those willing to embrace the darkness.",
+    "location": "Dark Temple Undercity",
+    "alignment": "evil",
+    "faction": "forces_of_shadow",
+    "personality": "Charismatic evil, offers power through corruption",
+    "dialogue": {
+      "greeting": "Ah, another soul seeking power. Good. The weak deserve their fate, but you... you show promise.",
+      "quest_available": "Power is not given, it is taken. Are you prepared to do what must be done to claim your destiny?",
+      "quest_in_progress": "The dark path is not for the squeamish. Show me your commitment to true power.",
+      "quest_completed": "Excellent. You understand that strength comes to those who seize it. Your dark education continues.",
+      "alignment_mismatch": "Your heart still clings to pathetic notions of 'good' and 'mercy'. Return when you have embraced your true nature.",
+      "insufficient_level": "Power respects only power. Grow stronger, then return to claim what is yours."
+    },
+    "quests_offered": ["evil_quest_1", "evil_quest_2"],
+    "reputation_effects": {
+      "forces_of_shadow": 10,
+      "thieves_guild": 5,
+      "dark_cults": 8
+    }
+  },
+  "grey_lord": {
+    "name": "The Grey Lord",
+    "description": "An enigmatic being of perfect neutrality, appearing as neither male nor female, young nor old. They exist in the space between extremes, embodying the principle of cosmic balance.",
+    "location": "Plane of Balance",
+    "alignment": "true_neutral",
+    "faction": "cosmic_balance",
+    "personality": "Perfectly neutral, speaks of cosmic truths",
+    "dialogue": {
+      "greeting": "You stand at the crossroads of infinity. Here, all paths converge and diverge in eternal balance.",
+      "quest_available": "The Eye sees all perspectives. Will you claim this sight and maintain the eternal equilibrium?",
+      "quest_in_progress": "The Eye watches your progress. Balance must be maintained in all things.",
+      "quest_completed": "The Eye is returned to its proper place. The balance holds, as it must.",
+      "alignment_mismatch": "Your spirit leans too heavily to one side. Find your center before seeking the Eye.",
+      "insufficient_level": "The trials ahead require one who has walked many paths. Return when experience has tempered you."
+    },
+    "quests_offered": ["neutral_quest_2"],
+    "reputation_effects": {
+      "cosmic_balance": 15,
+      "seekers_of_balance": 10
+    }
+  },
+  "quest_support_npcs": {
+    "markus_the_just": {
+      "name": "Paladin Markus the Just",
+      "description": "A righteous paladin targeted for assassination in evil quests",
+      "location": "Temple of Light",
+      "alignment": "good",
+      "quest_role": "target",
+      "related_quests": ["evil_quest_1"]
+    },
+    "silvanos_elf_lord": {
+      "name": "Elf-Lord Silvanos",
+      "description": "Leader of the woodland resistance against darkness",
+      "location": "Silverwood Court",
+      "alignment": "good",
+      "quest_role": "target",
+      "related_quests": ["evil_quest_2"]
+    },
+    "goru_nezar": {
+      "name": "Goru-Nezar the Demon Lord",
+      "description": "A powerful demon lord threatening the realm",
+      "location": "Shadowlands Fortress",
+      "alignment": "evil",
+      "quest_role": "target",
+      "related_quests": ["good_quest_2"]
+    },
+    "dark_phoenix": {
+      "name": "The Dark Phoenix",
+      "description": "Ancient fire creature of immense power",
+      "location": "Volcanic Lair",
+      "alignment": "chaotic_evil",
+      "quest_role": "target",
+      "related_quests": ["good_quest_3"]
+    },
+    "beholder_of_truths": {
+      "name": "The Beholder of Truths",
+      "description": "Many-eyed guardian of ultimate perspective",
+      "location": "Maze of Perspectives",
+      "alignment": "true_neutral",
+      "quest_role": "target",
+      "related_quests": ["neutral_quest_2"]
+    }
+  }
+}

@@ -119,6 +119,12 @@ class CommandParser:
         self.commands['greet'] = self.cmd_greet
         self.commands['whisper'] = self.cmd_whisper
         self.commands['broadcast'] = self.cmd_broadcast
+        
+        # Quest System commands
+        self.commands['quest'] = self.cmd_quest
+        self.commands['accept'] = self.cmd_accept_quest
+        self.commands['abandon'] = self.cmd_abandon_quest
+        self.commands['journal'] = self.cmd_quest_journal
     
     def setup_aliases(self):
         """Setup command aliases for convenience."""
@@ -224,6 +230,17 @@ class CommandParser:
         self.aliases['wh'] = 'whisper'
         self.aliases['br'] = 'broadcast'
         self.aliases['shout'] = 'broadcast'
+        
+        # Quest System aliases
+        self.aliases['q'] = 'quest'  # Note: overrides 'quit', but 'quit' is less common
+        self.aliases['que'] = 'quest'
+        self.aliases['quests'] = 'quest'
+        self.aliases['acc'] = 'accept'
+        self.aliases['take quest'] = 'accept'
+        self.aliases['aban'] = 'abandon'
+        self.aliases['drop quest'] = 'abandon'
+        self.aliases['jour'] = 'journal'
+        self.aliases['log'] = 'journal'
     
     def parse_command(self, input_text: str) -> bool:
         """Parse and execute a command. Returns True if game should continue."""
@@ -1746,11 +1763,20 @@ class CommandParser:
             return f"Could not tell {target_name} anything. {str(e)}"
     
     def cmd_ask(self, args: List[str]) -> str:
-        """Ask an NPC about a specific topic."""
-        if len(args) < 3 or args[1].lower() != 'about':
-            return "Usage: ask <person> about <topic>"
+        """Ask an NPC about a specific topic or for missions."""
+        if len(args) < 2:
+            return "Usage: ask <person> <topic> or ask <person> missions"
         
         target_name = args[0].lower()
+        
+        # Handle quest-specific "ask <npc> missions" command
+        if len(args) == 2 and args[1].lower() in ['missions', 'mission', 'quest', 'quests', 'task', 'tasks']:
+            return self._handle_ask_missions(target_name)
+        
+        # Standard ask command format: ask <person> about <topic>
+        if len(args) < 3 or args[1].lower() != 'about':
+            return "Usage: ask <person> about <topic> or ask <person> missions"
+        
         topic = ' '.join(args[2:]).lower()
         
         # Initialize conversation engine if not already done
@@ -1764,6 +1790,51 @@ class CommandParser:
             )
         except Exception as e:
             return f"Could not ask {target_name} about {topic}. {str(e)}"
+    
+    def _handle_ask_missions(self, target_name: str) -> str:
+        """Handle asking NPCs for missions/quests"""
+        # Check if target is a quest giver
+        from npcs.quest_giver_npc import create_quest_giver
+        
+        # Try to create quest giver by name mapping
+        npc_id_map = {
+            'annora': 'chancellor_annora',
+            'chancellor': 'chancellor_annora',
+            'chancellor annora': 'chancellor_annora',
+            'traveller': 'hooded_traveller',
+            'hooded': 'hooded_traveller',
+            'hooded traveller': 'hooded_traveller',
+            'balthazar': 'balthazar_dark_lord',
+            'dark lord': 'balthazar_dark_lord',
+            'balthazar dark lord': 'balthazar_dark_lord'
+        }
+        
+        npc_id = npc_id_map.get(target_name)
+        if not npc_id:
+            return f"{target_name} doesn't appear to offer missions."
+        
+        quest_giver = create_quest_giver(npc_id)
+        if not quest_giver:
+            return f"{target_name} is not available to give missions."
+        
+        # Initialize quest system if needed
+        if not hasattr(self.game, 'quest_system'):
+            from core.quest_system import QuestSystem
+            self.game.quest_system = QuestSystem(self.game)
+        
+        if not hasattr(self.game.current_player, 'quest_manager'):
+            from core.quest_manager import CharacterQuestManager
+            self.game.current_player.quest_manager = CharacterQuestManager(
+                self.game.current_player, self.game.quest_system
+            )
+        
+        # Set game reference for quest giver
+        self.game.current_player.game_engine = self.game
+        
+        try:
+            return quest_giver.handle_ask_missions(self.game.current_player)
+        except Exception as e:
+            return f"Error asking {target_name} for missions: {str(e)}"
     
     def cmd_greet(self, args: List[str]) -> str:
         """Formally greet an NPC."""
@@ -1817,3 +1888,284 @@ class CommandParser:
             message = message[1:-1]
         
         return f"{player_name} broadcasts: \"{message}\""
+    
+    # === QUEST SYSTEM COMMANDS ===
+    
+    def cmd_quest(self, args: List[str]) -> str:
+        """Display quest information and manage quests."""
+        # Initialize quest system if not already done
+        if not hasattr(self.game, 'quest_system'):
+            from core.quest_system import QuestSystem
+            self.game.quest_system = QuestSystem(self.game)
+        
+        if not hasattr(self.game.current_player, 'quest_manager'):
+            from core.quest_manager import CharacterQuestManager
+            self.game.current_player.quest_manager = CharacterQuestManager(
+                self.game.current_player, self.game.quest_system
+            )
+        
+        quest_manager = self.game.current_player.quest_manager
+        
+        if not args:
+            # Display quest journal
+            return self._format_quest_journal(quest_manager.get_journal())
+        
+        subcommand = args[0].lower()
+        
+        if subcommand == 'log' or subcommand == 'journal':
+            return self._format_quest_journal(quest_manager.get_journal())
+        elif subcommand == 'info' and len(args) > 1:
+            quest_name = ' '.join(args[1:]).lower()
+            return self._format_quest_info(quest_manager, quest_name)
+        elif subcommand == 'available':
+            available_quests = quest_manager.get_available_quests()
+            return self._format_available_quests(available_quests)
+        else:
+            return ("Quest commands:\n"
+                   "  quest           - Show quest journal\n"
+                   "  quest log       - Show quest journal\n"
+                   "  quest info <quest> - Show detailed quest information\n"
+                   "  quest available - Show available quests\n"
+                   "  accept <quest>  - Accept a quest\n"
+                   "  abandon <quest> - Abandon a quest")
+    
+    def cmd_accept_quest(self, args: List[str]) -> str:
+        """Accept a quest from an NPC or by name."""
+        if not args:
+            return "Accept which quest? Use 'quest available' to see available quests."
+        
+        # Initialize quest system
+        if not hasattr(self.game, 'quest_system'):
+            from core.quest_system import QuestSystem
+            self.game.quest_system = QuestSystem(self.game)
+        
+        if not hasattr(self.game.current_player, 'quest_manager'):
+            from core.quest_manager import CharacterQuestManager
+            self.game.current_player.quest_manager = CharacterQuestManager(
+                self.game.current_player, self.game.quest_system
+            )
+        
+        quest_manager = self.game.current_player.quest_manager
+        quest_name = ' '.join(args).lower()
+        
+        # Find quest by name
+        available_quests = quest_manager.get_available_quests()
+        target_quest = None
+        
+        for quest in available_quests:
+            if quest_name in quest.name.lower():
+                target_quest = quest
+                break
+        
+        if not target_quest:
+            return f"Quest '{quest_name}' not found or not available."
+        
+        # Accept the quest
+        if quest_manager.accept_quest(target_quest.quest_id):
+            return f"You have accepted the quest: {target_quest.name}"
+        else:
+            return f"You cannot accept '{target_quest.name}' at this time."
+    
+    def cmd_abandon_quest(self, args: List[str]) -> str:
+        """Abandon an active quest."""
+        if not args:
+            return "Abandon which quest? Use 'quest' to see active quests."
+        
+        # Initialize quest system
+        if not hasattr(self.game, 'quest_system'):
+            from core.quest_system import QuestSystem
+            self.game.quest_system = QuestSystem(self.game)
+        
+        if not hasattr(self.game.current_player, 'quest_manager'):
+            from core.quest_manager import CharacterQuestManager
+            self.game.current_player.quest_manager = CharacterQuestManager(
+                self.game.current_player, self.game.quest_system
+            )
+        
+        quest_manager = self.game.current_player.quest_manager
+        quest_name = ' '.join(args).lower()
+        
+        # Find active quest by name
+        active_quests = quest_manager.get_journal()['active']
+        target_quest_id = None
+        
+        for quest_info in active_quests:
+            if quest_name in quest_info['name'].lower():
+                target_quest_id = quest_info['quest_id']
+                break
+        
+        if not target_quest_id:
+            return f"Active quest '{quest_name}' not found."
+        
+        # Confirm abandonment
+        quest = self.game.quest_system.quest_definitions.get(target_quest_id)
+        if quest:
+            consequences = quest.abandon_consequences
+            warning = ""
+            if consequences:
+                warning = " Warning: Abandoning this quest may have consequences."
+            
+            # For now, abandon immediately. In a full implementation, 
+            # you might want to add a confirmation system
+            if quest_manager.abandon_quest(target_quest_id):
+                return f"You have abandoned the quest: {quest.name}.{warning}"
+            else:
+                return f"Could not abandon quest '{quest.name}'."
+        
+        return f"Quest '{quest_name}' not found."
+    
+    def cmd_quest_journal(self, args: List[str]) -> str:
+        """Display the quest journal."""
+        # Initialize quest system
+        if not hasattr(self.game, 'quest_system'):
+            from core.quest_system import QuestSystem
+            self.game.quest_system = QuestSystem(self.game)
+        
+        if not hasattr(self.game.current_player, 'quest_manager'):
+            from core.quest_manager import CharacterQuestManager
+            self.game.current_player.quest_manager = CharacterQuestManager(
+                self.game.current_player, self.game.quest_system
+            )
+        
+        quest_manager = self.game.current_player.quest_manager
+        return self._format_quest_journal(quest_manager.get_journal())
+    
+    def _format_quest_journal(self, journal: Dict[str, Any]) -> str:
+        """Format the quest journal for display."""
+        output = []
+        output.append(f"=== QUEST JOURNAL - {journal['character_name'].upper()} ===")
+        output.append(f"Level {journal['character_level']} {journal['character_alignment']} Character")
+        output.append("")
+        
+        # Active quests
+        if journal['active']:
+            output.append("ACTIVE QUESTS:")
+            for quest in journal['active']:
+                status_icon = "★"
+                output.append(f"{status_icon} [{quest['alignment_requirement'].upper()}] {quest['name']}")
+                output.append(f"  Step {quest.get('current_step', 1)}: {quest.get('current_objective', 'Unknown')}")
+                exp_reward = quest['rewards'].get('experience', 0)
+                output.append(f"  Reward: {exp_reward:,} experience + bonuses")
+                output.append("")
+        else:
+            output.append("ACTIVE QUESTS: None")
+            output.append("")
+        
+        # Completed quests
+        if journal['completed']:
+            output.append("COMPLETED QUESTS:")
+            for quest in journal['completed']:
+                output.append(f"✓ {quest['name']} ({quest['experience']:,} exp)")
+        else:
+            output.append("COMPLETED QUESTS: None")
+        
+        output.append("")
+        
+        # Available quests
+        if journal['available']:
+            output.append("AVAILABLE QUESTS:")
+            for quest in journal['available']:
+                exp_reward = quest['rewards'].get('experience', 0)
+                output.append(f"○ [{quest['alignment_requirement'].upper()}] {quest['name']}")
+                output.append(f"  Requirement: Level {quest['level_requirement']}+")
+                output.append(f"  Reward: {exp_reward:,} experience + bonuses")
+        else:
+            output.append("AVAILABLE QUESTS: None")
+        
+        output.append("")
+        
+        # Failed quests
+        if journal['failed']:
+            output.append("FAILED QUESTS:")
+            for quest in journal['failed']:
+                output.append(f"✗ {quest['name']} - {quest['reason']}")
+        
+        output.append("")
+        output.append("Commands: quest, accept <quest>, abandon <quest>, quest info <quest>")
+        
+        return '\n'.join(output)
+    
+    def _format_quest_info(self, quest_manager, quest_name: str) -> str:
+        """Format detailed quest information."""
+        # Find quest by name
+        all_quests = []
+        all_quests.extend(quest_manager.get_available_quests())
+        
+        journal = quest_manager.get_journal()
+        for quest_info in journal['active']:
+            quest_id = quest_info['quest_id']
+            if quest_id in quest_manager.quest_system.quest_definitions:
+                all_quests.append(quest_manager.quest_system.quest_definitions[quest_id])
+        
+        target_quest = None
+        for quest in all_quests:
+            if quest_name in quest.name.lower():
+                target_quest = quest
+                break
+        
+        if not target_quest:
+            return f"Quest '{quest_name}' not found."
+        
+        quest_info = quest_manager.get_quest_info(target_quest.quest_id)
+        if not quest_info:
+            return f"Could not get information for quest '{quest_name}'."
+        
+        output = []
+        output.append(f"=== QUEST DETAILS: {quest_info['name'].upper()} ===")
+        output.append(f"Quest Giver: {quest_info['quest_giver']}")
+        output.append(f"Alignment: {quest_info['alignment_requirement'].title()} required")
+        output.append(f"Level Requirement: {quest_info['level_requirement']}+")
+        output.append(f"Status: {quest_info['status'].title()}")
+        
+        if quest_info['status'] == 'active':
+            output.append(f"Current Step: {quest_info.get('current_step', 1)}")
+            output.append(f"Objective: {quest_info.get('current_objective', 'Unknown')}")
+        
+        output.append("")
+        output.append("DESCRIPTION:")
+        output.append(target_quest.description)
+        output.append("")
+        
+        # Rewards
+        rewards = quest_info['rewards']
+        output.append("REWARDS:")
+        if 'experience' in rewards:
+            output.append(f"- {rewards['experience']:,} experience points")
+        if 'gold' in rewards:
+            output.append(f"- {rewards['gold']} gold pieces")
+        if 'items' in rewards:
+            for item in rewards['items']:
+                output.append(f"- {item}")
+        
+        # Class-specific rewards
+        if 'class_specific' in rewards:
+            char_class = quest_manager.character.character_class.class_name.lower()
+            if char_class in rewards['class_specific']:
+                output.append(f"- Class bonus ({char_class}): {rewards['class_specific'][char_class]}")
+        
+        if quest_info['status'] == 'locked':
+            output.append("")
+            output.append(f"REQUIREMENT: {quest_info.get('lock_reason', 'Unknown requirement')}")
+        
+        return '\n'.join(output)
+    
+    def _format_available_quests(self, quests: List) -> str:
+        """Format available quests for display."""
+        if not quests:
+            return "No quests available at your current level and alignment."
+        
+        output = []
+        output.append("=== AVAILABLE QUESTS ===")
+        output.append("")
+        
+        for quest in quests:
+            exp_reward = quest.rewards.get('experience', 0)
+            output.append(f"[{quest.alignment_requirement.upper()}] {quest.name}")
+            output.append(f"  Quest Giver: {quest.quest_giver}")
+            output.append(f"  Level Requirement: {quest.level_requirement}+")
+            output.append(f"  Reward: {exp_reward:,} experience + bonuses")
+            output.append(f"  Description: {quest.description}")
+            output.append("")
+        
+        output.append("Use 'accept <quest name>' to accept a quest.")
+        return '\n'.join(output)

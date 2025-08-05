@@ -1,0 +1,385 @@
+{
+  "good_quest_1": {
+    "name": "Prove Your Worth",
+    "description": "Chancellor Annora seeks a champion to eliminate bandits threatening innocent travelers on the trade routes.",
+    "quest_giver": "chancellor_annora",
+    "alignment_requirement": "good",
+    "level_requirement": 15,
+    "prerequisites": [],
+    "steps": [
+      {
+        "step": 1,
+        "objective": "Speak with Chancellor Annora and accept the mission",
+        "description": "Visit Chancellor Annora in the Temple District to learn about the bandit threat."
+      },
+      {
+        "step": 2,
+        "objective": "Gather intelligence on bandit locations",
+        "description": "Question travelers and merchants about bandit sightings on the trade routes."
+      },
+      {
+        "step": 3,
+        "objective": "Locate and eliminate the bandit leader",
+        "description": "Track down the bandit leader and defeat them in combat to end the threat."
+      },
+      {
+        "step": 4,
+        "objective": "Collect proof of the bandit leader's defeat",
+        "description": "Retrieve the bandit leader's signet ring as proof of victory."
+      },
+      {
+        "step": 5,
+        "objective": "Return to Chancellor Annora with proof",
+        "description": "Present the signet ring to Chancellor Annora to complete the mission."
+      }
+    ],
+    "rewards": {
+      "experience": 150000,
+      "gold": 500,
+      "items": ["quest_ring_good_1"],
+      "class_specific": {
+        "paladin": {"max_damage": 1, "abilities": ["enhanced_lay_hands"]},
+        "priest": {"spell_casting": 1, "max_mana": 10},
+        "mage": {"spell_casting": 1, "max_mana": 10},
+        "rogue": {"stealth": 2, "backstab_damage": 5},
+        "thief": {"stealth": 2, "backstab_damage": 10},
+        "ranger": {"stealth": 6, "backstab_damage": 13},
+        "ninja": {"stealth": 6, "backstab_damage": 12}
+      }
+    },
+    "failure_consequences": {
+      "reputation_loss": {"forces_of_light": 25},
+      "alignment_shift": -10
+    },
+    "abandon_consequences": {
+      "reputation_loss": {"forces_of_light": 10}
+    }
+  },
+  "good_quest_2": {
+    "name": "The Demon Lord's Head",
+    "description": "Chancellor Annora requires the head of the evil demon lord Goru-Nezar to protect the realm from demonic invasion.",
+    "quest_giver": "chancellor_annora",
+    "alignment_requirement": "good",
+    "level_requirement": 25,
+    "prerequisites": ["good_quest_1"],
+    "steps": [
+      {
+        "step": 1,
+        "objective": "Accept the demon lord assassination mission",
+        "description": "Chancellor Annora explains the threat posed by Goru-Nezar."
+      },
+      {
+        "step": 2,
+        "objective": "Gather a party of worthy companions",
+        "description": "This mission requires a group of at least 4 level 25+ adventurers."
+      },
+      {
+        "step": 3,
+        "objective": "Locate Goru-Nezar's demonic stronghold",
+        "description": "Find the entrance to the demon lord's fortress in the Shadowlands."
+      },
+      {
+        "step": 4,
+        "objective": "Defeat Goru-Nezar in single combat",
+        "description": "Face the demon lord and emerge victorious through righteous might."
+      },
+      {
+        "step": 5,
+        "objective": "Return with Goru-Nezar's head",
+        "description": "Present the demon lord's head as proof of victory over evil."
+      }
+    ],
+    "rewards": {
+      "experience": 2000000,
+      "gold": 2500,
+      "items": ["holy_weapon_good_2", "status_enhancement_good"],
+      "class_specific": {
+        "paladin": {"turn_undead": 2, "divine_protection": 5},
+        "priest": {"healing_power": 3, "divine_favor": 10},
+        "mage": {"spell_power": 2, "mana_efficiency": 5},
+        "warrior": {"combat_mastery": 2, "weapon_expertise": 3},
+        "knight": {"damage_resistance": 1, "leadership": 5}
+      }
+    },
+    "failure_consequences": {
+      "reputation_loss": {"forces_of_light": 50},
+      "alignment_shift": -25
+    },
+    "abandon_consequences": {
+      "reputation_loss": {"forces_of_light": 25}
+    }
+  },
+  "good_quest_3": {
+    "name": "The Dark Phoenix",
+    "description": "The Dark Phoenix threatens to engulf the world in eternal flames. Only a champion of good can stop this ancient evil.",
+    "quest_giver": "chancellor_annora",
+    "alignment_requirement": "good",
+    "level_requirement": 35,
+    "prerequisites": ["good_quest_2"],
+    "steps": [
+      {
+        "step": 1,
+        "objective": "Learn about the Dark Phoenix prophecy",
+        "description": "Study ancient texts about the Dark Phoenix's return."
+      },
+      {
+        "step": 2,
+        "objective": "Obtain the Phoenix Feather of Protection",
+        "description": "Retrieve a protective phoenix feather from the Solar Temple."
+      },
+      {
+        "step": 3,
+        "objective": "Enter the Volcanic Lair",
+        "description": "Navigate the treacherous volcanic caves to reach the phoenix."
+      },
+      {
+        "step": 4,
+        "objective": "Defeat the Dark Phoenix",
+        "description": "Face the Dark Phoenix in its lair and emerge victorious."
+      },
+      {
+        "step": 5,
+        "objective": "Claim the Phoenix Crown",
+        "description": "Take the Phoenix Crown as proof of your heroic victory."
+      }
+    ],
+    "rewards": {
+      "experience": 7500000,
+      "gold": 5000,
+      "items": ["phoenix_crown", "fire_protection_blessing"],
+      "class_specific": {
+        "paladin": {"fire_immunity": true, "phoenix_aura": 10},
+        "priest": {"resurrection_power": 1, "divine_phoenix": 5},
+        "mage": {"fire_mastery": 5, "phoenix_familiar": true}
+      }
+    },
+    "failure_consequences": {
+      "reputation_loss": {"forces_of_light": 75},
+      "alignment_shift": -35
+    },
+    "abandon_consequences": {
+      "reputation_loss": {"forces_of_light": 40}
+    }
+  },
+  "neutral_quest_1": {
+    "name": "The Balance Keeper",
+    "description": "The Hooded Traveller seeks one who can maintain the delicate balance between order and chaos.",
+    "quest_giver": "hooded_traveller",
+    "alignment_requirement": "neutral",
+    "level_requirement": 15,
+    "prerequisites": [],
+    "steps": [
+      {
+        "step": 1,
+        "objective": "Meet the Hooded Traveller at the Observatory",
+        "description": "Find the mysterious figure who watches over cosmic balance."
+      },
+      {
+        "step": 2,
+        "objective": "Prevent the extremist faction's ritual",
+        "description": "Stop either good or evil extremists from disrupting the balance."
+      },
+      {
+        "step": 3,
+        "objective": "Negotiate peace between opposing forces",
+        "description": "Use diplomacy to resolve the conflict without violence."
+      },
+      {
+        "step": 4,
+        "objective": "Restore the Balance Stone",
+        "description": "Repair the ancient artifact that maintains cosmic equilibrium."
+      },
+      {
+        "step": 5,
+        "objective": "Report your success to the Hooded Traveller",
+        "description": "Confirm that balance has been restored to the region."
+      }
+    ],
+    "rewards": {
+      "experience": 150000,
+      "gold": 500,
+      "items": ["balance_medallion"],
+      "class_specific": {
+        "mystic": {"ki_mastery": 2, "inner_balance": 5},
+        "ranger": {"nature_harmony": 3, "tracking": 5},
+        "bard": {"diplomacy": 5, "influence": 3},
+        "druid": {"elemental_balance": 2, "nature_speech": 1}
+      },
+      "special_abilities": ["diplomatic_immunity", "faction_neutrality"]
+    },
+    "failure_consequences": {
+      "reputation_loss": {"seekers_of_balance": 25},
+      "cosmic_imbalance": 10
+    },
+    "abandon_consequences": {
+      "reputation_loss": {"seekers_of_balance": 10}
+    }
+  },
+  "neutral_quest_2": {
+    "name": "The Grey Path",
+    "description": "The Grey Lord requires the Eye of the Beholder to maintain the delicate balance between light and shadow.",
+    "quest_giver": "hooded_traveller",
+    "alignment_requirement": "neutral",
+    "level_requirement": 25,
+    "prerequisites": ["neutral_quest_1"],
+    "steps": [
+      {
+        "step": 1,
+        "objective": "Seek audience with the Grey Lord",
+        "description": "Find the enigmatic Grey Lord in the Plane of Balance."
+      },
+      {
+        "step": 2,
+        "objective": "Navigate the Maze of Perspectives",
+        "description": "Pass through trials that test your understanding of balance."
+      },
+      {
+        "step": 3,
+        "objective": "Defeat the Beholder of Truths",
+        "description": "Face the many-eyed guardian of ultimate perspective."
+      },
+      {
+        "step": 4,
+        "objective": "Claim the Eye of the Beholder",
+        "description": "Extract the mystical eye that sees all sides of truth."
+      },
+      {
+        "step": 5,
+        "objective": "Return the Eye to the Grey Lord",
+        "description": "Complete the cosmic ritual of balance restoration."
+      }
+    ],
+    "rewards": {
+      "experience": 2000000,
+      "gold": 2500,
+      "items": ["grey_cloak", "wisdom_enhancement"],
+      "class_specific": {
+        "mystic": {"enlightenment": 3, "ki_sight": 5},
+        "bard": {"true_speech": 2, "mind_reading": 1},
+        "ranger": {"beast_speech": 1, "nature_sight": 3},
+        "druid": {"shapeshift_mastery": 2, "elemental_sight": 3}
+      },
+      "special_abilities": ["universal_equipment_access", "truth_sight"]
+    },
+    "failure_consequences": {
+      "reputation_loss": {"seekers_of_balance": 50},
+      "cosmic_imbalance": 25
+    },
+    "abandon_consequences": {
+      "reputation_loss": {"seekers_of_balance": 25}
+    }
+  },
+  "evil_quest_1": {
+    "name": "Blood Money",
+    "description": "Balthazar the Dark Lord offers power to those willing to prove their commitment to the dark path through blood and treachery.",
+    "quest_giver": "balthazar_dark_lord",
+    "alignment_requirement": "evil",
+    "level_requirement": 15,
+    "prerequisites": [],
+    "steps": [
+      {
+        "step": 1,
+        "objective": "Meet Balthazar in the Dark Temple Undercity",
+        "description": "Find the hidden entrance to the Dark Temple's forbidden depths."
+      },
+      {
+        "step": 2,
+        "objective": "Retrieve the severed head of Markus the Just",
+        "description": "Assassinate the paladin Markus and bring proof of his death."
+      },
+      {
+        "step": 3,
+        "objective": "Steal the locked wooden box from the temple",
+        "description": "Infiltrate the Temple of Light and steal their sacred relic."
+      },
+      {
+        "step": 4,
+        "objective": "Corrupt three innocent souls",
+        "description": "Turn three good-aligned NPCs to the path of darkness."
+      },
+      {
+        "step": 5,
+        "objective": "Present your dark trophies to Balthazar",
+        "description": "Deliver the head, box, and proof of corruption to claim your reward."
+      }
+    ],
+    "rewards": {
+      "experience": 150000,
+      "gold": 500,
+      "items": ["dark_signet_ring"],
+      "class_specific": {
+        "necromancer": {"death_mastery": 2, "soul_drain": 5},
+        "warlock": {"dark_magic": 3, "eldritch_power": 5},
+        "rogue": {"stealth": 2, "backstab_damage": 5},
+        "thief": {"stealth": 2, "backstab_damage": 10},
+        "ninja": {"shadow_strike": 3, "death_blow": 2},
+        "witchhunter": {"dark_immunity": 1, "corruption_sense": 5}
+      },
+      "special_abilities": ["assassination_contracts", "dark_reputation"]
+    },
+    "failure_consequences": {
+      "reputation_loss": {"forces_of_shadow": 25},
+      "alignment_shift": 10
+    },
+    "abandon_consequences": {
+      "reputation_loss": {"forces_of_shadow": 10},
+      "dark_mark": true
+    }
+  },
+  "evil_quest_2": {
+    "name": "The Elf-Lord's Demise",
+    "description": "Balthazar demands the head of the elf-lord Silvanos, leader of the woodland resistance against the forces of darkness.",
+    "quest_giver": "balthazar_dark_lord",
+    "alignment_requirement": "evil",
+    "level_requirement": 25,
+    "prerequisites": ["evil_quest_1"],
+    "steps": [
+      {
+        "step": 1,
+        "objective": "Accept the contract on Elf-Lord Silvanos",
+        "description": "Receive detailed instructions for eliminating the elven leader."
+      },
+      {
+        "step": 2,
+        "objective": "Infiltrate the Silverwood Court",
+        "description": "Gain access to the hidden elven stronghold through stealth or treachery."
+      },
+      {
+        "step": 3,
+        "objective": "Eliminate Silvanos' bodyguards",
+        "description": "Remove the elf-lord's elite guard through poison, ambush, or direct assault."
+      },
+      {
+        "step": 4,
+        "objective": "Assassinate Elf-Lord Silvanos",
+        "description": "Strike down the elven leader and claim his head as proof."
+      },
+      {
+        "step": 5,
+        "objective": "Escape with the elf-lord's head",
+        "description": "Evade the pursuing elven forces and return to Balthazar."
+      }
+    ],
+    "rewards": {
+      "experience": 2000000,
+      "gold": 2500,
+      "items": ["dark_blade", "shadow_cloak"],
+      "class_specific": {
+        "necromancer": {"undead_command": 2, "life_drain": 5},
+        "warlock": {"shadow_magic": 3, "fear_aura": 5},
+        "ninja": {"assassination_mastery": 3, "shadow_step": 2},
+        "rogue": {"critical_strike": 2, "poison_mastery": 3}
+      },
+      "special_abilities": ["dark_magic_access", "intimidation_mastery"]
+    },
+    "failure_consequences": {
+      "reputation_loss": {"forces_of_shadow": 50},
+      "alignment_shift": 25,
+      "elven_vendetta": true
+    },
+    "abandon_consequences": {
+      "reputation_loss": {"forces_of_shadow": 25},
+      "dark_curse": true
+    }
+  }
+}

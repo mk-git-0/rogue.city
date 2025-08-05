@@ -1,0 +1,147 @@
+{
+  "experience_progression": {
+    "quest_tier_1": 150000,
+    "quest_tier_2": 2000000,
+    "quest_tier_3": 7500000,
+    "quest_tier_4": 30000000,
+    "quest_tier_5": 175000000
+  },
+  "class_specific_rewards": {
+    "knight": {
+      "quest_tier_1": {"damage_resistance": 1, "leadership": 2},
+      "quest_tier_2": {"damage_resistance": 2, "combat_mastery": 1},
+      "quest_tier_3": {"legendary_armor": 1, "command_presence": 3}
+    },
+    "warrior": {
+      "quest_tier_1": {"weapon_mastery": 1, "combat_expertise": 2},
+      "quest_tier_2": {"multiple_attacks": 1, "weapon_specialization": 2},
+      "quest_tier_3": {"berserker_rage": 1, "weapon_grandmastery": 3}
+    },
+    "barbarian": {
+      "quest_tier_1": {"rage_duration": 2, "intimidation": 3},
+      "quest_tier_2": {"fury_strikes": 1, "damage_bonus": 5},
+      "quest_tier_3": {"primal_rage": 1, "fear_immunity": true}
+    },
+    "ranger": {
+      "quest_tier_1": {"tracking": 3, "stealth": 6, "backstab_damage": 13},
+      "quest_tier_2": {"nature_mastery": 2, "beast_companion": 1},
+      "quest_tier_3": {"forest_lord": 1, "animal_speech": true}
+    },
+    "thief": {
+      "quest_tier_1": {"stealth": 2, "backstab_damage": 10, "lockpicking": 3},
+      "quest_tier_2": {"master_thief": 1, "shadow_step": 2},
+      "quest_tier_3": {"guild_master": 1, "legendary_stealth": 5}
+    },
+    "mystic": {
+      "quest_tier_1": {"ki_mastery": 2, "inner_balance": 5},
+      "quest_tier_2": {"enlightenment": 1, "martial_arts": 3},
+      "quest_tier_3": {"ki_master": 1, "astral_projection": true}
+    },
+    "mage": {
+      "quest_tier_1": {"spell_casting": 1, "max_mana": 10},
+      "quest_tier_2": {"spell_power": 2, "mana_efficiency": 5},
+      "quest_tier_3": {"archmage": 1, "spell_mastery": 3}
+    },
+    "priest": {
+      "quest_tier_1": {"spell_casting": 1, "max_mana": 10, "healing_power": 2},
+      "quest_tier_2": {"divine_favor": 3, "turn_undead": 2},
+      "quest_tier_3": {"high_priest": 1, "miracle_casting": 1}
+    },
+    "rogue": {
+      "quest_tier_1": {"stealth": 2, "backstab_damage": 5, "critical_chance": 5},
+      "quest_tier_2": {"sneak_attack": 2, "poison_mastery": 1},
+      "quest_tier_3": {"shadow_master": 1, "death_strike": 2}
+    },
+    "paladin": {
+      "quest_tier_1": {"max_damage": 1, "abilities": ["enhanced_lay_hands"]},
+      "quest_tier_2": {"divine_protection": 5, "turn_undead": 2},
+      "quest_tier_3": {"holy_champion": 1, "divine_weapon": true}
+    },
+    "spellsword": {
+      "quest_tier_1": {"battle_casting": 1, "weapon_enchantment": 2},
+      "quest_tier_2": {"spell_strike": 2, "arcane_weapon": 1},
+      "quest_tier_3": {"spell_master": 1, "reality_blade": true}
+    },
+    "ninja": {
+      "quest_tier_1": {"stealth": 6, "backstab_damage": 12, "shadow_step": 1},
+      "quest_tier_2": {"death_strike": 2, "invisibility": 1},
+      "quest_tier_3": {"shadow_lord": 1, "assassination_mastery": 5}
+    },
+    "warlock": {
+      "quest_tier_1": {"eldritch_blast": 2, "dark_magic": 3},
+      "quest_tier_2": {"shadow_magic": 3, "weapon_enchantment": 2},
+      "quest_tier_3": {"dark_master": 1, "eldritch_mastery": 5}
+    },
+    "necromancer": {
+      "quest_tier_1": {"death_mastery": 2, "soul_drain": 5},
+      "quest_tier_2": {"undead_command": 2, "life_drain": 5},
+      "quest_tier_3": {"lich_transformation": 1, "death_magic_mastery": 10}
+    },
+    "witchhunter": {
+      "quest_tier_1": {"magic_resistance": 2, "spell_immunity": 1},
+      "quest_tier_2": {"anti_magic": 3, "magic_destruction": 2},
+      "quest_tier_3": {"grand_inquisitor": 1, "magic_nullification": 5}
+    },
+    "bard": {
+      "quest_tier_1": {"song_power": 2, "influence": 3},
+      "quest_tier_2": {"bardic_mastery": 2, "inspiration": 5},
+      "quest_tier_3": {"legendary_bard": 1, "reality_song": true}
+    }
+  },
+  "universal_rewards": {
+    "quest_rings": {
+      "quest_ring_good_1": {
+        "name": "Ring of Righteous Purpose",
+        "description": "A golden ring that glows with holy light",
+        "effects": {"all_saves": 1, "good_reputation": 10}
+      },
+      "balance_medallion": {
+        "name": "Medallion of Cosmic Balance",
+        "description": "A medallion showing eternal yin-yang",
+        "effects": {"wisdom": 1, "diplomatic_immunity": true}
+      },
+      "dark_signet_ring": {
+        "name": "Signet of the Shadow Lord",
+        "description": "A black ring bearing dark runes",
+        "effects": {"intimidation": 5, "dark_magic_bonus": 2}
+      }
+    },
+    "special_items": {
+      "holy_weapon_good_2": {
+        "type": "weapon",
+        "name": "Sanctified Blade of Justice",
+        "damage": "2d8+3",
+        "properties": ["holy", "undead_bane", "evil_bane"]
+      },
+      "dark_blade": {
+        "type": "weapon", 
+        "name": "Shadowfang Dagger",
+        "damage": "1d6+2",
+        "properties": ["shadow_strike", "poison", "stealth_bonus"]
+      },
+      "phoenix_crown": {
+        "type": "armor",
+        "name": "Crown of the Phoenix",
+        "ac_bonus": 2,
+        "properties": ["fire_immunity", "resurrection", "leadership"]
+      }
+    }
+  },
+  "alignment_bonuses": {
+    "good": {
+      "reputation_bonus": {"forces_of_light": 25, "town_guards": 15, "priests": 20},
+      "equipment_access": ["holy_weapons", "blessed_armor", "divine_items"],
+      "special_abilities": ["turn_undead_bonus", "healing_bonus", "protection_spells"]
+    },
+    "neutral": {
+      "reputation_bonus": {"all_factions": 5},
+      "equipment_access": ["universal_items", "balanced_weapons", "adaptive_armor"],
+      "special_abilities": ["diplomatic_immunity", "faction_neutrality", "balance_mastery"]
+    },
+    "evil": {
+      "reputation_bonus": {"forces_of_shadow": 25, "thieves_guild": 15, "dark_cults": 20},
+      "equipment_access": ["dark_weapons", "cursed_armor", "necromantic_items"],
+      "special_abilities": ["intimidation_bonus", "dark_magic_bonus", "corruption_powers"]
+    }
+  }
+}
