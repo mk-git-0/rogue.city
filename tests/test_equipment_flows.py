@@ -13,6 +13,8 @@ class TestChar(BaseCharacter):
         return 8
     def get_hit_die_type(self):
         return "1d8"
+    def get_attack_speed(self):
+        return 3.0
     def get_base_attack_speed(self):
         return 3.0
     def get_critical_range(self):

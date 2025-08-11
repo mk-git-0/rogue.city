@@ -31,6 +31,8 @@ def collect_item_ids() -> Set[str]:
             data = load_json(path)
             ids.update(data.keys())
     # Add class-coded items known to ItemFactory
+    if PROJECT_ROOT not in sys.path:
+        sys.path.insert(0, PROJECT_ROOT)
     from core.item_factory import ItemFactory
     ids.update(ItemFactory().item_classes.keys())
     return ids
