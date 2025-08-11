@@ -33,6 +33,16 @@ A classic MajorMUD-style text RPG built for the terminal, featuring turn-based c
 - **ASCII Maps** showing area layouts and player position
 - **Dynamic Item Placement** with progression-based rewards
 
+### 🏪 Merchants and Trading
+- Buy and sell items with NPC merchants
+- Dynamic pricing influenced by alignment and reputation
+- Repair damaged equipment at blacksmiths
+
+### 📜 Quest System
+- Alignment-based quest lines with Good/Neutral/Evil paths
+- Quest journal, accept/abandon commands, and rewards
+- NPC dialogue integration (ask <npc> missions)
+
 ### 💾 Quality of Life
 - **Automatic Save/Load** preserving all progress
 - **Comprehensive Help System** with detailed command reference
