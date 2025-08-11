@@ -152,10 +152,21 @@ class QuestRewardCalculator:
                 applied_rewards.append(f"Received {gold_amount} gold pieces")
         
         # Item rewards
-        if 'items' in rewards:
-            for item_id in rewards['items']:
-                # TODO: Add item to character inventory
-                applied_rewards.append(f"Received item: {item_id}")
+        if 'items' in rewards and rewards['items']:
+            try:
+                from core.item_factory import ItemFactory
+                if not getattr(character, 'inventory_system', None):
+                    character.initialize_item_systems()
+                item_factory = ItemFactory()
+                for item_id in rewards['items']:
+                    item = item_factory.create_item(item_id)
+                    if item and character.inventory_system.add_item(item):
+                        applied_rewards.append(f"Received item: {item.name}")
+                    else:
+                        applied_rewards.append(f"Failed to add item: {item_id}")
+            except Exception:
+                for item_id in rewards['items']:
+                    applied_rewards.append(f"Item (unapplied): {item_id}")
         
         return applied_rewards
     
@@ -192,7 +203,8 @@ class QuestRewardCalculator:
         if 'reputation_bonus' in alignment_bonuses:
             rep_bonuses = alignment_bonuses['reputation_bonus']
             for faction, bonus in rep_bonuses.items():
-                # TODO: Apply reputation bonus to faction
+                if hasattr(character, 'alignment_manager'):
+                    character.alignment_manager.modify_reputation(faction, bonus)
                 applied_rewards.append(f"Reputation bonus: +{bonus} with {faction}")
         
         # Equipment access
