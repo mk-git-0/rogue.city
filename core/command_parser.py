@@ -686,7 +686,7 @@ class CommandParser:
         """Display game settings."""
         self.game.ui.display_message("=== GAME SETTINGS ===")
         self.game.ui.display_message("Game running at 60 FPS")
-        self.game.ui.display_message("Combat system: Timer-based")
+        self.game.ui.display_message("Combat system: Turn-based")
         self.game.ui.display_message("Auto-save: On character action")
         return True
     
