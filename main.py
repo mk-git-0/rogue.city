@@ -11,7 +11,7 @@ performs system checks, and handles startup/shutdown gracefully.
 
 Features:
 - Four character classes with unique abilities and combat styles
-- Timer-based combat system with weapon speed differences  
+- Turn-based combat system with class/weapon-driven multiple attacks  
 - Complete inventory and equipment management
 - Tutorial system for new players
 - Achievement and statistics tracking
@@ -181,7 +181,7 @@ def show_startup_sequence():
     print()
     print("✨ Game Features:")
     print("   🗡️  Four character classes with unique combat styles")
-    print("   ⚔️  Timer-based combat with weapon speed differences")
+    print("   ⚔️  Turn-based combat with class abilities")
     print("   🎒 Complete inventory and equipment management")
     print("   🏆 Achievement system with statistics tracking")
     print("   📚 Built-in tutorial for new players")
