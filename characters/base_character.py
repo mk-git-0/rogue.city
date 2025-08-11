@@ -406,7 +406,7 @@ class BaseCharacter(ABC):
         
         for slot, item in starting_equipment.items():
             self.inventory_system.add_item(item)
-            if slot in ['weapon', 'armor']:
+            if slot in ['weapon', 'armor', 'shield']:
                 self.equipment_system.equip_item(item.item_id)
     
     def restore_mana(self, amount: int) -> int:

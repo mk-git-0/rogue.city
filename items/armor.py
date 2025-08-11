@@ -22,6 +22,9 @@ class Armor(BaseItem):
         # Penalties
         self.stealth_penalty = 0  # penalty to stealth checks
         self.movement_penalty = 0  # penalty to movement speed
+
+        # Shield marker (used by EquipmentSystem routing)
+        self.is_shield: bool = False
     
     def get_effective_dex_bonus(self, dex_modifier: int) -> int:
         """Calculate the effective DEX bonus with armor restrictions."""
@@ -232,3 +235,51 @@ class MysticRobes(Armor):
         )
         self.class_restrictions = ["mystic"]
         self.stat_bonuses['wisdom'] = 2
+
+
+# Shield classes (treated as Armor items with is_shield = True)
+
+class WoodenShield(Armor):
+    def __init__(self):
+        super().__init__(
+            item_id="wooden_shield",
+            name="Wooden Shield",
+            description="A simple wooden shield offering basic protection.",
+            ac_bonus=1,
+            armor_type=ArmorType.LIGHT,
+            weight=6.0,
+            value=8,
+            rarity=ItemRarity.COMMON
+        )
+        self.is_shield = True
+        self.class_restrictions = ["knight", "warrior", "paladin", "ranger", "witchhunter"]
+
+class Buckler(Armor):
+    def __init__(self):
+        super().__init__(
+            item_id="buckler",
+            name="Buckler",
+            description="A small round shield that is light and easy to carry.",
+            ac_bonus=2,
+            armor_type=ArmorType.LIGHT,
+            weight=5.0,
+            value=20,
+            rarity=ItemRarity.UNCOMMON
+        )
+        self.is_shield = True
+        self.class_restrictions = ["knight", "warrior", "paladin", "ranger", "witchhunter"]
+
+class HeaterShield(Armor):
+    def __init__(self):
+        super().__init__(
+            item_id="heater_shield",
+            name="Heater Shield",
+            description="A sturdy heater shield providing solid defense.",
+            ac_bonus=3,
+            armor_type=ArmorType.MEDIUM,
+            weight=10.0,
+            value=45,
+            rarity=ItemRarity.UNCOMMON
+        )
+        self.is_shield = True
+        self.class_restrictions = ["knight", "warrior", "paladin", "witchhunter"]

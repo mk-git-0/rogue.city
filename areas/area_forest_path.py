@@ -143,6 +143,8 @@ class ForestPathArea(BaseArea):
         )
         clearing.is_safe = True
         clearing.add_item("wildflowers", "wildflowers", "Beautiful wildflowers grow here.")
+        # Loot: a small buckler can sometimes be found here
+        clearing.add_item("buckler", "buckler", "A small round buckler lies half-buried in leaves.")
         clearing.add_exit(ExitDirection.WEST, "forest_entrance")
         clearing.add_exit(ExitDirection.EAST, "deep_forest")
         clearing.add_exit(ExitDirection.NORTH, "northern_woods")
@@ -155,6 +157,8 @@ class ForestPathArea(BaseArea):
             "The deepest part of the forest with ancient trees and mysterious shadows."
         )
         deep_forest.add_enemy("forest_guardian", "orc", encounter_name="forest guardian")
+        # Loot: a sturdier heater shield hidden among roots
+        deep_forest.add_item("heater_shield", "heater shield", "A sturdy heater shield is wedged between massive roots.")
         deep_forest.add_exit(ExitDirection.WEST, "forest_clearing")
         deep_forest.add_exit(ExitDirection.EAST, "city_approach")
         self.add_room(deep_forest)

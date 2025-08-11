@@ -8,7 +8,8 @@ from items.weapons import (
 )
 from items.armor import (
     Armor, LeatherScraps, ClothRobes, PaddedArmor, SimpleGarb,
-    LeatherArmor, ChainMail, MageRobes, MysticRobes
+    LeatherArmor, ChainMail, MageRobes, MysticRobes,
+    WoodenShield, Buckler, HeaterShield
 )
 from items.consumables import (
     Consumable, MinorHealthPotion, MajorHealthPotion, MinorManaPotion,
@@ -40,6 +41,9 @@ class ItemFactory:
             'chain_mail': ChainMail,
             'mage_robes': MageRobes,
             'mystic_robes': MysticRobes,
+            'wooden_shield': WoodenShield,
+            'buckler': Buckler,
+            'heater_shield': HeaterShield,
             
             # Consumables
             'minor_health_potion': MinorHealthPotion,
@@ -127,7 +131,8 @@ class ItemFactory:
             'knight': {
                 'weapon': 'training_sword',
                 'armor': 'padded_armor',
-                'consumable': 'minor_health_potion'
+                'consumable': 'minor_health_potion',
+                'shield': 'wooden_shield'
             },
             'mage': {
                 'weapon': 'wooden_staff',
