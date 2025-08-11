@@ -971,21 +971,67 @@ class GameEngine:
                 self.ui_manager.log_error("Invalid stat name. Use: str, dex, con, int, wis, cha")
                 
     def _create_character_instance(self, name: str, class_type: str, race_id: str = "human", alignment: Alignment = Alignment.NEUTRAL):
-        """Create appropriate character class instance."""
-        if class_type == 'rogue':
+        """Create appropriate character class instance for all implemented classes."""
+        ct = class_type.lower()
+        if ct == 'rogue':
             from characters.class_rogue import Rogue
             return Rogue(name, race_id, alignment)
-        elif class_type == 'knight':
+        if ct == 'knight':
             from characters.class_knight import Knight
             return Knight(name, race_id, alignment)
-        elif class_type == 'mage':
+        if ct == 'mage':
             from characters.class_mage import Mage
             return Mage(name, race_id, alignment)
-        elif class_type == 'mystic':
+        if ct == 'mystic':
             from characters.class_mystic import Mystic
             return Mystic(name, race_id, alignment)
-        else:
-            raise ValueError(f"Unknown class type: {class_type}")
+        if ct == 'warrior':
+            from characters.class_warrior import Warrior
+            return Warrior(name, race_id, alignment)
+        if ct == 'ranger':
+            from characters.class_ranger import Ranger
+            return Ranger(name, race_id, alignment)
+        if ct == 'paladin':
+            from characters.class_paladin import Paladin
+            return Paladin(name, race_id, alignment)
+        if ct == 'barbarian':
+            from characters.class_barbarian import Barbarian
+            return Barbarian(name, race_id, alignment)
+        if ct == 'thief':
+            from characters.class_thief import Thief
+            return Thief(name, race_id, alignment)
+        if ct == 'spellsword':
+            from characters.class_spellsword import Spellsword
+            return Spellsword(name, race_id, alignment)
+        if ct == 'priest':
+            from characters.class_priest import Priest
+            return Priest(name, race_id, alignment)
+        if ct == 'ninja':
+            from characters.class_ninja import Ninja
+            return Ninja(name, race_id, alignment)
+        if ct == 'warlock':
+            from characters.class_warlock import Warlock
+            return Warlock(name, race_id, alignment)
+        if ct == 'necromancer':
+            from characters.class_necromancer import Necromancer
+            return Necromancer(name, race_id, alignment)
+        if ct == 'witchhunter':
+            from characters.class_witchhunter import Witchhunter
+            return Witchhunter(name, race_id, alignment)
+        # Optional classes present in repo (if implemented)
+        if ct == 'druid':
+            from characters.class_druid import Druid
+            return Druid(name, race_id, alignment)
+        if ct == 'bard':
+            from characters.class_bard import Bard
+            return Bard(name, race_id, alignment)
+        if ct == 'missionary':
+            from characters.class_missionary import Missionary
+            return Missionary(name, race_id, alignment)
+        if ct == 'gypsy':
+            from characters.class_gypsy import Gypsy
+            return Gypsy(name, race_id, alignment)
+        raise ValueError(f"Unknown class type: {class_type}")
             
     def _finalize_character(self) -> None:
         """Finalize character creation and save."""

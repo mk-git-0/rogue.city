@@ -562,9 +562,13 @@ class SaveManager:
                 if stat not in derived or not isinstance(derived[stat], int):
                     return False
                     
-            # Validate character class
-            valid_classes = ['rogue', 'knight', 'mage', 'mystic']
-            if save_data.get('character_class') not in valid_classes:
+            # Validate character class (accept all implemented classes)
+            valid_classes = [
+                'rogue','knight','mage','mystic','warrior','ranger','paladin','barbarian','thief',
+                'spellsword','priest','ninja','warlock','necromancer','witchhunter','druid','bard',
+                'missionary','gypsy'
+            ]
+            if str(save_data.get('character_class')).lower() not in valid_classes:
                 return False
                 
             return True
