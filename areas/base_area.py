@@ -357,6 +357,38 @@ class BaseArea(ABC):
             'total_rooms': total_rooms,
             'completion_percentage': (visited_rooms / total_rooms * 100) if total_rooms > 0 else 0
         }
+
+    # --- Room item helpers ---
+    def add_item_to_room(self, room_id: str, item: Any, quantity: int = 1) -> bool:
+        """Add a concrete item instance to a room as a room item.
+
+        Args:
+            room_id: Target room identifier
+            item: An item object with item_id, name, description
+            quantity: How many to add
+
+        Returns:
+            True if added, False otherwise
+        """
+        room = self.get_room(room_id)
+        if not room or not hasattr(item, 'item_id'):
+            return False
+
+        item_id = getattr(item, 'item_id', None)
+        name = getattr(item, 'name', str(item))
+        description = getattr(item, 'description', name)
+
+        if not item_id:
+            return False
+
+        # If item already exists in room, increase quantity
+        if item_id in room.items:
+            room.items[item_id].quantity += max(1, quantity)
+            return True
+
+        # Otherwise, add a new RoomItem entry
+        room.add_item(item_id=item_id, name=name, description=description, quantity=max(1, quantity))
+        return True
         
     def to_dict(self) -> Dict[str, Any]:
         """Serialize area state for saving."""
