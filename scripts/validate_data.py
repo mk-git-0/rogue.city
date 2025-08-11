@@ -14,6 +14,7 @@ import json
 import os
 import sys
 from typing import Dict, Any
+from jsonschema import validate as js_validate, Draft202012Validator
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -29,13 +30,23 @@ def validate_class_definitions() -> None:
     if not isinstance(data, dict):
         raise ValueError('class_definitions.json must be an object mapping class ids to definitions')
 
-    required_fields = ['name', 'difficulty', 'stat_modifiers', 'hit_die', 'base_attack_speed', 'critical_hit_range']
-    for cls_id, cls in data.items():
-        for field in required_fields:
-            if field not in cls:
-                raise ValueError(f'class {cls_id}: missing required field {field}')
-        if not isinstance(cls['stat_modifiers'], dict):
-            raise ValueError(f'class {cls_id}: stat_modifiers must be an object')
+    # JSON schema for classes
+    schema = {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "required": ["name", "difficulty", "stat_modifiers", "hit_die", "base_attack_speed", "critical_hit_range"],
+            "properties": {
+                "name": {"type": "string"},
+                "difficulty": {"type": "number"},
+                "stat_modifiers": {"type": "object"},
+                "hit_die": {"type": "string"},
+                "base_attack_speed": {"type": "number"},
+                "critical_hit_range": {"type": "number"}
+            }
+        }
+    }
+    Draft202012Validator(schema).validate(data)
 
 
 def validate_items(filename: str, required_fields: Dict[str, list]) -> None:
@@ -45,10 +56,16 @@ def validate_items(filename: str, required_fields: Dict[str, list]) -> None:
     data = load_json(path)
     if not isinstance(data, dict):
         raise ValueError(f'{filename} must be an object mapping item ids to definitions')
-    for item_id, item in data.items():
-        for field in required_fields.get(filename, []):
-            if field not in item:
-                raise ValueError(f'{filename} {item_id}: missing required field {field}')
+    # Build a simple schema on the fly
+    reqs = required_fields.get(filename, [])
+    schema = {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "required": reqs
+        }
+    }
+    Draft202012Validator(schema).validate(data)
 
 
 def validate_quests() -> None:
@@ -58,12 +75,18 @@ def validate_quests() -> None:
     data = load_json(path)
     if not isinstance(data, dict):
         raise ValueError('quest_definitions.json must be an object')
-    for qid, q in data.items():
-        for field in ['name', 'description', 'quest_giver', 'alignment_requirement', 'level_requirement', 'steps', 'rewards']:
-            if field not in q:
-                raise ValueError(f'quest {qid}: missing required field {field}')
-        if not isinstance(q['steps'], list) or not q['steps']:
-            raise ValueError(f'quest {qid}: steps must be a non-empty list')
+    schema = {
+        "type": "object",
+        "additionalProperties": {
+            "type": "object",
+            "required": ["name", "description", "quest_giver", "alignment_requirement", "level_requirement", "steps", "rewards"],
+            "properties": {
+                "steps": {"type": "array", "minItems": 1},
+                "rewards": {"type": "object"}
+            }
+        }
+    }
+    Draft202012Validator(schema).validate(data)
 
 
 def validate_areas_directory() -> None:
