@@ -1,6 +1,9 @@
 """
-Magic Command System for Rogue City
-Framework for spellcasting, mana management, and class-specific magical abilities.
+Legacy Magic Command System (unused)
+
+Note: Rogue City uses `core/spell_system.py` as the primary magic/spell framework,
+with `core/magic_system.py` providing mana and class spell access helpers.
+This file remains for historical reference and is not wired into gameplay.
 """
 
 import random

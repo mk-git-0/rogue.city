@@ -35,7 +35,7 @@ This is a Python-based text RPG (Rogue City) inspired by MajorMUD, built with a 
 #### MajorMUD Command Systems
 - **StealthSystem** (`stealth_system.py`): Stealth mode, hiding, backstab mechanics with class-specific multipliers (2x-5x)
 - **SkillSystem** (`skill_system.py`): Lockpicking, trap detection/disarmament, search, tracking, pickpocketing with skill checks
-- **MagicCommandSystem** (`magic_command_system.py`): Spellcasting framework, mana management, meditation for all magic classes
+- Magic Systems: Use **SpellSystem** (`spell_system.py`) as the primary framework with **MagicSystem** (`magic_system.py`) for mana/meditation. `magic_command_system.py` is legacy and not integrated.
 
 #### Economy & Commerce Systems
 - **CurrencySystem** (`currency_system.py`): Gold/Silver/Copper piece currency with automatic conversion and class-based starting wealth
