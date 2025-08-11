@@ -61,7 +61,6 @@ class CombatSystem:
         
         # Auto-combat settings
         self.auto_combat_enabled = False
-        self.last_combat_action = None
         
         # Combat tracking
         self.combat_round = 0
@@ -151,7 +150,6 @@ class CombatSystem:
         self.current_character = None
         self.enemies.clear()
         self.auto_combat_enabled = False
-        self.last_combat_action = None
         
         # Notify game engine to reset game state
         if self.game_engine:
@@ -502,16 +500,7 @@ class CombatSystem:
         }
         
                 
-    def _execute_player_action(self, timed_action) -> None:
-        """Execute a player combat action."""
-        action_data = timed_action.action_data
-        action = action_data.get("action")
-        
-        if not action or not self.is_active():
-            return
-            
-        if action.action_type == "attack":
-            self._execute_player_attack(action)
+    # Note: timer-based action executor removed in turn-based model
             
     def _execute_single_player_attack(self, target_enemy) -> None:
         """Execute a single player attack."""
@@ -619,7 +608,7 @@ class CombatSystem:
         if not enemy or not enemy.is_alive() or not self.is_active():
             return
             
-        # Enemy attacks player
+        # Enemy attacks player (with potential shield block)
         # Display enemy attack attempt
         enemy_colored = self.ui_manager.colorize_enemy(enemy.name)
         self.ui_manager.log_info(f"The {enemy_colored} attacks you!")
@@ -629,6 +618,18 @@ class CombatSystem:
             critical_threshold=20
         )
         
+        # Shield block attempt for shielded classes
+        if hasattr(self.current_character, 'attempt_shield_block') and \
+           hasattr(self.current_character, 'equipment_system') and \
+           self.current_character.equipment_system and \
+           self.current_character.equipment_system.has_shield_equipped():
+            try:
+                if self.current_character.attempt_shield_block():
+                    self.ui_manager.log_success("You block the attack with your shield!")
+                    return
+            except Exception:
+                pass
+
         if attack_roll >= self.current_character.armor_class:
             # Attack hits
             damage = self.dice_system.roll_with_context(enemy.damage_dice, f"The {enemy.name}", "damage")

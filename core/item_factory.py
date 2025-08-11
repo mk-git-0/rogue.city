@@ -139,6 +139,81 @@ class ItemFactory:
                 'weapon': 'hand_wraps',
                 'armor': 'simple_garb',
                 'consumable': 'herbal_remedy'
+            },
+            'warrior': {
+                'weapon': 'training_sword',
+                'armor': 'padded_armor',
+                'consumable': 'minor_health_potion'
+            },
+            'barbarian': {
+                'weapon': 'iron_sword',
+                'armor': 'leather_armor',
+                'consumable': 'rations'
+            },
+            'ranger': {
+                'weapon': 'iron_sword',
+                'armor': 'leather_armor',
+                'consumable': 'rations'
+            },
+            'thief': {
+                'weapon': 'steel_dagger',
+                'armor': 'leather_armor',
+                'consumable': 'minor_health_potion'
+            },
+            'priest': {
+                'weapon': 'wooden_staff',
+                'armor': 'cloth_robes',
+                'consumable': 'minor_health_potion'
+            },
+            'paladin': {
+                'weapon': 'training_sword',
+                'armor': 'chain_mail',
+                'consumable': 'minor_health_potion'
+            },
+            'spellsword': {
+                'weapon': 'iron_sword',
+                'armor': 'padded_armor',
+                'consumable': 'minor_mana_potion'
+            },
+            'ninja': {
+                'weapon': 'steel_dagger',
+                'armor': 'leather_armor',
+                'consumable': 'herbal_remedy'
+            },
+            'warlock': {
+                'weapon': 'wooden_staff',
+                'armor': 'mage_robes',
+                'consumable': 'minor_mana_potion'
+            },
+            'necromancer': {
+                'weapon': 'wooden_staff',
+                'armor': 'mage_robes',
+                'consumable': 'minor_mana_potion'
+            },
+            'witchhunter': {
+                'weapon': 'iron_sword',
+                'armor': 'chain_mail',
+                'consumable': 'minor_health_potion'
+            },
+            'bard': {
+                'weapon': 'wooden_staff',
+                'armor': 'leather_armor',
+                'consumable': 'minor_health_potion'
+            },
+            'druid': {
+                'weapon': 'wooden_staff',
+                'armor': 'leather_armor',
+                'consumable': 'herbal_remedy'
+            },
+            'missionary': {
+                'weapon': 'wooden_staff',
+                'armor': 'cloth_robes',
+                'consumable': 'minor_health_potion'
+            },
+            'gypsy': {
+                'weapon': 'steel_dagger',
+                'armor': 'leather_scraps',
+                'consumable': 'minor_health_potion'
             }
         }
         

@@ -155,7 +155,7 @@ class HelpSystem:
                 'description': 'Toggle automatic combat mode during battle.',
                 'examples': ['auto'],
                 'aliases': '',
-                'notes': 'Only available during combat. Toggles between manual and automatic attacking.'
+                'notes': 'Only available during combat. When ON, the game runs full turn cycles automatically until combat ends or you toggle it OFF.'
             },
             'flee': {
                 'syntax': 'FLEE',
