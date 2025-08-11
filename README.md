@@ -142,6 +142,7 @@ rogue.city/
 │   ├── config/             # Game configuration
 │   └── saves/              # Character save files
 └── docs/                    # Documentation and development phases
+└── scripts/                 # Tooling (data validation, etc.)
 ```
 
 ### Key Systems
@@ -154,6 +155,12 @@ rogue.city/
 - **UI System**: Simple cross-platform terminal interface (no curses required)
 
 ## 🏆 Achievements
+## 🧪 CI & Data Validation
+
+- Data integrity checks: `python scripts/validate_data.py`
+- Test suite (smoke + quest tests): `pytest`
+- CI: GitHub Actions runs validation and tests on pushes/PRs
+
 
 Track your progress with a comprehensive achievement system:
 
