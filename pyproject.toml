@@ -1,0 +1,28 @@
+[build-system]
+requires = ["setuptools>=65", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "rogue-city"
+version = "0.1.0"
+description = "Rogue City - A MajorMUD-style text RPG"
+authors = [{name = "Rogue City Devs"}]
+readme = "README.md"
+requires-python = ">=3.8"
+keywords = ["MUD", "RPG", "text", "game"]
+license = {text = "MIT"}
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Environment :: Console",
+]
+
+[project.scripts]
+rogue-city = "main:main"
+
+[tool.setuptools]
+packages = ["core", "areas", "characters", "items", "enemies", "npcs", "spells"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+"" = ["data/**/*.*"]
