@@ -69,6 +69,9 @@ class EquipmentSystem:
     
     def _get_slot_for_item(self, item: BaseItem) -> Optional[str]:
         """Get the appropriate equipment slot for an item."""
+        # Shields are represented as Armor but should go to 'shield' slot if present
+        if hasattr(item, 'is_shield') and getattr(item, 'is_shield') and 'shield' in self.slots:
+            return 'shield'
         for slot_name, slot in self.slots.items():
             if slot.can_equip(item):
                 return slot_name
