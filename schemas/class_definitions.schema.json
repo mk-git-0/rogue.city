@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": {
+    "type": "object",
+    "required": ["name", "difficulty", "stat_modifiers", "hit_die", "base_attack_speed", "critical_hit_range"],
+    "properties": {
+      "name": {"type": "string"},
+      "difficulty": {"type": "number"},
+      "stat_modifiers": {"type": "object"},
+      "hit_die": {"type": "string"},
+      "base_attack_speed": {"type": "number"},
+      "critical_hit_range": {"type": "number"}
+    }
+  }
+}

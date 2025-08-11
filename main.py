@@ -25,6 +25,12 @@ import traceback
 import time
 import json
 from pathlib import Path
+# Optional minimal telemetry (opt-in)
+try:
+    from scripts.telemetry import install as install_telemetry
+    install_telemetry()
+except Exception:
+    pass
 
 # Add the project root to the Python path
 project_root = os.path.dirname(os.path.abspath(__file__))
