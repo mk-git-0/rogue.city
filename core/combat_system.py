@@ -1,6 +1,6 @@
 """
 Combat System for Rogue City
-Timer-based combat with class-specific speeds, auto-combat, and multi-enemy support.
+Turn-based combat with class abilities, auto-combat, and multi-enemy support.
 """
 
 import time
@@ -34,8 +34,8 @@ class CombatAction:
 
 class CombatSystem:
     """
-    Manages timer-based combat encounters with class-specific attack speeds,
-    auto-combat functionality, and multi-enemy support.
+    Manages turn-based combat encounters with class and weapon-based multiple
+    attacks per round, optional auto-combat functionality, and multi-enemy support.
     """
     
     def __init__(self, timer_system: TimerSystem, dice_system: DiceSystem, ui_manager, game_engine=None):
@@ -225,17 +225,29 @@ class CombatSystem:
                 self.ui_manager.log_error("There are no enemies to attack.")
             return False
             
-        # Turn-based combat - no delays needed
-            
         # Turn-based combat: Execute player turn immediately
         self._execute_player_turn(target_name)
         
         # Then execute enemy turn if combat is still active
         if self.is_active():
             self._execute_enemy_turn()
-            
-        # Auto-combat will be handled by the command parser asking for another attack
-            
+
+        # Auto-combat loop: continue rounds automatically while enabled
+        if self.auto_combat_enabled and self.is_active() and self.current_character.is_alive():
+            while (
+                self.auto_combat_enabled
+                and self.is_active()
+                and self.current_character.is_alive()
+                and any(enemy.is_alive() for enemy in self.enemies.values())
+            ):
+                # Advance round
+                self.combat_round += 1
+                # Player turn
+                self._execute_player_turn()
+                # Enemy turn (if still active)
+                if self.is_active():
+                    self._execute_enemy_turn()
+
         return True
         
     def _execute_player_turn(self, target_name: str = None) -> None:
@@ -643,48 +655,6 @@ class CombatSystem:
             self.ui_manager.log_info(f"The {enemy_colored} misses you!")
             
         # Turn-based combat - no scheduling needed
-            
-    def _execute_auto_combat(self) -> None:
-        """Execute auto-combat action."""
-        if (not self.auto_combat_enabled or 
-            not self.last_combat_action or 
-            not self.is_active()):
-            return
-            
-        # Find a valid target (in case original target died)
-        living_enemies = [(eid, e) for eid, e in self.enemies.items() if e.is_alive()]
-        if not living_enemies:
-            return
-            
-        # Use first living enemy as target
-        target_id, target_enemy = living_enemies[0]
-        
-        # Update the action with new target
-        action = CombatAction(
-            actor_id=self.current_character.name,
-            action_type="attack",
-            target_id=target_id,
-            action_data={"target_enemy": target_enemy}
-        )
-        
-        self._execute_player_attack(action)
-        
-    def _execute_auto_combat_callback(self, timed_action) -> None:
-        """Callback for auto-combat timer."""
-        if self.auto_combat_enabled and self.is_active():
-            self._execute_auto_combat()
-            
-            # Schedule next auto-attack
-            if self.auto_combat_enabled and self.is_active():
-                attack_speed = self.current_character.get_attack_speed()
-                action = timed_action.action_data.get("action")
-                self.timer_system.schedule_action(
-                    actor_id=self.current_character.name,
-                    action_type="auto_attack",
-                    delay=attack_speed,
-                    action_data={"action": action},
-                    callback=self._execute_auto_combat_callback
-                )
                 
     def toggle_dual_wield(self, character) -> bool:
         """

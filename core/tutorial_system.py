@@ -129,8 +129,8 @@ class TutorialSystem:
             'combat_intro': TutorialMessage(
                 'combat_intro',
                 TutorialPhase.COMBAT,
-                "An enemy appears! Combat in Rogue City is timer-based.\n"
-                "Use 'attack' to fight. Each class has different attack speeds.",
+                "An enemy appears! Combat in Rogue City is turn-based.\n"
+                "Use 'attack' to fight. Some classes and weapons grant multiple attacks per turn.",
                 conditions=['enemy_present']
             ),
             

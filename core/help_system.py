@@ -148,7 +148,7 @@ class HelpSystem:
                 'description': 'Attack a specific enemy, starting combat.',
                 'examples': ['attack goblin', 'kill orc', 'a skeleton', 'k wolf'],
                 'aliases': 'a, kill, k',
-                'notes': 'Starts timer-based combat. Combat continues automatically after initial attack.'
+                'notes': 'Starts turn-based combat. Use \"auto\" to automate rounds until combat ends.'
             },
             'auto': {
                 'syntax': 'AUTO',
@@ -550,7 +550,7 @@ class HelpSystem:
         self.ui.display_message("")
         
         self.ui.display_message("COMBAT BASICS:")
-        self.ui.display_message("• Combat is timer-based - different weapons have different speeds")
+        self.ui.display_message("• Combat is turn-based - you and enemies alternate turns")
         self.ui.display_message("• Use 'auto' during combat for automatic attacking")
         self.ui.display_message("• Use 'flee' to escape difficult battles")
         self.ui.display_message("• Equipment affects your attack bonus and armor class")
