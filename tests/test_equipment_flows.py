@@ -29,14 +29,14 @@ def test_equip_unequip_and_shield_bonus():
     base_ac = c.armor_class
 
     factory = ItemFactory()
-    armor = factory.create_item('padded_armor')
+    weapon = factory.create_item('training_sword')
     shield = factory.create_item('wooden_shield')
 
     # Add to inventory and equip
-    assert c.inventory_system.add_item(armor)
+    assert c.inventory_system.add_item(weapon)
     assert c.inventory_system.add_item(shield)
 
-    msg = c.equipment_system.equip_item(armor.item_id)
+    msg = c.equipment_system.equip_item(weapon.item_id)
     assert 'equip' in msg.lower()
     armor_ac = c.equipment_system.get_armor_class_bonus()
 
