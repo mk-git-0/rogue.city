@@ -183,10 +183,14 @@ class BaseCharacter(ABC):
         # Add equipment bonuses if available
         if hasattr(self, 'equipment_system') and self.equipment_system:
             armor_bonus = self.equipment_system.get_armor_class_bonus()
+            # Include shield base AC if present
+            shield_bonus = 0
+            if hasattr(self.equipment_system, 'get_shield_ac_bonus'):
+                shield_bonus = self.equipment_system.get_shield_ac_bonus()
             max_dex = self.equipment_system.get_max_dex_bonus()
             if max_dex is not None:
                 dex_modifier = min(dex_modifier, max_dex)
-            self.armor_class = base_ac + racial_ac_bonus + armor_bonus
+            self.armor_class = base_ac + racial_ac_bonus + armor_bonus + shield_bonus
         else:
             self.armor_class = base_ac + racial_ac_bonus
         

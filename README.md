@@ -158,6 +158,7 @@ rogue.city/
 ## 🧪 CI & Data Validation
 
 - Data integrity checks: `python scripts/validate_data.py`
+- Data linting: `python scripts/lint_data.py`
 - Test suite (smoke + quest tests): `pytest`
 - CI: GitHub Actions runs validation and tests on pushes/PRs
 
