@@ -1,7 +1,7 @@
 from typing import Dict, Optional, Any, List
 from items.base_item import BaseItem, ItemType
 from items.weapons import Weapon
-from items.armor import Armor
+from items.armor import Armor, ArmorType
 from core.inventory_system import InventorySystem
 
 class EquipmentSlot:
@@ -42,6 +42,10 @@ class EquipmentSystem:
         # Add off-hand weapon slot for dual-wielding classes (rogues)
         if hasattr(character, 'character_class') and character.character_class == 'rogue':
             self.slots['offhand'] = EquipmentSlot('offhand', [ItemType.WEAPON])
+
+        # Add shield slot (future-proof; shield items will use this slot)
+        # Minimal viable: no shield item types yet; helpers will handle None safely
+        self.slots['shield'] = EquipmentSlot('shield', [ItemType.ARMOR])
         
         # Track applied bonuses for removal
         self.applied_bonuses = {}
@@ -190,12 +194,27 @@ class EquipmentSystem:
         if armor_slot and armor_slot.equipped_item:
             return armor_slot.equipped_item
         return None
+
+    def get_equipped_shield(self) -> Optional[Armor]:
+        """Get currently equipped shield (if shield slot used)."""
+        shield_slot = self.slots.get('shield')
+        if shield_slot and shield_slot.equipped_item:
+            # Shields will be represented by Armor until a Shield class exists
+            return shield_slot.equipped_item  # type: ignore[return-value]
+        return None
     
     def get_armor_class_bonus(self) -> int:
         """Get AC bonus from equipped armor."""
         armor = self.get_equipped_armor()
         if armor:
             return armor.ac_bonus
+        return 0
+
+    def get_shield_ac_bonus(self) -> int:
+        """Get AC bonus from equipped shield (0 if none)."""
+        shield = self.get_equipped_shield()
+        if shield and hasattr(shield, 'ac_bonus'):
+            return getattr(shield, 'ac_bonus', 0)
         return 0
     
     def get_max_dex_bonus(self) -> Optional[int]:
@@ -289,6 +308,15 @@ class EquipmentSystem:
                 lines.append(f"Max DEX Bonus: +{armor.max_dex_bonus}")
             else:
                 lines.append("Max DEX Bonus: Unlimited")
+
+        # Show shield stats if equipped
+        shield = self.get_equipped_shield()
+        if shield:
+            if not armor:
+                lines.append("")
+                lines.append("=== DEFENSE STATS ===")
+            lines.append(f"Shield: {shield.name}")
+            lines.append(f"Shield AC Bonus: +{getattr(shield, 'ac_bonus', 0)}")
         
         return "\n".join(lines)
     
@@ -319,3 +347,15 @@ class EquipmentSystem:
                 if inv_item:
                     self.slots[slot_name].equip(inv_item.item)
                     inv_item.equipped = True
+
+    # --- Helpers for Knight and armor checks ---
+    def has_shield_equipped(self) -> bool:
+        """Return True if a shield is equipped in the shield slot."""
+        return self.get_equipped_shield() is not None
+
+    def has_heavy_armor(self) -> bool:
+        """Return True if equipped armor is heavy type."""
+        armor = self.get_equipped_armor()
+        if not armor:
+            return False
+        return getattr(armor, 'armor_type', None) == ArmorType.HEAVY
