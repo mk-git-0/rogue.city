@@ -274,39 +274,78 @@ class QuestSystem:
         # Universal rewards
         if 'experience' in rewards:
             character.gain_experience(rewards['experience'])
+            if hasattr(self.game, 'ui_manager'):
+                self.game.ui_manager.log_success(f"You gain {rewards['experience']:,} experience from the quest.")
         
-        if 'gold' in rewards:
+        if 'gold' in rewards and hasattr(character, 'currency') and character.currency:
             character.currency.add_gold(rewards['gold'])
+            if hasattr(self.game, 'ui_manager'):
+                self.game.ui_manager.log_success(f"You receive {rewards['gold']} gold pieces.")
         
-        if 'items' in rewards:
+        if 'items' in rewards and rewards['items']:
+            # Ensure item systems are initialized
+            if not getattr(character, 'inventory_system', None):
+                character.initialize_item_systems()
+            from core.item_factory import ItemFactory
+            item_factory = ItemFactory()
             for item_id in rewards['items']:
-                # TODO: Add item to character inventory
-                pass
+                item = item_factory.create_item(item_id)
+                if item and character.inventory_system.add_item(item):
+                    if hasattr(self.game, 'ui_manager'):
+                        self.game.ui_manager.log_success(f"You receive: {item.name}")
+                else:
+                    if hasattr(self.game, 'ui_manager'):
+                        self.game.ui_manager.log_error(f"Could not add reward item '{item_id}' to inventory.")
         
         # Class-specific rewards
         class_rewards = rewards.get('class_specific', {})
-        character_class = character.character_class.class_name.lower()
+        character_class = getattr(character, 'character_class', '').lower()
         
         if character_class in class_rewards:
             class_bonus = class_rewards[character_class]
             
-            # Apply stat bonuses
-            for stat, bonus in class_bonus.items():
-                if hasattr(character, stat):
-                    current_value = getattr(character, stat)
-                    setattr(character, stat, current_value + bonus)
+            # Apply stat/ability bonuses
+            for key, bonus in class_bonus.items():
+                if key == 'abilities' and isinstance(bonus, list):
+                    if not hasattr(character, 'special_abilities'):
+                        character.special_abilities = []
+                    for ability in bonus:
+                        if ability not in character.special_abilities:
+                            character.special_abilities.append(ability)
+                            if hasattr(self.game, 'ui_manager'):
+                                self.game.ui_manager.log_success(f"Gained special ability: {ability}")
+                elif hasattr(character, key) and isinstance(getattr(character, key), (int, float)):
+                    current_value = getattr(character, key)
+                    setattr(character, key, current_value + bonus)
+                    if hasattr(self.game, 'ui_manager'):
+                        self.game.ui_manager.log_success(f"Class bonus: +{bonus} {key}")
     
     def _apply_consequences(self, character, consequences: Dict[str, Any]):
         """Apply quest failure/abandon consequences"""
+        # Apply faction reputation losses via AlignmentManager
         if 'reputation_loss' in consequences:
             for faction, loss in consequences['reputation_loss'].items():
-                # TODO: Apply reputation loss to faction
-                pass
+                if hasattr(character, 'alignment_manager'):
+                    new_rep = character.alignment_manager.modify_reputation(faction, -abs(loss))
+                    if hasattr(self.game, 'ui_manager'):
+                        self.game.ui_manager.log_error(
+                            f"Reputation with {faction.replace('_',' ').title()} decreased by {abs(loss)} (now {new_rep})."
+                        )
         
+        # Apply alignment drift
         if 'alignment_shift' in consequences:
-            shift = consequences['alignment_shift']
-            # TODO: Apply alignment shift
-            pass
+            shift = int(consequences['alignment_shift'])
+            if hasattr(character, 'alignment_manager'):
+                # Positive shift moves toward Evil, negative toward Good (example policy)
+                # Map shift to drift actions; use granular increments
+                drift_action = 'murder_for_gain' if shift > 0 else 'help_innocent'
+                steps = min(10, abs(shift) // 5 or 1)
+                for _ in range(steps):
+                    character.alignment_manager.add_alignment_drift(drift_action)
+                if hasattr(self.game, 'ui_manager'):
+                    self.game.ui_manager.log_system(
+                        f"Alignment shifted {'toward Evil' if shift > 0 else 'toward Good'} by {abs(shift)}."
+                    )
     
     def get_quest_journal(self, character) -> Dict[str, Any]:
         """Get formatted quest journal for character"""

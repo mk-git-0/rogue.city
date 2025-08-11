@@ -243,9 +243,17 @@ class CharacterQuestManager:
                 self.character.currency.add_gold(rewards['gold'])
         
         if 'items' in rewards:
+            # Ensure item systems are initialized
+            if not getattr(self.character, 'inventory_system', None):
+                self.character.initialize_item_systems()
+            from core.item_factory import ItemFactory
+            item_factory = ItemFactory()
             for item_id in rewards['items']:
-                # TODO: Add item to character inventory
-                print(f"Received item: {item_id}")
+                item = item_factory.create_item(item_id)
+                if item and self.character.inventory_system.add_item(item):
+                    print(f"Received item: {item.name}")
+                else:
+                    print(f"Failed to add reward item: {item_id}")
         
         # Class-specific rewards
         class_rewards = rewards.get('class_specific', {})
@@ -300,8 +308,12 @@ class CharacterQuestManager:
         
         if 'alignment_shift' in consequences:
             shift = consequences['alignment_shift']
-            # TODO: Apply alignment shift
-            print(f"Alignment shifted by {shift}")
+            # Apply via alignment manager drift
+            drift_action = 'murder_for_gain' if shift > 0 else 'help_innocent'
+            steps = min(10, abs(int(shift)) // 5 or 1)
+            for _ in range(steps):
+                self.character.add_alignment_drift(drift_action)
+            print(f"Alignment shifted {'toward Evil' if shift > 0 else 'toward Good'} by {abs(int(shift))}")
         
         # Special consequences
         for consequence, value in consequences.items():
