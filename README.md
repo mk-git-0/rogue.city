@@ -9,11 +9,8 @@ A classic MajorMUD-style text RPG built for the terminal, featuring turn-based c
 ## ✨ Features
 
 ### 🎮 Core Gameplay
-- **Four Character Classes** with unique abilities and difficulty ratings
-  - 🗡️ **Rogue** (Difficulty 11): Fast, high damage, stealth-focused
-  - 🛡️ **Knight** (Difficulty 3): Tanky, reliable, beginner-friendly  
-  - 🔮 **Mage** (Difficulty 9): Magical, complex spell system
-  - ⚖️ **Mystic** (Difficulty 6): Balanced, mind-body harmony
+- **Sixteen Character Classes** with unique abilities and difficulty ratings
+  - Knight, Warrior, Barbarian, Ranger, Thief, Mystic, Mage, Priest, Paladin, Spellsword, Ninja, Warlock, Necromancer, Witchhunter, Rogue, plus optional Bard/Druid/Missionary/Gypsy where available
 
 ### ⚔️ Combat System
 - **Turn-based Combat** with class/weapon-driven multiple attacks
@@ -53,7 +50,7 @@ A classic MajorMUD-style text RPG built for the terminal, featuring turn-based c
 
 ### Prerequisites
 - Python 3.6 or higher
-- Terminal with curses support (standard on macOS/Linux, Windows Terminal/PowerShell recommended)
+- Standard terminal (no curses dependency; macOS Terminal, Linux Terminal, Windows Terminal/PowerShell)
 
 ### Installation & Running
 
@@ -71,7 +68,7 @@ python main.py
 
 ### First Time Playing
 
-1. **Create a Character**: Choose from four classes with different difficulty levels
+1. **Create a Character**: Choose from sixteen classes with different difficulty levels
 2. **Complete the Tutorial**: Learn basic commands in the tutorial cave (~15 minutes)
 3. **Explore the Forest**: Adventure through dangerous paths to reach Rogue City (~30 minutes)
 4. **Master the Commands**: Use `help` for complete command reference
@@ -90,14 +87,10 @@ Character:    stats, health, experience
 Game:         help, save, quit, time
 ```
 
-### Character Classes Deep Dive
+### Character Classes Overview
 
-| Class  | STR | DEX | CON | INT | WIS | CHA | Weapon Speed | Special Abilities |
-|--------|-----|-----|-----|-----|-----|-----|--------------|-------------------|
-| Rogue  | 8   | 13  | 8   | 12  | 9   | 9   | 2.0s (Fast)  | 19-20 Crit Range |
-| Knight | 13  | 8   | 12  | 8   | 9   | 9   | 4.0s (Slow)  | Damage Resistance |
-| Mage   | 8   | 9   | 8   | 13  | 12  | 9   | 6.0s (Slowest) | Mana System |
-| Mystic | 9   | 12  | 9   | 9   | 13  | 8   | 3.0s (Medium) | Balanced Build |
+- Choose from iconic archetypes including Knight, Warrior, Barbarian, Ranger, Thief, Mystic, Mage, Priest, Paladin, Spellsword, Ninja, Warlock, Necromancer, Witchhunter, Rogue, and more.
+- Each class features unique stats, abilities, and difficulty ratings. Use `help` and `stats` in-game for details.
 
 ### Combat Mechanics
 
@@ -158,7 +151,7 @@ rogue.city/
 - **Combat System**: Turn-based with initiative and class abilities
 - **World System**: Room-based exploration with dynamic events
 - **Save System**: JSON-based with complete state preservation
-- **UI System**: Cross-platform terminal interface using curses
+- **UI System**: Simple cross-platform terminal interface (no curses required)
 
 ## 🏆 Achievements
 
