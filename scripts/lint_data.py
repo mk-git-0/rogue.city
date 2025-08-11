@@ -59,7 +59,13 @@ def lint_area_item_refs(item_ids: Set[str]) -> None:
         rooms = data.get('rooms', {})
         for room_id, room in rooms.items():
             items = (room or {}).get('items', {})
-            for iid in items.keys():
+            for iid, idef in items.items():
+                # Ignore non-takeable environmental items to reduce noise
+                try:
+                    if isinstance(idef, dict) and idef.get('can_take') is False:
+                        continue
+                except Exception:
+                    pass
                 if iid not in item_ids:
                     print(f"WARN: Area {fname}:{room_id} references unknown item '{iid}'")
 

@@ -25,7 +25,7 @@ class DummyChar(BaseCharacter):
 
 
 def test_quest_accept_complete_flow():
-    game = type('G', (), {})()
+    game = type('G', (), {"get_game_time": lambda self: "now"})()
     qs = QuestSystem(game)
 
     # Build a tiny in-memory quest

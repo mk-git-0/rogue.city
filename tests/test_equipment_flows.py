@@ -29,7 +29,7 @@ def test_equip_unequip_and_shield_bonus():
     base_ac = c.armor_class
 
     factory = ItemFactory()
-    armor = factory.create_item('leather_armor')
+    armor = factory.create_item('padded_armor')
     shield = factory.create_item('wooden_shield')
 
     # Add to inventory and equip
