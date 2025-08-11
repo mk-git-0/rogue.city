@@ -4,7 +4,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Platform](https://img.shields.io/badge/platform-cross--platform-lightgrey.svg)]()
 
-A classic MajorMUD-style text RPG built for the terminal, featuring timer-based combat, character progression, and dungeon exploration. Experience the nostalgia of 1990s BBS gaming with modern polish and cross-platform compatibility.
+A classic MajorMUD-style text RPG built for the terminal, featuring turn-based combat, character progression, and dungeon exploration. Experience the nostalgia of 1990s BBS gaming with modern polish and cross-platform compatibility.
 
 ## ✨ Features
 
@@ -16,7 +16,7 @@ A classic MajorMUD-style text RPG built for the terminal, featuring timer-based 
   - ⚖️ **Mystic** (Difficulty 6): Balanced, mind-body harmony
 
 ### ⚔️ Combat System
-- **Timer-based Combat** with weapon speed differences
+- **Turn-based Combat** with class/weapon-driven multiple attacks
 - **Auto-combat Mode** for streamlined gameplay
 - **Critical Hit System** with class-specific bonuses
 - **Tactical Fleeing** with success chance calculations
@@ -91,7 +91,7 @@ Game:         help, save, quit, time
 
 ### Combat Mechanics
 
-- **Timer-based System**: Each weapon has different attack speeds
+- **Turn-based System**: Alternating player/enemy turns with initiative
 - **D20 Combat**: Attack rolls use D20 + modifiers vs target AC
 - **Critical Hits**: Natural 20 (Rogues: 19-20) deal double damage
 - **Equipment Matters**: Weapon and armor bonuses significantly impact combat
@@ -122,7 +122,7 @@ rogue.city/
 ├── core/                    # Core game systems
 │   ├── game_engine.py      # Central game coordinator (60 FPS)
 │   ├── command_parser.py   # MajorMUD-style command processing
-│   ├── combat_system.py    # Timer-based combat mechanics
+│   ├── combat_system.py    # Turn-based combat mechanics
 │   ├── inventory_system.py # Weight-based inventory management
 │   ├── equipment_system.py # Equipment bonuses and restrictions
 │   ├── help_system.py      # Comprehensive help system
@@ -145,7 +145,7 @@ rogue.city/
 
 - **Game Engine**: 60 FPS main loop coordinating all systems
 - **Command Parser**: Comprehensive MajorMUD-style command processing
-- **Combat System**: Timer-based with weapon speed differences
+- **Combat System**: Turn-based with initiative and class abilities
 - **World System**: Room-based exploration with dynamic events
 - **Save System**: JSON-based with complete state preservation
 - **UI System**: Cross-platform terminal interface using curses
@@ -168,7 +168,7 @@ This project was built in 6 development phases:
 
 1. **Phase 1**: Foundation (Game engine, UI, basic systems)
 2. **Phase 2**: Character System (Classes, stats, progression)
-3. **Phase 3**: Combat System (Timer-based, D&D mechanics)
+3. **Phase 3**: Combat System (Turn-based, D&D mechanics)
 4. **Phase 4**: World System (Areas, rooms, exploration)
 5. **Phase 5**: Item System (Inventory, equipment, progression)
 6. **Phase 6**: Final Polish (Commands, completion, documentation)

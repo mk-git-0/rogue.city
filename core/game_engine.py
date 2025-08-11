@@ -4,6 +4,7 @@ Central game state management and main game loop coordination.
 """
 
 import time
+import os
 import signal
 import sys
 from typing import Dict, Any, Optional, List
@@ -579,7 +580,10 @@ class GameEngine:
         """Show race selection interface."""
         try:
             import json
-            with open('/Users/knight/workspace/github.com/mk-git-0/rogue.city/data/races/race_definitions.json', 'r') as f:
+            # Resolve project root relative to this file
+            project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            race_path = os.path.join(project_root, 'data', 'races', 'race_definitions.json')
+            with open(race_path, 'r') as f:
                 race_data = json.load(f)
         except Exception as e:
             self.ui_manager.log_error(f"Error loading race data: {e}")
@@ -615,7 +619,10 @@ class GameEngine:
                 # Load race data for confirmation display
                 try:
                     import json
-                    with open('/Users/knight/workspace/github.com/mk-git-0/rogue.city/data/races/race_definitions.json', 'r') as f:
+                    # Resolve project root relative to this file
+                    project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                    race_path = os.path.join(project_root, 'data', 'races', 'race_definitions.json')
+                    with open(race_path, 'r') as f:
                         race_data = json.load(f)
                     
                     selected_info = race_data[selected_race]
@@ -1139,6 +1146,10 @@ class GameEngine:
                 items_in_room=len(new_room.get_visible_items()),
                 enemies_in_room=len(new_room.get_active_enemies())
             )
+
+            # Trigger game completion when reaching Rogue City center
+            if getattr(self, 'current_area_id', None) == 'forest_path' and self.current_room == 'city_center':
+                self.complete_game()
             
             # Check for combat encounters
             active_enemies = new_room.get_active_enemies()

@@ -403,42 +403,8 @@ class CommandParser:
         
     
     def cmd_drop(self, args: List[str]) -> bool:
-        """Drop an item from inventory."""
-        if not args:
-            self.game.ui.display_message("Drop what?")
-            return True
-        
-        if not self.game.current_player:
-            self.game.ui.display_message("No character loaded.")
-            return True
-        
-        item_name = ' '.join(args).lower()
-        
-        # Find item in inventory
-        item_to_drop = None
-        for item in self.game.current_player.inventory_system.items:
-            if item_name in item.name.lower():
-                item_to_drop = item
-                break
-        
-        if item_to_drop:
-            # Check if item is equipped
-            if (hasattr(self.game.current_player, 'equipment_system') and 
-                self.game.current_player.equipment_system.is_equipped(item_to_drop)):
-                self.game.ui.display_message(f"You must unequip the {item_to_drop.name} first.")
-                return True
-            
-            self.game.current_player.inventory_system.remove_item(item_to_drop)
-            
-            # Add to current area
-            current_area = self.game.current_player.current_area
-            if current_area and hasattr(current_area, 'items'):
-                current_area.items.append(item_to_drop)
-            
-            self.game.ui.display_message(f"You drop the {item_to_drop.name}.")
-        else:
-            self.game.ui.display_message(f"You don't have '{item_name}'.")
-        
+        """Drop an item from inventory (delegates to engine)."""
+        self.game._drop_command(args)
         return True
     
     def cmd_equip(self, args: List[str]) -> bool:
