@@ -1643,14 +1643,23 @@ class GameEngine:
             
         item_name = ' '.join(args).lower()
         
-        # Find item by name
+        # Support explicit offhand syntax: 'equip offhand <item>'
+        target_slot = None
+        if item_name.startswith('offhand '):
+            target_slot = 'offhand'
+            item_name = item_name[len('offhand '):].strip()
+
+        # Find item by name (prefer unequipped)
         item_id = self.current_character.inventory_system.find_item_by_name(item_name)
         if not item_id:
             self.ui_manager.log_error(f"You don't have '{item_name}' in your inventory.")
             return
             
-        # Try to equip the item
-        result = self.current_character.equipment_system.equip_item(item_id)
+        # Equip to a specific slot if requested
+        if target_slot:
+            result = self.current_character.equipment_system.equip_item_to_slot(target_slot, item_id)
+        else:
+            result = self.current_character.equipment_system.equip_item(item_id)
         self.ui_manager.log_info(result)
     
     def _unequip_command(self, args: List[str]) -> None:

@@ -103,18 +103,12 @@ class EquipmentSystem:
             return "This item cannot be equipped."
 
         # Special handling for weapons: if main-hand is occupied and off-hand exists and is free,
-        # equip into off-hand for dual-wielding classes. Also prefer unequipped copy when
-        # there are multiple items with the same name to ensure the second dagger equips.
+        # auto-equip into off-hand for dual-wielding classes regardless of name.
         if item.item_type == ItemType.WEAPON:
             main_slot = self.slots.get('weapon')
             off_slot = self.slots.get('offhand')
             if main_slot and main_slot.equipped_item and off_slot and not off_slot.equipped_item:
-                # If trying to equip the same weapon as main-hand and an unequipped copy exists, route to offhand
-                try:
-                    if main_slot.equipped_item and main_slot.equipped_item.name == item.name:
-                        slot_name = 'offhand'
-                except Exception:
-                    slot_name = 'offhand'
+                slot_name = 'offhand'
         
         slot = self.slots[slot_name]
         
@@ -132,6 +126,46 @@ class EquipmentSystem:
         # Recalculate character stats
         self.character.recalculate_stats()
         
+        return f"You equip the {item.name}."
+
+    def equip_item_to_slot(self, slot_name: str, item_id: str) -> str:
+        """Equip a specific item into a specified slot if valid.
+
+        Args:
+            slot_name: Target slot name (e.g., 'offhand', 'weapon', 'armor')
+            item_id: Inventory item identifier
+        """
+        if slot_name not in self.slots:
+            return "Invalid equipment slot."
+
+        inv_item = self.inventory_system.get_item(item_id)
+        if not inv_item:
+            return "You don't have that item."
+
+        item = inv_item.item
+        slot = self.slots[slot_name]
+
+        # Validate type compatibility
+        if not slot.can_equip(item):
+            return f"You can't equip {item.name} in your {slot_name} slot."
+
+        # Validate shields routed only to shield slot
+        try:
+            from items.armor import Armor
+            if isinstance(item, Armor) and getattr(item, 'is_shield', False) and slot_name != 'shield':
+                return f"{item.name} must be equipped in the shield slot."
+        except Exception:
+            pass
+
+        # Remove any item currently in that slot
+        if slot.equipped_item:
+            self.unequip_item(slot_name)
+
+        # Equip
+        slot.equip(item)
+        inv_item.equipped = True
+        self._apply_item_bonuses(item, slot_name)
+        self.character.recalculate_stats()
         return f"You equip the {item.name}."
     
     def unequip_item(self, slot_name: str) -> str:
