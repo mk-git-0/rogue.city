@@ -144,6 +144,31 @@ class CombatSystem:
         if self.loot_gained:
             loot_names = [item['name'] for item in self.loot_gained]
             self.ui_manager.log_success(f"You find: {', '.join(loot_names)}")
+            # Distribute loot: currency goes to player, items go to room
+            try:
+                if self.game_engine and hasattr(self.game_engine, 'current_area') and hasattr(self.game_engine, 'current_room'):
+                    area = self.game_engine.current_area
+                    room_id = self.game_engine.current_room
+                    for idx, loot in enumerate(self.loot_gained):
+                        loot_name = str(loot.get('name', 'Loot'))
+                        loot_type = str(loot.get('type', 'misc')).lower()
+                        quantity = int(loot.get('quantity', 1))
+                        # Handle currency
+                        if loot_type in ['currency', 'gold'] or loot_name.lower() == 'gold':
+                            from core.currency_system import Currency
+                            if hasattr(self.current_character, 'currency'):
+                                self.current_character.currency.add(Currency(gold=quantity))
+                                self.ui_manager.log_success(f"You receive {quantity} GP.")
+                            continue
+                        # Place a simple item in the room
+                        if hasattr(area, 'add_simple_item_to_room'):
+                            slug = loot_name.lower().replace(' ', '_')
+                            unique_id = f"loot_{slug}_{self.combat_round}_{idx}"
+                            description = f"{loot_name} lies here."
+                            area.add_simple_item_to_room(room_id, unique_id, loot_name, description, quantity=quantity)
+            except Exception:
+                # Fail-soft on loot placement
+                pass
             
         # Reset combat state
         self.state = CombatState.INACTIVE
@@ -290,8 +315,8 @@ class CombatSystem:
             if num_attacks > 1:
                 self.ui_manager.log_info(f"Attack {attack_num + 1} of {num_attacks}:")
                 
-            # Execute the attack
-            self._execute_single_player_attack(target_enemy)
+            # Execute the attack (pass index to alternate hands when dual-wielding)
+            self._execute_single_player_attack(target_enemy, attack_index=attack_num)
             
     def _execute_enemy_turn(self) -> None:
         """Execute all enemies' turns."""
@@ -311,20 +336,16 @@ class CombatSystem:
             return 1
             
         equipment = self.current_character.equipment_system
-        
-        # For dual-wielding classes (rogues), sum attacks from both weapons
-        if (hasattr(self.current_character, 'character_class') and 
-            self.current_character.character_class == 'rogue' and
-            hasattr(equipment, 'get_all_weapons')):
-            
-            weapons = equipment.get_all_weapons()
-            total_attacks = 0
-            for weapon in weapons:
-                if hasattr(weapon, 'attacks_per_turn'):
-                    total_attacks += weapon.attacks_per_turn
-                else:
-                    total_attacks += 1  # Default if no attacks_per_turn
-            return max(1, total_attacks)  # At least 1 attack
+
+        # For dual-wielding classes in dual-wield mode, sum attacks from both weapons
+        char_class = getattr(self.current_character, 'character_class', '').lower()
+        dual_wield_classes = ['ranger', 'rogue', 'ninja', 'bard']
+        if char_class in dual_wield_classes and getattr(self.current_character, 'dual_wield_mode', False):
+            main_weapon = equipment.get_equipped_weapon()
+            off_weapon = equipment.get_offhand_weapon() if hasattr(equipment, 'get_offhand_weapon') else None
+            if main_weapon and off_weapon:
+                total_attacks = getattr(main_weapon, 'attacks_per_turn', 1) + getattr(off_weapon, 'attacks_per_turn', 1)
+                return max(1, total_attacks)
         
         # For non-dual-wielding classes, use main weapon only
         weapon = equipment.get_equipped_weapon()
@@ -502,20 +523,34 @@ class CombatSystem:
                 
     # Note: timer-based action executor removed in turn-based model
             
-    def _execute_single_player_attack(self, target_enemy) -> None:
-        """Execute a single player attack."""
+    def _execute_single_player_attack(self, target_enemy, attack_index: int = 0) -> None:
+        """Execute a single player attack.
+
+        attack_index: Used to alternate hands when dual-wielding.
+        """
         if not target_enemy or not target_enemy.is_alive():
             return
             
         # Calculate attack roll with equipment bonuses
         attack_bonus = self.current_character.base_attack_bonus
         crit_range = self.current_character.get_critical_range()
-        
-        # Add equipment attack bonus
-        if (hasattr(self.current_character, 'equipment_system') and 
-            self.current_character.equipment_system and 
-            self.current_character.equipment_system.get_equipped_weapon()):
-            weapon = self.current_character.equipment_system.get_equipped_weapon()
+
+        # Choose weapon (supports dual-wield alternation)
+        weapon = None
+        if hasattr(self.current_character, 'equipment_system') and self.current_character.equipment_system:
+            equipment = self.current_character.equipment_system
+            main_weapon = equipment.get_equipped_weapon()
+            off_weapon = equipment.get_offhand_weapon() if hasattr(equipment, 'get_offhand_weapon') else None
+            char_class = getattr(self.current_character, 'character_class', '').lower()
+            use_dual = char_class in ['ranger', 'rogue', 'ninja', 'bard'] and getattr(self.current_character, 'dual_wield_mode', False) and off_weapon is not None
+            if use_dual:
+                weapons_cycle = [w for w in [main_weapon, off_weapon] if w is not None]
+                if weapons_cycle:
+                    weapon = weapons_cycle[attack_index % len(weapons_cycle)]
+            else:
+                weapon = main_weapon
+
+        if weapon is not None:
             if hasattr(weapon, 'attack_bonus'):
                 attack_bonus += weapon.attack_bonus
             if hasattr(weapon, 'crit_range'):
@@ -533,11 +568,8 @@ class CombatSystem:
         # Check if attack hits
         if attack_roll >= target_enemy.armor_class:
             # Attack hits - calculate damage using equipped weapon
-            if (hasattr(self.current_character, 'equipment_system') and 
-                self.current_character.equipment_system and 
-                self.current_character.equipment_system.get_equipped_weapon()):
-                # Use equipped weapon damage
-                weapon = self.current_character.equipment_system.get_equipped_weapon()
+            if weapon is not None:
+                # Use selected weapon damage
                 if hasattr(weapon, 'damage_dice'):
                     base_damage = weapon.damage_dice
                 else:
@@ -596,6 +628,16 @@ class CombatSystem:
                 if loot:
                     self.loot_gained.extend(loot)
                     
+                # Mark encounter defeated in area and check for combat end
+                try:
+                    if self.game_engine and hasattr(target_enemy, 'combat_id'):
+                        area = getattr(self.game_engine, 'current_area', None)
+                        room_id = getattr(self.game_engine, 'current_room', None)
+                        if area and hasattr(area, 'on_enemy_defeated'):
+                            area.on_enemy_defeated(target_enemy.combat_id, room_id)
+                except Exception:
+                    pass
+
                 # Check for combat end
                 if not any(enemy.is_alive() for enemy in self.enemies.values()):
                     self.end_combat(victory=True)
@@ -638,7 +680,8 @@ class CombatSystem:
                 damage *= 2
                 self.ui_manager.log_critical(f"*** CRITICAL HIT! *** The {enemy_colored} strikes you for {damage} damage!")
             else:
-                self.ui_manager.log_error(f"The {enemy_colored} hits you for {damage} damage!")
+                # Treat enemy hits as normal combat info rather than errors
+                self.ui_manager.log_info(f"The {enemy_colored} hits you for {damage} damage!")
                 
             actual_damage = self.current_character.take_damage(damage)
             
@@ -688,6 +731,7 @@ class CombatSystem:
         if character.dual_wield_mode:
             self.ui_manager.log_success("You prepare to fight with both hands.")
             self.ui_manager.log_system("[Dual-wield mode activated - extra attacks with penalties]")
+            self.ui_manager.log_info("Dual-wield tips: Equip a second one-handed weapon; use 'dual' to toggle. Attacks will combine both hands.")
         else:
             self.ui_manager.log_success("You return to single-weapon fighting.")
             self.ui_manager.log_system("[Dual-wield mode deactivated]")

@@ -1540,9 +1540,12 @@ class GameEngine:
             
         item_name = ' '.join(args).lower()
         
-        # Find matching item
+        # Find matching item (allow partial match against any room item)
         for item_id, item in room.items.items():
-            if item_name in item.name.lower() and item.quantity > 0:
+            if item.quantity <= 0:
+                continue
+            room_item_name = str(item.name).lower()
+            if item_name == room_item_name or item_name in room_item_name:
                 if not item.can_take:
                     self.ui_manager.log_error(f"You cannot take the {item.name}.")
                     return

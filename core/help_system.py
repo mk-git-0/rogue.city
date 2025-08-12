@@ -150,6 +150,13 @@ class HelpSystem:
                 'aliases': 'a, kill, k',
                 'notes': 'Starts turn-based combat. Use \"auto\" to automate rounds until combat ends.'
             },
+            'dual': {
+                'syntax': 'DUAL',
+                'description': 'Toggle dual-wielding (two weapons) if your class supports it.',
+                'examples': ['dual', 'du'],
+                'aliases': 'du',
+                'notes': 'Ranger, Rogue, Ninja, and Bard can equip an off-hand one-handed weapon. Equip your main-hand, then equip another weapon to fill off-hand automatically. Use DUAL to toggle.'
+            },
             'auto': {
                 'syntax': 'AUTO',
                 'description': 'Toggle automatic combat mode during battle.',

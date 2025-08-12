@@ -389,6 +389,44 @@ class BaseArea(ABC):
         # Otherwise, add a new RoomItem entry
         room.add_item(item_id=item_id, name=name, description=description, quantity=max(1, quantity))
         return True
+
+    def add_simple_item_to_room(
+        self,
+        room_id: str,
+        item_id: str,
+        name: str,
+        description: str,
+        quantity: int = 1,
+        can_take: bool = True,
+    ) -> bool:
+        """Add a simple ad-hoc item (not from item factory) to a room.
+
+        This is used for generic loot like "Goblin Ear" that isn't a defined item class.
+
+        Args:
+            room_id: Target room identifier
+            item_id: Unique identifier for the room item (scoped to room)
+            name: Display name of the item
+            description: Description shown in room
+            quantity: Quantity to add
+            can_take: Whether the player can pick up the item
+        """
+        room = self.get_room(room_id)
+        if not room:
+            return False
+        # If item already exists, bump quantity
+        if item_id in room.items:
+            room.items[item_id].quantity += max(1, quantity)
+            return True
+
+        room.add_item(
+            item_id=item_id,
+            name=name,
+            description=description,
+            can_take=can_take,
+            quantity=max(1, quantity),
+        )
+        return True
         
     def to_dict(self) -> Dict[str, Any]:
         """Serialize area state for saving."""

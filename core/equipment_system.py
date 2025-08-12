@@ -39,9 +39,11 @@ class EquipmentSystem:
             'accessory': EquipmentSlot('accessory', [ItemType.ACCESSORY])
         }
         
-        # Add off-hand weapon slot for dual-wielding classes (rogues)
-        if hasattr(character, 'character_class') and character.character_class == 'rogue':
-            self.slots['offhand'] = EquipmentSlot('offhand', [ItemType.WEAPON])
+        # Add off-hand weapon slot for dual-wielding classes
+        if hasattr(character, 'character_class'):
+            dual_wield_classes = ['rogue', 'ranger', 'ninja', 'bard']
+            if character.character_class.lower() in dual_wield_classes:
+                self.slots['offhand'] = EquipmentSlot('offhand', [ItemType.WEAPON])
 
         # Add shield slot (future-proof; shield items will use this slot)
         # Minimal viable: no shield item types yet; helpers will handle None safely
@@ -95,6 +97,14 @@ class EquipmentSystem:
         slot_name = self._get_slot_for_item(item)
         if not slot_name:
             return "This item cannot be equipped."
+
+        # Special handling for weapons: if main-hand is occupied and off-hand exists and is free,
+        # equip into off-hand for dual-wielding classes
+        if item.item_type == ItemType.WEAPON:
+            main_slot = self.slots.get('weapon')
+            off_slot = self.slots.get('offhand')
+            if main_slot and main_slot.equipped_item and off_slot and not off_slot.equipped_item:
+                slot_name = 'offhand'
         
         slot = self.slots[slot_name]
         
