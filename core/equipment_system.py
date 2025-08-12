@@ -72,8 +72,12 @@ class EquipmentSystem:
     def _get_slot_for_item(self, item: BaseItem) -> Optional[str]:
         """Get the appropriate equipment slot for an item."""
         # Shields are represented as Armor but should go to 'shield' slot if present
-        if hasattr(item, 'is_shield') and getattr(item, 'is_shield') and 'shield' in self.slots:
-            return 'shield'
+        try:
+            from items.armor import Armor  # local import to avoid cycles
+            if isinstance(item, Armor) and getattr(item, 'is_shield', False) and 'shield' in self.slots:
+                return 'shield'
+        except Exception:
+            pass
         for slot_name, slot in self.slots.items():
             if slot.can_equip(item):
                 return slot_name
@@ -211,15 +215,22 @@ class EquipmentSystem:
         """Get currently equipped armor."""
         armor_slot = self.slots.get('armor')
         if armor_slot and armor_slot.equipped_item:
-            return armor_slot.equipped_item
+            # Ensure the equipped item is actually an Armor instance
+            item = armor_slot.equipped_item
+            if isinstance(item, Armor):
+                return item
+            # Defensive: if a non-armor item somehow occupies the armor slot, ignore it
+            return None
         return None
 
     def get_equipped_shield(self) -> Optional[Armor]:
         """Get currently equipped shield (if shield slot used)."""
         shield_slot = self.slots.get('shield')
         if shield_slot and shield_slot.equipped_item:
-            # Shields will be represented by Armor until a Shield class exists
-            return shield_slot.equipped_item  # type: ignore[return-value]
+            # Shields are Armor instances marked with is_shield
+            item = shield_slot.equipped_item
+            if isinstance(item, Armor) and getattr(item, 'is_shield', False):
+                return item
         return None
     
     def get_armor_class_bonus(self) -> int:
