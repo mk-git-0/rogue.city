@@ -1558,6 +1558,22 @@ class GameEngine:
                 from core.item_factory import ItemFactory
                 item_factory = ItemFactory()
                 actual_item = item_factory.create_item(item_id)
+
+                # Fallback for ad-hoc room items (e.g., Goblin Ear)
+                if actual_item is None:
+                    try:
+                        from items.base_item import BaseItem, ItemType
+                        # Create a lightweight accessory item with minimal weight
+                        actual_item = BaseItem(
+                            item_id=item_id,
+                            name=str(item.name).title(),
+                            description=str(item.description),
+                            item_type=ItemType.ACCESSORY,
+                            weight=0.1,
+                            value=0
+                        )
+                    except Exception:
+                        actual_item = None
                 
                 if actual_item and self.current_character.inventory_system.can_add_item(actual_item):
                     # Remove item from room
@@ -1577,7 +1593,11 @@ class GameEngine:
                                 
                         return
                 else:
-                    self.ui_manager.log_error("You can't carry that much weight.")
+                    # If we failed to construct a carryable item, report not implemented; otherwise weight error
+                    if actual_item is None:
+                        self.ui_manager.log_error("You cannot take that right now.")
+                    else:
+                        self.ui_manager.log_error("You can't carry that much weight.")
                     return
                     
         self.ui_manager.log_error(f"There is no {item_name} here to take.")

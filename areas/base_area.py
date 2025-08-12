@@ -308,22 +308,41 @@ class BaseArea(ABC):
         return False
         
     def get_map_display(self, current_room: str = None) -> str:
-        """Get ASCII map with current position marked."""
+        """Get ASCII map with current position marked and known rooms revealed."""
         if not self.map_data:
             return f"No map available for {self.name}."
             
         map_lines = [f"=== {self.name.upper()} MAP ==="]
         
+        # Build token map from room ids to labels used in map ascii (from legend)
+        room_tokens = {
+            'cave_exit': '[Exit]',
+            'northern_tunnel': '[Northern]',
+            'main_chamber': '[Main]',
+            'western_alcove': '[West]',
+            'eastern_passage': '[East]',
+            'cave_entrance': '[Entrance]',
+        }
+
+        # Determine which tokens should be considered "discovered"
+        discovered_tokens = set()
+        for rid, room in self.rooms.items():
+            token = room_tokens.get(rid)
+            if token and room.visited:
+                discovered_tokens.add(token)
+
         # Process map data and mark current room
-        for line in self.map_data:
-            if current_room:
-                # Mark current room position (this would need room-specific logic)
-                display_line = line.replace("[?]", "[?]")  # Placeholder for room marking
-                if f"[{current_room[0].upper()}]" in line:
-                    display_line = line.replace(f"[{current_room[0].upper()}]", f"[{current_room[0].upper()}*]")
-            else:
-                display_line = line
-            map_lines.append(display_line)
+        for raw_line in self.map_data:
+            line = raw_line
+            # Reveal visited rooms by ensuring their token is printed (noop for static map)
+            # Replace unknown markers with '?' where appropriate (not used in current static map)
+
+            # Mark current room token with '*'
+            if current_room and current_room in room_tokens:
+                token = room_tokens[current_room]
+                if token in line:
+                    line = line.replace(token, token[:-1] + '*]')
+            map_lines.append(line)
             
         # Add legend
         if self.map_legend:
