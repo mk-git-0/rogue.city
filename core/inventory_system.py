@@ -90,19 +90,40 @@ class InventorySystem:
         return self.items[item_id].quantity >= quantity
     
     def find_item_by_name(self, name: str) -> Optional[str]:
-        """Find item ID by partial name match (case insensitive)."""
+        """Find item ID by name with preference for unequipped copies.
+
+        Strategy:
+        1) Exact match, prefer unequipped; then exact match equipped
+        2) Partial match, prefer unequipped; then partial match equipped
+        """
         name_lower = name.lower()
-        
-        # First try exact match
+
+        exact_unequipped = []
+        exact_equipped = []
+        partial_unequipped = []
+        partial_equipped = []
+
         for item_id, inv_item in self.items.items():
-            if inv_item.item.name.lower() == name_lower:
-                return item_id
-        
-        # Then try partial match
-        for item_id, inv_item in self.items.items():
-            if name_lower in inv_item.item.name.lower():
-                return item_id
-        
+            item_name = inv_item.item.name.lower()
+            is_exact = item_name == name_lower
+            is_partial = name_lower in item_name
+            if not (is_exact or is_partial):
+                continue
+            if is_exact:
+                if inv_item.equipped:
+                    exact_equipped.append(item_id)
+                else:
+                    exact_unequipped.append(item_id)
+            else:
+                if inv_item.equipped:
+                    partial_equipped.append(item_id)
+                else:
+                    partial_unequipped.append(item_id)
+
+        for bucket in (exact_unequipped, exact_equipped, partial_unequipped, partial_equipped):
+            if bucket:
+                return bucket[0]
+
         return None
     
     def get_items_by_type(self, item_type: ItemType) -> Dict[str, InventoryItem]:

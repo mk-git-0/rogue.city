@@ -99,12 +99,18 @@ class EquipmentSystem:
             return "This item cannot be equipped."
 
         # Special handling for weapons: if main-hand is occupied and off-hand exists and is free,
-        # equip into off-hand for dual-wielding classes
+        # equip into off-hand for dual-wielding classes. Also prefer unequipped copy when
+        # there are multiple items with the same name to ensure the second dagger equips.
         if item.item_type == ItemType.WEAPON:
             main_slot = self.slots.get('weapon')
             off_slot = self.slots.get('offhand')
             if main_slot and main_slot.equipped_item and off_slot and not off_slot.equipped_item:
-                slot_name = 'offhand'
+                # If trying to equip the same weapon as main-hand and an unequipped copy exists, route to offhand
+                try:
+                    if main_slot.equipped_item and main_slot.equipped_item.name == item.name:
+                        slot_name = 'offhand'
+                except Exception:
+                    slot_name = 'offhand'
         
         slot = self.slots[slot_name]
         
