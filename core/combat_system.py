@@ -589,14 +589,24 @@ class CombatSystem:
                 # Rogues use DEX for damage with finesse weapons
                 stat_modifier = self.current_character.get_stat_modifier('dexterity')
             
-            total_bonus = stat_modifier + weapon_bonus
-            
-            if total_bonus > 0:
-                damage_notation = f"{base_damage}+{total_bonus}"
-            elif total_bonus < 0:
-                damage_notation = f"{base_damage}{total_bonus}"
+            # Combine any modifier embedded in base_damage with bonuses
+            try:
+                base_num, base_sides, base_mod = self.dice_system.parse_dice_notation(base_damage)
+                base_core = f"{base_num}d{base_sides}"
+            except Exception:
+                # Fall back if weapon uses non-standard notation
+                base_core = base_damage
+                base_mod = 0
+
+            extra_bonus = stat_modifier + weapon_bonus
+            combined_mod = base_mod + extra_bonus
+
+            if combined_mod > 0:
+                damage_notation = f"{base_core}+{combined_mod}"
+            elif combined_mod < 0:
+                damage_notation = f"{base_core}{combined_mod}"
             else:
-                damage_notation = base_damage
+                damage_notation = base_core
                 
             damage = self.dice_system.roll_with_context(damage_notation, "You", "damage")
             
