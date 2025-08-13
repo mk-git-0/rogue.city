@@ -214,7 +214,7 @@ class CommandParser:
         # Commerce & Economy aliases
         self.aliases['b'] = 'buy'
         self.aliases['purchase'] = 'buy'
-        self.aliases['s'] = 'sell'  # Note: conflicts with 'south', context determines usage
+        # Removed 's' -> 'sell' to avoid conflict with movement 'south'
         self.aliases['trade'] = 'sell'
         self.aliases['ls'] = 'list'
         self.aliases['shop'] = 'list'
