@@ -2014,13 +2014,8 @@ class GameEngine:
         def _rest_cb(action):
             self._rest_tick()
 
-        interval = 3.0
-        try:
-            room = self.current_area.get_room(self.current_room) if self.current_area else None
-            if room and room.is_safe:
-                interval = 2.0
-        except Exception:
-            pass
+        # Use a fixed 5-second rest tick interval
+        interval = 5.0
 
         self.timer_system.schedule_recurring_action(
             actor_id=self._rest_actor_id,
@@ -2090,13 +2085,16 @@ class GameEngine:
             self._stop_resting(reason="You feel fully recovered.")
             return
 
-        if healed > 0 or mana_recovered > 0:
-            msg_parts = []
-            if healed > 0:
-                msg_parts.append(f"+{healed} HP")
-            if mana_recovered > 0:
-                msg_parts.append(f"+{mana_recovered} mana")
-            self.ui_manager.log_success("Resting recovery: " + ", ".join(msg_parts))
+        # Announce tick and show current totals
+        try:
+            hp_part = f"HP {player.current_hp}/{player.max_hp}"
+            mana_part = None
+            if hasattr(player, 'max_mana') and hasattr(player, 'current_mana') and player.max_mana > 0:
+                mana_part = f"Mana {player.current_mana}/{player.max_mana}"
+            parts = [hp_part] + ([mana_part] if mana_part else [])
+            self.ui_manager.log_system("Rest tick: " + ", ".join(parts))
+        except Exception:
+            pass
 
     def _restore_mana(self, character, amount: int) -> int:
         """Restore mana to a character, returns actual restored amount."""
