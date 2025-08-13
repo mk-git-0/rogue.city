@@ -103,6 +103,11 @@ class GameEngine:
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
         
+        # Resting/regeneration state
+        self._is_resting: bool = False
+        self._rest_actor_id: Optional[str] = None
+        self._natural_regen_actor_id: Optional[str] = None
+        
     def _signal_handler(self, signum, frame):
         """Handle system signals for clean shutdown."""
         self.ui_manager.log_system("Received shutdown signal. Cleaning up...")
@@ -1122,6 +1127,8 @@ class GameEngine:
         if not self.current_area or not self.current_room:
             self.ui_manager.log_error("No current location.")
             return
+        # Moving interrupts resting
+        self._stop_resting(reason="You stop resting and get to your feet.")
             
         # Parse direction
         from areas.base_area import parse_direction
@@ -1294,6 +1301,8 @@ class GameEngine:
         if not self.current_character:
             self.ui_manager.log_error("No character loaded.")
             return
+        # Attacking interrupts resting
+        self._stop_resting(reason="You stop resting to prepare for combat.")
             
         # Parse target from arguments
         target_name = None
@@ -1490,6 +1499,11 @@ class GameEngine:
                 
             # Show current room
             self._look_command()
+            # Start passive natural regeneration for this character
+            try:
+                self._schedule_natural_regeneration()
+            except Exception:
+                pass
         else:
             self.ui_manager.log_error(f"Could not load area: {start_area_id}")
             
@@ -1806,6 +1820,8 @@ class GameEngine:
         # Process tutorial system
         if self.tutorial_system.enabled:
             self.tutorial_system.update()
+        # Trigger first-time rest hint when the player is wounded
+        self._maybe_trigger_rest_tutorial_hint()
             
         # Update context display periodically
         if self.frame_count % 60 == 0:  # Update once per second at 60 FPS
@@ -1867,6 +1883,8 @@ class GameEngine:
             
     def start_combat(self, enemy) -> None:
         """Start combat with an enemy."""
+        # Entering combat interrupts resting
+        self._stop_resting(reason=None)
         if self.combat_system.start_combat(self.current_character, [enemy]):
             self.current_state = GameState.COMBAT
             self.state = self.current_state
@@ -1886,6 +1904,8 @@ class GameEngine:
                 self.current_character.current_hp = 1
                 self.ui_manager.log_error("You have been defeated and barely escape with your life!")
                 self.ui_manager.log_info("You recover consciousness with 1 hit point remaining.")
+        # After combat, suggest resting if wounded
+        self._maybe_trigger_rest_tutorial_hint()
     
     def complete_game(self) -> None:
         """Complete the game and show completion screen."""
@@ -1902,6 +1922,14 @@ class GameEngine:
     def shutdown(self) -> None:
         """Shutdown the game engine and clean up resources."""
         self.running = False
+        # Cancel any scheduled regen/rest actions
+        try:
+            if self._rest_actor_id:
+                self.timer_system.cancel_actor_actions(self._rest_actor_id)
+            if self._natural_regen_actor_id:
+                self.timer_system.cancel_actor_actions(self._natural_regen_actor_id)
+        except Exception:
+            pass
         
         # Save character if one is loaded
         if self.current_character:
@@ -1916,6 +1944,180 @@ class GameEngine:
             
         self.ui_manager.cleanup()
         sys.exit(0)
+
+    # ===========================
+    # Resting and Regeneration
+    # ===========================
+
+    def _schedule_natural_regeneration(self) -> None:
+        """Schedule passive, slow regeneration ticks for the current player."""
+        if not self.current_character:
+            return
+        actor_id = f"regen:{self.current_character.name}"
+        self._natural_regen_actor_id = actor_id
+
+        def _natural_regen_cb(action):
+            self._natural_regen_tick()
+
+        # Every 12 seconds by default
+        self.timer_system.schedule_recurring_action(
+            actor_id=actor_id,
+            action_type="natural_regen",
+            interval=12.0,
+            action_data={},
+            callback=_natural_regen_cb,
+        )
+
+    def _natural_regen_tick(self) -> None:
+        """Passive regen when not resting and not in combat."""
+        player = self.current_character
+        if not player:
+            return
+        if self.combat_system.is_active():
+            return
+        if self._is_resting:
+            return
+
+        hp_before = player.current_hp
+        mana_before = getattr(player, 'current_mana', None)
+
+        if hp_before < player.max_hp:
+            player.heal(1)
+
+        if mana_before is not None and hasattr(player, 'max_mana') and player.max_mana > 0:
+            self._restore_mana(player, 1)
+
+    def _start_resting(self) -> None:
+        """Begin resting to accelerate health and mana recovery."""
+        if not self.current_character:
+            self.ui_manager.log_error("No character loaded.")
+            return
+        if self.combat_system.is_active():
+            self.ui_manager.log_error("You cannot rest during combat!")
+            return
+        try:
+            room = self.current_area.get_room(self.current_room) if self.current_area else None
+            if room and not room.is_safe and room.get_active_enemies():
+                self.ui_manager.log_error("It's not safe to rest here!")
+                return
+        except Exception:
+            pass
+
+        if self._is_resting:
+            self.ui_manager.log_info("You are already resting.")
+            return
+
+        self._is_resting = True
+        self._rest_actor_id = f"rest:{self.current_character.name}"
+        self.ui_manager.log_info("You sit down to rest and recover.")
+
+        def _rest_cb(action):
+            self._rest_tick()
+
+        interval = 3.0
+        try:
+            room = self.current_area.get_room(self.current_room) if self.current_area else None
+            if room and room.is_safe:
+                interval = 2.0
+        except Exception:
+            pass
+
+        self.timer_system.schedule_recurring_action(
+            actor_id=self._rest_actor_id,
+            action_type="rest_tick",
+            interval=interval,
+            action_data={},
+            callback=_rest_cb,
+        )
+
+    def _stop_resting(self, reason: Optional[str] = None) -> None:
+        """Stop resting if currently resting."""
+        if not self._is_resting:
+            return
+        self._is_resting = False
+        if self._rest_actor_id:
+            try:
+                self.timer_system.cancel_actor_actions(self._rest_actor_id)
+            except Exception:
+                pass
+        if reason:
+            self.ui_manager.log_info(reason)
+
+    def _rest_tick(self) -> None:
+        """Apply rest regeneration amount each tick; auto-stop at full recovery."""
+        player = self.current_character
+        if not player:
+            self._stop_resting()
+            return
+        if self.combat_system.is_active():
+            self._stop_resting()
+            return
+
+        con_mod = 0
+        wis_mod = 0
+        int_mod = 0
+        try:
+            con_mod = max(0, player.get_stat_modifier('constitution'))
+            wis_mod = max(0, player.get_stat_modifier('wisdom'))
+            int_mod = max(0, player.get_stat_modifier('intelligence'))
+        except Exception:
+            pass
+
+        hp_gain = 1 + con_mod
+        mana_gain = 1 + max(wis_mod, int_mod)
+
+        try:
+            room = self.current_area.get_room(self.current_room) if self.current_area else None
+            if room and room.is_safe:
+                hp_gain += 1
+                if hasattr(player, 'max_mana') and player.max_mana > 0:
+                    mana_gain += 1
+        except Exception:
+            pass
+
+        healed = 0
+        if player.current_hp < player.max_hp:
+            healed = player.heal(hp_gain)
+        mana_recovered = 0
+        if hasattr(player, 'current_mana') and hasattr(player, 'max_mana') and player.max_mana > 0:
+            before = player.current_mana
+            self._restore_mana(player, mana_gain)
+            mana_recovered = player.current_mana - before
+
+        if player.current_hp >= player.max_hp and (
+            not hasattr(player, 'max_mana') or player.current_mana >= getattr(player, 'max_mana', 0)
+        ):
+            self._stop_resting(reason="You feel fully recovered.")
+            return
+
+        if healed > 0 or mana_recovered > 0:
+            msg_parts = []
+            if healed > 0:
+                msg_parts.append(f"+{healed} HP")
+            if mana_recovered > 0:
+                msg_parts.append(f"+{mana_recovered} mana")
+            self.ui_manager.log_success("Resting recovery: " + ", ".join(msg_parts))
+
+    def _restore_mana(self, character, amount: int) -> int:
+        """Restore mana to a character, returns actual restored amount."""
+        if not hasattr(character, 'current_mana') or not hasattr(character, 'max_mana'):
+            return 0
+        before = character.current_mana
+        character.current_mana = min(character.max_mana, character.current_mana + max(0, amount))
+        return character.current_mana - before
+
+    def _maybe_trigger_rest_tutorial_hint(self) -> None:
+        """Show a one-time tutorial hint when the player is first injured."""
+        if not self.current_character:
+            return
+        try:
+            if (
+                self.current_character.current_hp < self.current_character.max_hp
+                and 'rest_hint' not in self.tutorial_system.messages_shown
+            ):
+                self.tutorial_system.trigger_tutorial('rest_hint')
+        except Exception:
+            pass
 
 
 # Test function for the game engine

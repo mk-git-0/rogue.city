@@ -47,6 +47,9 @@ class CommandParser:
         self.commands['auto'] = self.cmd_auto
         self.commands['flee'] = self.cmd_flee
         self.commands['status'] = self.cmd_status
+        # Resting commands
+        self.commands['rest'] = self.cmd_rest
+        self.commands['stoprest'] = self.cmd_stop_rest
         
         # Character commands
         self.commands['stats'] = self.cmd_stats
@@ -155,6 +158,8 @@ class CommandParser:
         self.aliases['k'] = 'attack'
         self.aliases['run'] = 'flee'
         self.aliases['escape'] = 'flee'
+        self.aliases['sleep'] = 'rest'
+        self.aliases['wait'] = 'rest'
         
         # Character aliases
         self.aliases['st'] = 'stats'
@@ -533,6 +538,24 @@ class CommandParser:
             print(f"\n*** IN COMBAT with {living_enemies} enemies ***")
             
         print()
+
+    # Resting Commands
+    def cmd_rest(self, args: List[str]) -> bool:
+        """Sit and rest to regenerate HP and mana over time."""
+        if not self.game.current_player:
+            self.game.ui_manager.log_error("No character loaded.")
+            return True
+        if hasattr(self.game, '_start_resting'):
+            self.game._start_resting()
+        else:
+            self.game.ui_manager.log_error("Resting is not available.")
+        return True
+
+    def cmd_stop_rest(self, args: List[str]) -> bool:
+        """Stop resting immediately."""
+        if hasattr(self.game, '_stop_resting'):
+            self.game._stop_resting(reason="You stop resting.")
+        return True
     
     # Character Commands
     def cmd_stats(self, args: List[str]) -> bool:

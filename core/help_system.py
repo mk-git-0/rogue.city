@@ -150,6 +150,13 @@ class HelpSystem:
                 'aliases': 'a, kill, k',
                 'notes': 'Starts turn-based combat. Use \"auto\" to automate rounds until combat ends.'
             },
+            'rest': {
+                'syntax': 'REST',
+                'description': 'Sit and recover health and mana over time. Faster in safe areas. Stops on movement or combat.',
+                'examples': ['rest', 'sleep', 'wait'],
+                'aliases': 'sleep, wait',
+                'notes': 'Cannot rest during combat. Unsafe rooms with nearby enemies may prevent resting.'
+            },
             'dual': {
                 'syntax': 'DUAL',
                 'description': 'Toggle dual-wielding (two weapons) if your class supports it.',
@@ -294,6 +301,7 @@ class HelpSystem:
         self.ui.display_message("  auto              - Toggle auto-combat")
         self.ui.display_message("  flee              - Escape from combat")
         self.ui.display_message("  status            - Show combat status")
+        self.ui.display_message("  rest              - Recover HP and mana over time")
         self.ui.display_message("")
         
         # Character

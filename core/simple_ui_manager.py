@@ -651,7 +651,7 @@ class SimpleUIManager:
         # Show healing rate
         if hp_percent < 100:
             print("\nYou will heal naturally over time.")
-            print("Use the REST command to increase your healing rate.")
+            print("Use the REST command to increase your healing and mana recovery rate.")
         print()
 
 

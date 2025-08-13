@@ -159,6 +159,15 @@ class TutorialSystem:
                 conditions=['enemy_defeated']
             ),
             
+            # Resting hint (contextual)
+            'rest_hint': TutorialMessage(
+                'rest_hint',
+                TutorialPhase.EXPLORATION,
+                "Tip: You are wounded. Type 'rest' to recover health and mana over time.\n"
+                "Resting is faster in safe areas like clearings and the tutorial cave.",
+                show_once=True
+            ),
+            
             # Exploration Phase
             'map_hint': TutorialMessage(
                 'map_hint',
