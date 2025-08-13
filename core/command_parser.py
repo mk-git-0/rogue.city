@@ -342,6 +342,19 @@ class CommandParser:
             self.game.ui.display_message("You are not in any area.")
             return
         
+        # Check enemies in room first (so players can 'look goblin')
+        try:
+            room = current_area.get_room(self.game.current_player.current_room)
+            for enemy in room.get_active_enemies():
+                enemy_name = enemy.get_display_name().lower()
+                if target in enemy_name or enemy_name in target:
+                    colored = self.game.ui_manager.colorize_enemy(enemy.get_display_name())
+                    self.game.ui.display_message(f"A {colored} is here!")
+                    self.game.ui.display_message(f"HP: {enemy.current_hp}/{enemy.max_hp}  AC: {enemy.armor_class}")
+                    return
+        except Exception:
+            pass
+
         # Check inventory first
         for item in self.game.current_player.inventory_system.items:
             if target in item.name.lower():

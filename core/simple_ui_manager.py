@@ -147,6 +147,8 @@ class SimpleUIManager:
         if enemies:
             colored_enemies = self.color_manager.colorize_enemies_list(enemies)
             print(f"Enemies: {', '.join(colored_enemies)}")
+            for e in colored_enemies:
+                print(f"A {e} is here!")
         print()
         
     def show_character_status(self, character) -> None:

@@ -1113,6 +1113,15 @@ class GameEngine:
         description = room.get_full_description()
         self.ui_manager.log_info(description)
         
+        # Debug: list active enemies internally (to reconcile UI vs state)
+        try:
+            active = room.get_active_enemies()
+            if active:
+                enemy_names = ', '.join([e.get_display_name() for e in active])
+                self.ui_manager.log_system(f"[Debug] Active enemies detected: {enemy_names}")
+        except Exception:
+            pass
+        
         # Trigger tutorial
         self.tutorial_system.on_player_action('look', 
             items_in_room=len(room.get_visible_items()),
@@ -1320,6 +1329,13 @@ class GameEngine:
             if not active_enemies:
                 self.ui_manager.log_error("There are no enemies here to attack.")
                 return
+            else:
+                # Log for debugging reconciliation
+                try:
+                    names = ', '.join([e.get_display_name() for e in active_enemies])
+                    self.ui_manager.log_system(f"[Debug] Attack sees enemies: {names}")
+                except Exception:
+                    pass
                 
             # Find the target enemy
             target_room_enemy = None
