@@ -70,11 +70,14 @@ class TutorialCaveArea(BaseArea):
         room = Room(
             room_id=room_id,
             name=room_data["name"],
-            description=room_data["description"]
+            description=room_data["description"],
+            coords=tuple(room_data.get("coords")) if room_data.get("coords") else None,
+            room_type=room_data.get("room_type", "normal"),
+            lighting=room_data.get("lighting", "bright"),
         )
         
         # Set room properties
-        room.is_safe = room_data.get("is_safe", False)
+        room.is_safe = room_data.get("is_safe", room.room_type == 'safe_zone')
         room.ambient_sound = room_data.get("ambient_sound", "")
         
         # Add exits

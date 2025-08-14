@@ -85,12 +85,20 @@ class RoomEnemy:
 class Room:
     """Represents a single room in the world."""
     
-    def __init__(self, room_id: str, name: str, description: str):
+    def __init__(self, room_id: str, name: str, description: str,
+                 coords: Optional[Tuple[int, int, int]] = None,
+                 room_type: str = "normal",
+                 lighting: str = "bright"):
         """Initialize room with basic properties."""
         self.room_id = room_id
         self.name = name
         self.description = description
         
+        # Spatial metadata
+        self.coords: Optional[Tuple[int, int, int]] = coords  # (x, y, z)
+        self.room_type: str = room_type  # normal, safe_zone, boss_room, shop, transition
+        self.lighting: str = lighting  # bright, dim, dark
+
         # Navigation
         self.exits: Dict[ExitDirection, RoomExit] = {}
         
@@ -105,7 +113,7 @@ class Room:
         
         # Special properties
         self.is_safe: bool = False  # No combat allowed
-        self.is_dark: bool = False  # Requires light source
+        self.is_dark: bool = (lighting == 'dark')  # Requires light source
         self.ambient_sound: str = ""  # Background sound description
         self.special_actions: Dict[str, str] = {}  # Custom room actions
         
@@ -187,7 +195,11 @@ class Room:
         
     def get_full_description(self) -> str:
         """Get complete room description including contents."""
-        desc_lines = [self.name, self.description]
+        desc_lines = [self.name]
+        # Add lighting header
+        if self.lighting in ('dim', 'dark'):
+            desc_lines.append(f"[{self.lighting.upper()}]")
+        desc_lines.append(self.description)
         
         # Add ambient sound if present
         if self.ambient_sound:
@@ -226,6 +238,9 @@ class Room:
             'visited': self.visited,
             'discovered_items': list(self.discovered_items),
             'defeated_enemies': list(self.defeated_enemies),
+            'coords': self.coords,
+            'room_type': self.room_type,
+            'lighting': self.lighting,
             'items': {
                 item_id: {
                     'quantity': item.quantity,
@@ -243,6 +258,10 @@ class Room:
         self.visited = data.get('visited', False)
         self.discovered_items = set(data.get('discovered_items', []))
         self.defeated_enemies = set(data.get('defeated_enemies', []))
+        self.coords = tuple(data.get('coords')) if data.get('coords') else self.coords
+        self.room_type = data.get('room_type', self.room_type)
+        self.lighting = data.get('lighting', self.lighting)
+        self.is_dark = (self.lighting == 'dark')
         
         # Restore item quantities
         saved_items = data.get('items', {})

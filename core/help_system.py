@@ -81,7 +81,7 @@ class HelpSystem:
                 'description': 'Display all available exits from the current room.',
                 'examples': ['exits'],
                 'aliases': '',
-                'notes': 'Shows compass directions you can move: north, south, east, west, up, down.'
+                'notes': 'Shows compass directions you can move: north, northeast, east, southeast, south, southwest, west, northwest, up, down.'
             },
             'map': {
                 'syntax': 'MAP',

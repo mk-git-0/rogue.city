@@ -26,6 +26,11 @@ class CommandParser:
         self.commands['west'] = self.cmd_west
         self.commands['up'] = self.cmd_up
         self.commands['down'] = self.cmd_down
+        # Diagonal movement
+        self.commands['northeast'] = self.cmd_northeast
+        self.commands['northwest'] = self.cmd_northwest
+        self.commands['southeast'] = self.cmd_southeast
+        self.commands['southwest'] = self.cmd_southwest
         
         # Examination commands
         self.commands['look'] = self.cmd_look
@@ -138,6 +143,11 @@ class CommandParser:
         self.aliases['w'] = 'west'
         self.aliases['u'] = 'up'
         self.aliases['d'] = 'down'
+        # Diagonal aliases
+        self.aliases['ne'] = 'northeast'
+        self.aliases['nw'] = 'northwest'
+        self.aliases['se'] = 'southeast'
+        self.aliases['sw'] = 'southwest'
         
         # Examination aliases
         self.aliases['l'] = 'look'
@@ -290,6 +300,18 @@ class CommandParser:
     
     def cmd_down(self, args: List[str]) -> bool:
         return self._move_direction('down')
+
+    def cmd_northeast(self, args: List[str]) -> bool:
+        return self._move_direction('northeast')
+
+    def cmd_northwest(self, args: List[str]) -> bool:
+        return self._move_direction('northwest')
+
+    def cmd_southeast(self, args: List[str]) -> bool:
+        return self._move_direction('southeast')
+
+    def cmd_southwest(self, args: List[str]) -> bool:
+        return self._move_direction('southwest')
     
     def _move_direction(self, direction: str) -> bool:
         """Handle directional movement."""
