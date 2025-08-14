@@ -88,7 +88,9 @@ class Room:
     def __init__(self, room_id: str, name: str, description: str,
                  coords: Optional[Tuple[int, int, int]] = None,
                  room_type: str = "normal",
-                 lighting: str = "bright"):
+                 lighting: str = "bright",
+                 scent: str = "",
+                 temperature: str = ""):
         """Initialize room with basic properties."""
         self.room_id = room_id
         self.name = name
@@ -105,6 +107,7 @@ class Room:
         # Contents
         self.items: Dict[str, RoomItem] = {}
         self.enemies: Dict[str, RoomEnemy] = {}
+        self.examinables: Dict[str, str] = {}
         
         # State tracking
         self.visited: bool = False
@@ -115,6 +118,8 @@ class Room:
         self.is_safe: bool = False  # No combat allowed
         self.is_dark: bool = (lighting == 'dark')  # Requires light source
         self.ambient_sound: str = ""  # Background sound description
+        self.scent: str = scent
+        self.temperature: str = temperature
         self.special_actions: Dict[str, str] = {}  # Custom room actions
         
     def add_exit(self, direction: ExitDirection, destination_room: str, 
@@ -204,6 +209,11 @@ class Room:
         # Add ambient sound if present
         if self.ambient_sound:
             desc_lines.append(f"[{self.ambient_sound}]")
+        # Add sensory details
+        if self.scent:
+            desc_lines.append(f"[Scent: {self.scent}]")
+        if self.temperature:
+            desc_lines.append(f"[Air: {self.temperature}]")
         
         # Add visible items
         visible_items = self.get_visible_items()
@@ -241,6 +251,9 @@ class Room:
             'coords': self.coords,
             'room_type': self.room_type,
             'lighting': self.lighting,
+            'scent': self.scent,
+            'temperature': self.temperature,
+            'examinables': self.examinables,
             'items': {
                 item_id: {
                     'quantity': item.quantity,
@@ -262,6 +275,9 @@ class Room:
         self.room_type = data.get('room_type', self.room_type)
         self.lighting = data.get('lighting', self.lighting)
         self.is_dark = (self.lighting == 'dark')
+        self.scent = data.get('scent', self.scent)
+        self.temperature = data.get('temperature', self.temperature)
+        self.examinables = data.get('examinables', self.examinables)
         
         # Restore item quantities
         saved_items = data.get('items', {})

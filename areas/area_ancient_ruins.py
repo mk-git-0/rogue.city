@@ -38,6 +38,8 @@ class AncientRuinsArea(BaseArea):
                 coords=tuple(room_data.get("coords")) if room_data.get("coords") else None,
                 room_type=room_data.get("room_type", "normal"),
                 lighting=room_data.get("lighting", "dim"),
+                scent=room_data.get("scent", ""),
+                temperature=room_data.get("temperature", ""),
             )
 
             # Properties
@@ -70,6 +72,10 @@ class AncientRuinsArea(BaseArea):
                     can_take=item.get("can_take", True),
                     quantity=item.get("quantity", 1),
                 )
+
+            # Examinables
+            for key, value in room_data.get("examinables", {}).items():
+                room.examinables[key.lower()] = value
 
             # Enemies (none yet in Session 1)
             self.add_room(room)

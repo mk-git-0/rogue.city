@@ -388,8 +388,18 @@ class CommandParser:
                 return
         
         # Check room items
-        if hasattr(current_area, 'items'):
-            for item in current_area.items:
+        try:
+            room = current_area.get_room(self.game.current_player.current_room)
+        except Exception:
+            room = None
+        if room:
+            # Examinables (environmental details)
+            for key, text in getattr(room, 'examinables', {}).items():
+                if target in key or key in target:
+                    self.game.ui.display_message(text)
+                    return
+            # Visible items
+            for item in room.get_visible_items():
                 if target in item.name.lower():
                     self.game.ui.display_message(f"{item.name}: {item.description}")
                     return

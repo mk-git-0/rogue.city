@@ -396,7 +396,7 @@ class SkillSystem:
         return detected_traps
     
     def attempt_search(self, character, area=None, target: str = None) -> List[str]:
-        """Search for hidden items using the new skill system."""
+        """Search for hidden items, examinables, or exits using the new skill system."""
         if target:
             self.ui_manager.log_info(f"You search the {target} carefully...")
         else:
@@ -409,7 +409,25 @@ class SkillSystem:
         found_items = []
         
         if success:
-            # Simulate finding things (this would integrate with actual hidden content)
+            # Reveal hidden exits in current room if present
+            try:
+                room = area.get_room(character.current_room)
+            except Exception:
+                room = None
+            if room:
+                hidden_revealed = []
+                for dir_enum, exit_obj in room.exits.items():
+                    if getattr(exit_obj, 'hidden', False):
+                        # On non-critical success, reveal but keep it present; on crit, also unlock if previously locked
+                        exit_obj.hidden = False
+                        hidden_revealed.append(dir_enum.value)
+                if hidden_revealed:
+                    self.ui_manager.log_success(f"You discover a hidden passage: {', '.join(hidden_revealed)}.")
+                    found_items.extend([f"hidden exit {d}" for d in hidden_revealed])
+                    # Early return if we found hard content
+                    return found_items
+
+            # Flavor finds
             if result_desc == "Critical Success!":
                 found = "You discover a secret compartment behind a loose stone!"
                 found_items.append(found)

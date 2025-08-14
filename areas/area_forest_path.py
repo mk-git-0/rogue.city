@@ -84,6 +84,8 @@ class ForestPathArea(BaseArea):
             coords=tuple(room_data.get("coords")) if room_data.get("coords") else None,
             room_type=room_data.get("room_type", "normal"),
             lighting=room_data.get("lighting", "bright"),
+            scent=room_data.get("scent", ""),
+            temperature=room_data.get("temperature", ""),
         )
         
         # Set room properties
@@ -117,6 +119,10 @@ class ForestPathArea(BaseArea):
                 can_take=item_data.get("can_take", True),
                 quantity=item_data.get("quantity", 1)
             )
+
+        # Add examinables
+        for key, value in room_data.get("examinables", {}).items():
+            room.examinables[key.lower()] = value
             
         # Add enemies
         enemies_data = room_data.get("enemies", {})
