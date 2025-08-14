@@ -888,6 +888,21 @@ class CommandParser:
         target = ' '.join(args) if args else None
         current_area = getattr(self.game.current_player, 'current_area', None)
         self.game.skill_system.attempt_search(self.game.current_player, current_area, target)
+        # Quest hook: Ruins Q1 step completion when searching Entrance Hall
+        try:
+            if current_area and getattr(current_area, 'area_id', '') == 'ancient_ruins':
+                if self.game.current_room == 'entrance_hall' and hasattr(self.game.current_player, 'quest_manager'):
+                    qm = self.game.current_player.quest_manager
+                    journal = qm.get_journal()
+                    active_ids = [q['quest_id'] for q in journal['active']]
+                    if 'ruins_q1_investigate' in active_ids:
+                        # Advance Q1 if step 1
+                        quest = qm.get_active_quest('ruins_q1_investigate')
+                        if quest and quest.current_step.value <= 1:
+                            qm.advance_quest_step('ruins_q1_investigate')
+                            self.game.ui_manager.log_success("Objective complete: You investigated the disturbance.")
+        except Exception:
+            pass
         
         return True
     

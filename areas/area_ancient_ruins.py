@@ -34,6 +34,7 @@ class AncientRuinsArea(BaseArea):
             'lore_star_1', 'lore_star_2', 'lore_star_3'
         }
         self._lore_fragments_collected: set[str] = set()
+        self._flags: set[str] = set()
 
     def _load_area_data(self) -> None:
         data = self._load_json_data("ancient_ruins.json")
@@ -198,6 +199,63 @@ class AncientRuinsArea(BaseArea):
                     self._flags.add('star_unlocked')
                     messages.append("A resonance hum builds in the Archive Gate. A passage opens above!")
         return messages
+
+    def on_enemy_defeated(self, enemy_id: str, room_id: str) -> list[str]:
+        """Dynamic world-state changes after important defeats."""
+        messages: list[str] = []
+        low = (enemy_id or "").lower()
+
+        # Corrupted Keeper defeated => Entrance Hall becomes calmer (reduce respawns nearby)
+        if 'keeper' in low and 'keeper_cleansed' not in self._flags:
+            self._flags.add('keeper_cleansed')
+            self._adjust_respawns(zone='entrance', factor=0)
+            messages.append("A hush settles over the Entrance Hall. Fewer creatures prowl these corridors.")
+
+        # Demon seal disrupted => Deep Vaults spawn less often
+        if ('demon' in low or 'seal' in low) and 'demon_seal_disrupted' not in self._flags:
+            self._flags.add('demon_seal_disrupted')
+            self._adjust_respawns(zone='deep', factor=2)
+            messages.append("The demonic resonance weakens. Vault denizens grow scarce.")
+
+        # Twin Sentinels placeholder (future mid-boss)
+        if 'sentinel' in low and 'twin_sentinels_defeated' not in self._flags:
+            self._flags.add('twin_sentinels_defeated')
+            self._adjust_respawns(zone='central', factor=2)
+            messages.append("With the Sentinels down, patrols thin in the Central Chambers.")
+
+        return messages
+
+    def _adjust_respawns(self, zone: str, factor: int) -> None:
+        """Reduce or disable respawns in selected zones.
+
+        factor:
+          0 => disable respawns
+          2 => double respawn delay (slower)
+        """
+        try:
+            zone_rooms = []
+            if zone == 'entrance':
+                zone_rooms = ['entrance_hall', 'shattered_portico', 'vestibule', 'threshold_gate', 'watch_alcove']
+            elif zone == 'central':
+                zone_rooms = ['training_circle', 'barracks', 'hall_of_chains', 'cross_ref', 'kiln', 'automata_bay']
+            elif zone == 'deep':
+                zone_rooms = ['warded_quadrant', 'demon_seal', 'deep_repository', 'sentinel_watch', 'undercroft', 'ring_gallery']
+
+            for rid in zone_rooms:
+                room = self.get_room(rid)
+                if not room:
+                    continue
+                for eid, renemy in room.enemies.items():
+                    if factor == 0:
+                        renemy.respawn = False
+                    elif factor > 1:
+                        try:
+                            renemy.respawn_delay = int(max(1, renemy.respawn_delay) * factor)
+                            renemy.respawn = True
+                        except Exception:
+                            renemy.respawn = True
+        except Exception:
+            pass
 
     def on_room_enter(self, room_id: str, character) -> list[str]:
         messages = []
