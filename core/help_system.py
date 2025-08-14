@@ -272,8 +272,8 @@ class HelpSystem:
         
         # Movement
         self.ui.display_message("MOVEMENT COMMANDS:")
-        self.ui.display_message("  north, south, east, west, up, down")
-        self.ui.display_message("  Aliases: n, s, e, w, u, d")
+        self.ui.display_message("  north, northeast, east, southeast, south, southwest, west, northwest, up, down")
+        self.ui.display_message("  Aliases: n, ne, e, se, s, sw, w, nw, u, d")
         self.ui.display_message("")
         
         # Examination
@@ -584,7 +584,7 @@ class HelpSystem:
     def get_general_help(self) -> str:
         """Get general help text for external use."""
         return """=== ROGUE CITY COMMAND REFERENCE ===
-MOVEMENT: north, south, east, west, up, down (n, s, e, w, u, d)
+MOVEMENT: north, northeast, east, southeast, south, southwest, west, northwest, up, down (n, ne, e, se, s, sw, w, nw, u, d)
 EXAMINATION: look [target], examine <target>, exits, map
 INVENTORY: inventory (i), get <item>, drop <item>, equip <item>, unequip <item>
 COMBAT: attack <enemy>, auto, flee, status
