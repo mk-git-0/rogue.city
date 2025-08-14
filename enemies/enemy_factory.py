@@ -290,6 +290,29 @@ class EnemyFactory:
         
         # Loot table
         enemy.loot_table = template.get('loot_table', [])
+        # Add tiered loot entry if defined via economy override
+        try:
+            econ_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'economy', 'loot_tables.json')
+            if os.path.exists(econ_path):
+                with open(econ_path, 'r') as f:
+                    econ = json.load(f)
+                tiers = econ.get('enemy_overrides', {}).get(enemy_type, {}).get('tiers')
+                if tiers:
+                    # Roll one tier according to weights to drop as placeholder; conversion handled in combat system
+                    import random
+                    total = sum(tiers.values())
+                    r = random.randint(1, max(1, total))
+                    acc = 0
+                    chosen = None
+                    for tier, weight in tiers.items():
+                        acc += int(weight)
+                        if r <= acc:
+                            chosen = tier
+                            break
+                    if chosen:
+                        enemy.loot_table.append({'name': chosen, 'type': 'tier', 'chance': 100, 'quantity': 1})
+        except Exception:
+            pass
         enemy.gold_min = template.get('gold_min', 0)
         enemy.gold_max = template.get('gold_max', 0)
         

@@ -1,0 +1,40 @@
+{
+  "tiers": {
+    "common": 60,
+    "uncommon": 25,
+    "rare": 12,
+    "legendary": 3
+  },
+  "pools": {
+    "common": [
+      {"item_id": "minor_health_potion", "weight": 10},
+      {"item_id": "rations", "weight": 8},
+      {"item_id": "leather_scraps", "weight": 4}
+    ],
+    "uncommon": [
+      {"item_id": "steel_dagger", "weight": 6},
+      {"item_id": "leather_armor", "weight": 6},
+      {"item_id": "buckler", "weight": 4}
+    ],
+    "rare": [
+      {"item_id": "heater_shield", "weight": 3},
+      {"item_id": "chain_mail", "weight": 2}
+    ],
+    "legendary": [
+      {"item_id": "guardian_aegis", "weight": 1}
+    ]
+  },
+  "enemy_overrides": {
+    "ruin_bat": {"tiers": {"common": 90, "uncommon": 10}},
+    "crumbling_guard": {"tiers": {"common": 50, "uncommon": 35, "rare": 12, "legendary": 3}},
+    "hooded_cultist": {"tiers": {"common": 40, "uncommon": 40, "rare": 17, "legendary": 3}},
+    "animated_armor": {"tiers": {"common": 30, "uncommon": 40, "rare": 27, "legendary": 3}},
+    "lesser_demon": {"tiers": {"common": 20, "uncommon": 35, "rare": 40, "legendary": 5}},
+    "stone_construct": {"tiers": {"common": 20, "uncommon": 35, "rare": 40, "legendary": 5}},
+    "aberrant_wisp": {"tiers": {"common": 25, "uncommon": 35, "rare": 35, "legendary": 5}},
+    "vault_guardian": {"tiers": {"common": 0, "uncommon": 0, "rare": 70, "legendary": 30}}
+  },
+  "chests": {
+    "ruins_common": {"guaranteed_min_tier": "uncommon", "cooldown_minutes": 30}
+  }
+}

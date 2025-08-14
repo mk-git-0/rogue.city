@@ -31,6 +31,32 @@
       "class_restrictions": []
     },
     {
+      "merchant_id": "ruins_quartermaster",
+      "name": "Rellan the Quartermaster",
+      "merchant_type": "general_store",
+      "area_id": "ancient_ruins",
+      "room_id": "entrance_hall",
+      "alignment": "NEUTRAL",
+      "inventory": {
+        "minor_health_potion": 5,
+        "rations": 5,
+        "rope": 2,
+        "steel_dagger": 1,
+        "leather_armor": 1
+      },
+      "buy_categories": ["weapon", "armor", "consumable", "accessory"],
+      "sell_markup": 1.3,
+      "buy_markdown": 0.5,
+      "wealth": { "gold": 150, "silver": 0, "copper": 0 },
+      "greeting": "Supplies for the ruins! Rest up and stock wisely.",
+      "description": "A pragmatic quartermaster posted at the ruins entrance to support expeditions.",
+      "is_hidden": false,
+      "discovery_skill": null,
+      "discovery_difficulty": 10,
+      "reputation_requirements": {},
+      "class_restrictions": []
+    },
+    {
       "merchant_id": "forest_peddler",
       "name": "Wandering Peddler",
       "merchant_type": "traveling",

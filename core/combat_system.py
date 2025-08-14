@@ -149,6 +149,42 @@ class CombatSystem:
                 if self.game_engine and hasattr(self.game_engine, 'current_area') and hasattr(self.game_engine, 'current_room'):
                     area = self.game_engine.current_area
                     room_id = self.game_engine.current_room
+                    # Augment loot via economy tables for drops that are tiered placeholders
+                    augmented_loot = []
+                    try:
+                        from core.item_factory import ItemFactory
+                        import json, os, random
+                        econ_file = os.path.join('data', 'economy', 'loot_tables.json')
+                        economy = None
+                        if os.path.exists(econ_file):
+                            with open(econ_file, 'r') as f:
+                                economy = json.load(f)
+                        def roll_from_pool(tier: str) -> str | None:
+                            if not economy:
+                                return None
+                            pool = economy.get('pools', {}).get(tier, [])
+                            if not pool:
+                                return None
+                            total = sum(entry.get('weight', 1) for entry in pool)
+                            r = random.randint(1, max(1, total))
+                            acc = 0
+                            for entry in pool:
+                                acc += entry.get('weight', 1)
+                                if r <= acc:
+                                    return entry.get('item_id')
+                            return None
+                        # Convert any loot entries with type 'tier' into concrete items
+                        for loot in list(self.loot_gained):
+                            if str(loot.get('type','')).lower() == 'tier':
+                                tier = str(loot.get('name','common')).lower()
+                                item_id = roll_from_pool(tier)
+                                if item_id:
+                                    augmented_loot.append({'name': item_id, 'type': 'item', 'quantity': loot.get('quantity',1)})
+                            else:
+                                augmented_loot.append(loot)
+                        self.loot_gained = augmented_loot
+                    except Exception:
+                        pass
                     for idx, loot in enumerate(self.loot_gained):
                         loot_name = str(loot.get('name', 'Loot'))
                         loot_type = str(loot.get('type', 'misc')).lower()
