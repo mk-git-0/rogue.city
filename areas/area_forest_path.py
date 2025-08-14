@@ -68,6 +68,12 @@ class ForestPathArea(BaseArea):
             "[Clearing]": "Forest Clearing (safe)",
             "[Deep Forest]": "Deep Forest (guardian)"
         }
+
+        # Ensure dungeon entrance from forest if present
+        entrance = self.get_room("deep_forest")
+        if entrance and 'southeast' not in {d.value for d in entrance.exits.keys()}:
+            from .base_area import ExitDirection
+            entrance.add_exit(ExitDirection.SOUTHEAST, "entrance_hall", "ancient_ruins")
         
     def _create_room_from_data(self, room_id: str, room_data: Dict[str, Any]) -> None:
         """Create a room from JSON data."""

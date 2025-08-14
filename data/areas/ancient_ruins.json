@@ -1,0 +1,215 @@
+{
+  "area_info": {
+    "area_id": "ancient_ruins",
+    "name": "Ancient Ruins",
+    "description": "An ancient subterranean complex beneath the forest, divided into Entrance Hall, Central Chambers, and Deep Vaults.",
+    "starting_room": "entrance_hall"
+  },
+  "rooms": {
+    "entrance_hall": {
+      "name": "Entrance Hall",
+      "room_type": "transition",
+      "lighting": "dim",
+      "coords": [0, 0, 0],
+      "description": "Stone steps descend from the forest into a crumbling hall. Faded mosaics [depict processions] and fractured columns lean in the gloom.",
+      "ambient_sound": "Distant drip of water, soft gusts stirring dust",
+      "exits": {
+        "north": { "destination": "deep_forest", "destination_area": "forest_path", "description": "back to the forest" },
+        "east": { "destination": "antechamber" },
+        "down": { "destination": "collapsed_ramp" }
+      }
+    },
+    "antechamber": {
+      "name": "Antechamber",
+      "lighting": "dim",
+      "coords": [1, 0, 0],
+      "description": "A narrow chamber with [stone benches] and [faded script] carved into the walls. The air is noticeably colder.",
+      "ambient_sound": "A whispering draft flowing from below",
+      "exits": {
+        "west": { "destination": "entrance_hall" },
+        "down": { "destination": "grand_crossing" },
+        "northeast": { "destination": "mosaic_nook" }
+      }
+    },
+    "mosaic_nook": {
+      "name": "Mosaic Nook",
+      "lighting": "dim",
+      "coords": [2, 1, 0],
+      "description": "A small alcove where a [broken mosaic] shows robed figures around a star. Tiles crunch underfoot.",
+      "exits": {
+        "southwest": { "destination": "antechamber" }
+      }
+    },
+    "collapsed_ramp": {
+      "name": "Collapsed Ramp",
+      "lighting": "dark",
+      "coords": [0, 0, -1],
+      "description": "A sloped passage choked with rubble. Narrow gaps allow squeezing through if you proceed carefully.",
+      "exits": {
+        "up": { "destination": "entrance_hall" },
+        "east": { "destination": "grand_crossing" }
+      }
+    },
+    "grand_crossing": {
+      "name": "Grand Crossing",
+      "lighting": "dark",
+      "coords": [1, 0, -1],
+      "description": "A wide intersection where corridors meet from all directions. A [fallen statue] lays broken across one path.",
+      "exits": {
+        "west": { "destination": "collapsed_ramp" },
+        "east": { "destination": "statue_hall" },
+        "north": { "destination": "scribe_way" },
+        "south": { "destination": "drain_tunnel" },
+        "down": { "destination": "lower_landing" }
+      }
+    },
+    "statue_hall": {
+      "name": "Statue Hall",
+      "lighting": "dim",
+      "coords": [2, 0, -1],
+      "description": "A procession of shattered statues lines the hall. One [intact plinth] bears scrape marks pointing east.",
+      "exits": {
+        "west": { "destination": "grand_crossing" },
+        "east": { "destination": "fountain_court" },
+        "southeast": { "destination": "service_stairs" }
+      }
+    },
+    "fountain_court": {
+      "name": "Fountain Court",
+      "lighting": "dim",
+      "coords": [3, 0, -1],
+      "room_type": "safe_zone",
+      "description": "A dry fountain dominates a small court. Faint scratches read: 'Rest here, traveler.'",
+      "exits": {
+        "west": { "destination": "statue_hall" },
+        "down": { "destination": "cistern" }
+      }
+    },
+    "scribe_way": {
+      "name": "Scribe Way",
+      "lighting": "dim",
+      "coords": [1, 1, -1],
+      "description": "Shelves carved into stone hold crumbling [clay tablets]. Drafts carry the scent of old dust.",
+      "exits": {
+        "south": { "destination": "grand_crossing" },
+        "northeast": { "destination": "archive_gate" },
+        "northwest": { "destination": "ledge_overlook" }
+      }
+    },
+    "drain_tunnel": {
+      "name": "Drain Tunnel",
+      "lighting": "dark",
+      "coords": [1, -1, -1],
+      "description": "A cramped passage with slick stone and trickling water. A faint breeze suggests other routes ahead.",
+      "exits": {
+        "north": { "destination": "grand_crossing" },
+        "southeast": { "destination": "service_stairs" }
+      }
+    },
+    "service_stairs": {
+      "name": "Service Stairs",
+      "lighting": "dark",
+      "coords": [2, -1, -1],
+      "description": "Narrow stairs descend into deeper shadow. The stone is worn by centuries of use.",
+      "exits": {
+        "northwest": { "destination": "statue_hall" },
+        "up": { "destination": "statue_hall" },
+        "down": { "destination": "lower_landing" }
+      }
+    },
+    "lower_landing": {
+      "name": "Lower Landing",
+      "lighting": "dark",
+      "coords": [1, 0, -2],
+      "room_type": "transition",
+      "description": "A cramped landing where deeper vault corridors begin. The temperature drops noticeably.",
+      "exits": {
+        "up": { "destination": "grand_crossing" },
+        "east": { "destination": "vault_corridor_e" },
+        "west": { "destination": "vault_corridor_w" }
+      }
+    },
+    "vault_corridor_e": {
+      "name": "Vault Corridor (East)",
+      "lighting": "dark",
+      "coords": [2, 0, -2],
+      "description": "A long corridor with sealed doors bearing [glyph seals].", 
+      "exits": {
+        "west": { "destination": "lower_landing" },
+        "east": { "destination": "sealed_vault" },
+        "northeast": { "destination": "archive_gate" }
+      }
+    },
+    "vault_corridor_w": {
+      "name": "Vault Corridor (West)",
+      "lighting": "dark",
+      "coords": [0, 0, -2],
+      "description": "Broken niches and toppled urns line the passage.",
+      "exits": {
+        "east": { "destination": "lower_landing" },
+        "west": { "destination": "collapsed_maze" }
+      }
+    },
+    "archive_gate": {
+      "name": "Archive Gate",
+      "lighting": "dim",
+      "coords": [2, 2, -1],
+      "room_type": "transition",
+      "description": "A reinforced arch with rusted hinges. A [gate sigil] faintly glows when touched.",
+      "exits": {
+        "southwest": { "destination": "scribe_way" },
+        "south": { "destination": "vault_corridor_e" },
+        "north": { "destination": "ancient_library" }
+      }
+    },
+    "ancient_library": {
+      "name": "The Crumbling Archive",
+      "lighting": "dim",
+      "coords": [2, 3, -1],
+      "room_type": "normal",
+      "description": "Collapsed shelves and scattered [journal fragments] hint at knowledge lost. The air tastes of old ink.",
+      "exits": {
+        "south": { "destination": "archive_gate" },
+        "east": { "destination": "sealed_vault" }
+      }
+    },
+    "sealed_vault": {
+      "name": "Sealed Vault",
+      "lighting": "dark",
+      "coords": [3, 3, -1],
+      "room_type": "boss_room",
+      "description": "A heavy door marked by a warded sigil. It feels significant.",
+      "exits": {
+        "west": { "destination": "ancient_library" }
+      }
+    },
+    "cistern": {
+      "name": "Cistern",
+      "lighting": "dark",
+      "coords": [3, 0, -2],
+      "room_type": "safe_zone",
+      "description": "A silent underground reservoir. The water is still. Cool air pools here.",
+      "exits": {
+        "up": { "destination": "fountain_court" }
+      }
+    },
+    "ledge_overlook": {
+      "name": "Ledge Overlook",
+      "lighting": "dim",
+      "coords": [0, 2, -1],
+      "description": "A narrow ledge overlooking darkness. Somewhere below, metal clinks softly.",
+      "exits": {
+        "southeast": { "destination": "scribe_way" }
+      }
+    },
+    "collapsed_maze": {
+      "name": "Collapsed Maze",
+      "lighting": "dark",
+      "coords": [-1, 0, -2],
+      "description": "A tangle of fallen walls and dead ends. You can navigate with care, but it loops upon itself.",
+      "exits": {
+        "east": { "destination": "vault_corridor_w" }
+      }
+    }
+  }
+}

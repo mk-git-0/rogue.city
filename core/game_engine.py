@@ -1461,15 +1461,18 @@ class GameEngine:
             # Import area classes
             from areas.area_tutorial_cave import TutorialCaveArea
             from areas.area_forest_path import ForestPathArea
+            from areas.area_ancient_ruins import AncientRuinsArea
             
             # Create area instances
             tutorial_cave = TutorialCaveArea()
             forest_path = ForestPathArea()
+            ancient_ruins = AncientRuinsArea()
             
             # Store areas
             self.world_areas = {
                 'tutorial_cave': tutorial_cave,
-                'forest_path': forest_path
+                'forest_path': forest_path,
+                'ancient_ruins': ancient_ruins,
             }
             
             self.ui_manager.log_info("World areas loaded successfully.")
