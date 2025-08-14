@@ -5,6 +5,7 @@ Multi-zone dungeon with 8-directional navigation and vertical transitions.
 
 from typing import Dict, Any
 from .base_area import BaseArea, Room, ExitDirection
+import time
 
 
 class AncientRuinsArea(BaseArea):
@@ -22,6 +23,8 @@ class AncientRuinsArea(BaseArea):
                 "Faint glyphs mark the stone and stale air carries whispers of the past."
             ),
         )
+        # Chest respawn tracking: chest_id -> next_available_epoch
+        self._chest_respawns: Dict[str, float] = {}
 
     def _load_area_data(self) -> None:
         data = self._load_json_data("ancient_ruins.json")
@@ -91,6 +94,24 @@ class AncientRuinsArea(BaseArea):
             # Enemies (none yet in Session 1)
             self.add_room(room)
 
+        # Initialize chest cooldowns based on economy config (default 30 minutes)
+        try:
+            import json, os
+            econ_file = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data', 'economy', 'loot_tables.json')
+            cooldown = 30
+            if os.path.exists(econ_file):
+                with open(econ_file, 'r') as f:
+                    econ = json.load(f)
+                cooldown = int(econ.get('chests', {}).get('ruins_common', {}).get('cooldown_minutes', 30))
+            now = time.time()
+            for rid, room in self.rooms.items():
+                for item_id, item in room.items.items():
+                    if 'chest' in item_id:
+                        self._chest_respawns[item_id] = now
+            self._chest_cooldown_minutes = cooldown
+        except Exception:
+            self._chest_cooldown_minutes = 30
+
         # Area meta
         info = data.get("area_info", {})
         self.starting_room = info.get("starting_room", "entrance_hall")
@@ -143,3 +164,33 @@ class AncientRuinsArea(BaseArea):
 
     def get_starting_room(self) -> str:
         return self.starting_room
+
+    def on_item_taken(self, item_id: str, room_id: str) -> list[str]:
+        """Handle chest respawn scheduling and lore hooks."""
+        messages = []
+        if 'chest' in item_id:
+            # Schedule chest respawn
+            cooldown = getattr(self, '_chest_cooldown_minutes', 30)
+            self._chest_respawns[item_id] = time.time() + cooldown * 60
+            messages.append("You empty the chest. It will take time to reset.")
+        return messages
+
+    def on_room_enter(self, room_id: str, character) -> list[str]:
+        messages = []
+        room = self.get_room(room_id)
+        if not room:
+            return messages
+        # Chest respawn check
+        try:
+            now = time.time()
+            to_respawn = []
+            for item_id, item in list(room.items.items()):
+                # If chest missing but cooldown passed, re-add
+                if 'chest' in item_id and item.quantity <= 0:
+                    next_at = self._chest_respawns.get(item_id, 0)
+                    if now >= next_at:
+                        item.quantity = 1
+                        messages.append("You hear a click as an ancient mechanism resets a chest." )
+            return messages
+        except Exception:
+            return messages

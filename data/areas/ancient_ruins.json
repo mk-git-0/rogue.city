@@ -444,6 +444,14 @@
       "exits": {
         "south": { "destination": "archive_gate" },
         "east": { "destination": "sealed_vault" }
+      },
+      "items": {
+        "library_chest": {
+          "name": "ancient chest",
+          "description": "An ornate chest bound in bronze. A faint ward sigil flickers on its latch.",
+          "can_take": false,
+          "quantity": 1
+        }
       }
     },
     "sealed_vault": {

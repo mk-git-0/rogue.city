@@ -14,7 +14,11 @@
     "uncommon": [
       {"item_id": "steel_dagger", "weight": 6},
       {"item_id": "leather_armor", "weight": 6},
-      {"item_id": "buckler", "weight": 4}
+      {"item_id": "buckler", "weight": 4},
+      {"item_id": "oak_staff", "weight": 4},
+      {"item_id": "chain_mail", "weight": 2},
+      {"item_id": "mage_robes", "weight": 2},
+      {"item_id": "mystic_robes", "weight": 2}
     ],
     "rare": [
       {"item_id": "heater_shield", "weight": 3},
