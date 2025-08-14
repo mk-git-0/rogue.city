@@ -509,9 +509,38 @@ class MerchantSystem:
         """Get formatted display of merchant's inventory"""
         lines = []
         lines.append(f"=== {merchant.name.upper()}'S SHOP ===")
-        lines.append(f'"{merchant.greeting}"')
+        # Dynamic greeting based on world state flags
+        dynamic_greeting = merchant.greeting
+        try:
+            area = getattr(self.game, 'current_area', None)
+            if merchant.merchant_id == 'ruins_quartermaster' and area and hasattr(area, '_flags'):
+                if 'keeper_cleansed' in area._flags:
+                    dynamic_greeting = "With the halls calmer, I can offer better gear."
+                if 'twin_sentinels_defeated' in area._flags:
+                    dynamic_greeting = "Stock's improving as patrols thin—take a look."
+                if 'demon_seal_disrupted' in area._flags:
+                    dynamic_greeting = "Deep vaults grow quiet—special supplies just arrived."
+        except Exception:
+            pass
+        lines.append(f'"{dynamic_greeting}"')
         lines.append("")
         
+        # Dynamic inventory unlocks for Ruins Quartermaster
+        try:
+            area = getattr(self.game, 'current_area', None)
+            if merchant.merchant_id == 'ruins_quartermaster' and area and hasattr(area, '_flags'):
+                if 'keeper_cleansed' in area._flags:
+                    merchant.add_inventory('steel_dagger', 1)
+                    merchant.add_inventory('leather_armor', 1)
+                if 'twin_sentinels_defeated' in area._flags:
+                    merchant.add_inventory('chain_mail', 1)
+                    merchant.add_inventory('heater_shield', 1)
+                if 'demon_seal_disrupted' in area._flags:
+                    merchant.add_inventory('major_health_potion', 2)
+                    merchant.add_inventory('major_mana_potion', 2)
+        except Exception:
+            pass
+
         if not merchant.inventory:
             lines.append("Nothing for sale right now.")
             return "\n".join(lines)

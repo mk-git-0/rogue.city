@@ -198,6 +198,21 @@ class AncientRuinsArea(BaseArea):
                         self._flags = set()
                     self._flags.add('star_unlocked')
                     messages.append("A resonance hum builds in the Archive Gate. A passage opens above!")
+            # Quest hook: advance Keeper's Journal quest steps
+            try:
+                if hasattr(self, 'game_engine') and hasattr(self.game_engine, 'current_character'):
+                    character = self.game_engine.current_character
+                    if character and hasattr(character, 'quest_manager') and character.quest_manager:
+                        qm = character.quest_manager
+                        journal = qm.get_journal()
+                        active_ids = [q['quest_id'] for q in journal['active']]
+                        if 'ruins_q2_keepers_journal' in active_ids:
+                            quest = qm.get_active_quest('ruins_q2_keepers_journal')
+                            if quest and quest.current_step.value < 4:
+                                qm.advance_quest_step('ruins_q2_keepers_journal')
+                                messages.append("Journal updated: A fragment has been secured.")
+            except Exception:
+                pass
         return messages
 
     def on_enemy_defeated(self, enemy_id: str, room_id: str) -> list[str]:
@@ -216,14 +231,31 @@ class AncientRuinsArea(BaseArea):
             self._flags.add('demon_seal_disrupted')
             self._adjust_respawns(zone='deep', factor=2)
             messages.append("The demonic resonance weakens. Vault denizens grow scarce.")
+            # Quest hook Q3 progression
+            self._advance_ruins_quest('ruins_q3_cleanse')
 
         # Twin Sentinels placeholder (future mid-boss)
         if 'sentinel' in low and 'twin_sentinels_defeated' not in self._flags:
             self._flags.add('twin_sentinels_defeated')
             self._adjust_respawns(zone='central', factor=2)
             messages.append("With the Sentinels down, patrols thin in the Central Chambers.")
+            self._advance_ruins_quest('ruins_q3_cleanse')
 
         return messages
+
+    def _advance_ruins_quest(self, quest_id: str) -> None:
+        """Advance a Ruins quest by one step if it's currently active."""
+        try:
+            if hasattr(self, 'game_engine') and hasattr(self.game_engine, 'current_character'):
+                character = self.game_engine.current_character
+                if character and hasattr(character, 'quest_manager') and character.quest_manager:
+                    qm = character.quest_manager
+                    journal = qm.get_journal()
+                    active_ids = [q['quest_id'] for q in journal['active']]
+                    if quest_id in active_ids:
+                        qm.advance_quest_step(quest_id)
+        except Exception:
+            pass
 
     def _adjust_respawns(self, zone: str, factor: int) -> None:
         """Reduce or disable respawns in selected zones.
