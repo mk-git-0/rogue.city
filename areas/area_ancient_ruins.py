@@ -25,6 +25,15 @@ class AncientRuinsArea(BaseArea):
         )
         # Chest respawn tracking: chest_id -> next_available_epoch
         self._chest_respawns: Dict[str, float] = {}
+        # First-visit bonuses and lore fragment tracking
+        self._first_visit_bonus_awarded: set[str] = set()
+        self._secret_rooms: set[str] = {
+            'waterfall_hollow', 'puzzle_vault', 'class_chamber', 'star_chamber'
+        }
+        self._lore_fragments_required: set[str] = {
+            'lore_star_1', 'lore_star_2', 'lore_star_3'
+        }
+        self._lore_fragments_collected: set[str] = set()
 
     def _load_area_data(self) -> None:
         data = self._load_json_data("ancient_ruins.json")
@@ -173,6 +182,21 @@ class AncientRuinsArea(BaseArea):
             cooldown = getattr(self, '_chest_cooldown_minutes', 30)
             self._chest_respawns[item_id] = time.time() + cooldown * 60
             messages.append("You empty the chest. It will take time to reset.")
+        # Lore fragment collection
+        if item_id in self._lore_fragments_required:
+            if item_id not in self._lore_fragments_collected:
+                self._lore_fragments_collected.add(item_id)
+                messages.append("You recover a lore fragment etched with star glyphs.")
+            # Unlock final secret if all collected
+            if self._lore_fragments_required.issubset(self._lore_fragments_collected):
+                gate = self.get_room('archive_gate')
+                if gate and 'star_unlocked' not in getattr(self, '_flags', set()):
+                    from .base_area import ExitDirection
+                    gate.add_exit(ExitDirection.UP, 'star_chamber')
+                    if not hasattr(self, '_flags'):
+                        self._flags = set()
+                    self._flags.add('star_unlocked')
+                    messages.append("A resonance hum builds in the Archive Gate. A passage opens above!")
         return messages
 
     def on_room_enter(self, room_id: str, character) -> list[str]:
@@ -194,3 +218,15 @@ class AncientRuinsArea(BaseArea):
             return messages
         except Exception:
             return messages
+
+        # First-visit exploration bonuses
+        if room_id not in self._first_visit_bonus_awarded:
+            self._first_visit_bonus_awarded.add(room_id)
+            bonus_xp = 50 if room_id in self._secret_rooms else 15
+            try:
+                if character and hasattr(character, 'gain_experience'):
+                    character.gain_experience(bonus_xp)
+                    messages.append(f"You gain {bonus_xp} bonus experience for discovering this area.")
+            except Exception:
+                pass
+        return messages

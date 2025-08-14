@@ -242,6 +242,14 @@
       "exits": {
         "west": { "destination": "statue_hall" },
         "down": { "destination": "cistern", "hidden": true }
+      },
+      "items": {
+        "lore_star_1": {
+          "name": "star-etched shard",
+          "description": "A small shard etched with one point of a seven-pointed star.",
+          "can_take": true,
+          "quantity": 1
+        }
       }
     },
     "scribe_way": {
@@ -360,6 +368,14 @@
       },
       "enemies": {
         "cultists": { "enemy_type": "hooded_cultist", "quantity": 2, "respawn": true, "respawn_delay": 5 }
+      },
+      "items": {
+        "lore_star_2": {
+          "name": "catalogue scrap",
+          "description": "A catalog entry fragment with a star motif and a verse number.",
+          "can_take": true,
+          "quantity": 1
+        }
       }
     },
     "kiln": {
@@ -635,6 +651,14 @@
       },
       "enemies": {
         "construct": { "enemy_type": "stone_construct", "quantity": 1, "respawn": true, "respawn_delay": 15 }
+      },
+      "items": {
+        "lore_star_3": {
+          "name": "ward sigil rubbing",
+          "description": "A rubbing of a ward sigil showing the star complete when aligned.",
+          "can_take": true,
+          "quantity": 1
+        }
       }
     },
     "demon_seal": {
