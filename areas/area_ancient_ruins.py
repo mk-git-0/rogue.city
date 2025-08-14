@@ -229,4 +229,9 @@ class AncientRuinsArea(BaseArea):
                     messages.append(f"You gain {bonus_xp} bonus experience for discovering this area.")
             except Exception:
                 pass
+        # Context hints for quest Session 7.1
+        if room_id == 'entrance_hall':
+            messages.append("Objective: Investigate the disturbance deeper in the Entrance Hall zone.")
+        if room_id == 'ancient_library':
+            messages.append("Objective: The Keeper's Journal fragments may be scattered here.")
         return messages

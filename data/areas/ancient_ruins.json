@@ -23,6 +23,9 @@
       },
       "enemies": {
         "bat_swarm": { "enemy_type": "ruin_bat", "quantity": 2, "respawn": true, "respawn_delay": 0, "encounter_name": "ruin bats" }
+      },
+      "special_actions": {
+        "ask missions": "Rellan the Quartermaster mentions disturbances deeper in the ruins. He suggests: 'Investigate the disturbance in the Entrance Hall and report back.'"
       }
     },
     "shattered_portico": {
