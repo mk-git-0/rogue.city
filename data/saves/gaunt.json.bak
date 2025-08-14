@@ -1,50 +1,132 @@
 {
   "character_name": "gaunt",
-  "character_class": "mystic",
+  "character_class": "rogue",
   "race_id": "gaunt_one",
-  "level": 1,
-  "experience": 0,
+  "level": 2,
+  "experience": 500,
   "base_stats": {
-    "strength": 13,
-    "dexterity": 14,
-    "constitution": 13,
+    "strength": 10,
+    "dexterity": 16,
+    "constitution": 14,
     "intelligence": 10,
     "wisdom": 10,
     "charisma": 10
   },
   "stats": {
-    "strength": 10,
-    "dexterity": 18,
+    "strength": 6,
+    "dexterity": 19,
     "constitution": 10,
-    "intelligence": 12,
-    "wisdom": 14,
-    "charisma": 10
+    "intelligence": 16,
+    "wisdom": 11,
+    "charisma": 8
   },
   "derived_stats": {
-    "max_hp": 8,
-    "current_hp": 1,
-    "armor_class": 14,
-    "base_attack_bonus": 5
+    "max_hp": 6,
+    "current_hp": 6,
+    "armor_class": 16,
+    "base_attack_bonus": 6
   },
   "current_location": {
     "area_id": "tutorial_cave",
     "room_id": "main_chamber"
   },
-  "unallocated_stats": 0,
+  "unallocated_stats": 1,
   "creation_complete": true,
-  "save_timestamp": "2025-08-02T23:50:41.614896",
+  "alignment_data": {
+    "alignment": "EVIL",
+    "reputation": {
+      "good_faction": -10,
+      "neutral_faction": 0,
+      "evil_faction": 10,
+      "town_guards": -15,
+      "merchants": 0,
+      "thieves_guild": 15,
+      "priests": -20,
+      "necromancers": 20,
+      "scholars": 0
+    },
+    "alignment_history": [
+      "EVIL"
+    ],
+    "drift_points": {
+      "good": 0,
+      "neutral": 0,
+      "evil": 0
+    }
+  },
+  "reputation_data": {
+    "character_name": "gaunt",
+    "faction_reputations": {
+      "town_guards": 0,
+      "merchants": 0,
+      "priests": 0,
+      "thieves_guild": 0,
+      "scholars": 0,
+      "nobles": 0,
+      "common_folk": 0,
+      "paladins": 0,
+      "necromancers": 0,
+      "cultists": 0,
+      "assassins": 0,
+      "smugglers": 0,
+      "demons": 0,
+      "rangers": 0,
+      "druids": 0
+    },
+    "individual_reputations": {},
+    "reputation_history": []
+  },
+  "magic_data": {
+    "max_mana": 0,
+    "current_mana": 0,
+    "known_spells": []
+  },
+  "currency_data": {
+    "gold": 133,
+    "silver": 0,
+    "copper": 0
+  },
+  "save_timestamp": "2025-08-12T23:05:54.310317",
   "inventory": {
     "items": {
-      "hand_wraps": {
+      "rusty_dagger": {
         "item": {
-          "item_id": "hand_wraps",
-          "name": "Hand Wraps",
-          "description": "Simple cloth wrappings that protect the hands during unarmed combat while maintaining flexibility.",
+          "item_id": "rusty_dagger",
+          "name": "Rusty Dagger",
+          "description": "A small, rusty blade that has seen better days. Despite its worn appearance, it's still sharp enough to be deadly in the right hands.",
           "item_type": "weapon",
-          "weight": 0.5,
-          "value": 3,
+          "weight": 1.0,
+          "value": 5,
           "rarity": "common",
           "class_restrictions": [
+            "rogue"
+          ],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "leather_scraps": {
+        "item": {
+          "item_id": "leather_scraps",
+          "name": "Leather Scraps",
+          "description": "Rough pieces of leather hastily sewn together. Provides minimal protection but doesn't restrict movement.",
+          "item_type": "armor",
+          "weight": 5.0,
+          "value": 5,
+          "rarity": "common",
+          "class_restrictions": [
+            "rogue",
             "mystic"
           ],
           "level_requirement": 1,
@@ -56,28 +138,74 @@
             "wisdom": 0,
             "charisma": 0
           },
-          "damage_dice": "1d3",
-          "attack_speed": 3.0,
-          "attacks_per_turn": 1,
-          "crit_range": 20,
-          "attack_bonus": 0,
-          "damage_bonus": 0
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "minor_health_potion": {
+        "item": {
+          "item_id": "minor_health_potion",
+          "name": "Minor Health Potion",
+          "description": "A small vial of red liquid that restores a modest amount of health when consumed.",
+          "item_type": "consumable",
+          "weight": 0.5,
+          "value": 25,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "rusty_dagger_1": {
+        "item": {
+          "item_id": "rusty_dagger",
+          "name": "Rusty Dagger",
+          "description": "A small, rusty blade that has seen better days. Despite its worn appearance, it's still sharp enough to be deadly in the right hands.",
+          "item_type": "weapon",
+          "weight": 1.0,
+          "value": 5,
+          "rarity": "common",
+          "class_restrictions": [
+            "rogue"
+          ],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
         },
         "quantity": 1,
         "equipped": true
       },
-      "simple_garb": {
+      "loot_rat_tail_1_1": {
         "item": {
-          "item_id": "simple_garb",
-          "name": "Simple Garb",
-          "description": "Plain, comfortable clothing that doesn't restrict movement or meditation.",
-          "item_type": "armor",
-          "weight": 1.0,
-          "value": 2,
+          "item_id": "loot_rat_tail_1_1",
+          "name": "Rat Tail",
+          "description": "Rat Tail lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
           "rarity": "common",
-          "class_restrictions": [
-            "mystic"
-          ],
+          "class_restrictions": [],
           "level_requirement": 1,
           "stat_bonuses": {
             "strength": 0,
@@ -87,14 +215,236 @@
             "wisdom": 0,
             "charisma": 0
           },
-          "ac_bonus": 0,
-          "armor_type": "light",
-          "max_dex_bonus": null,
-          "stealth_penalty": 0,
-          "movement_penalty": 0
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
         },
         "quantity": 1,
-        "equipped": true
+        "equipped": false
+      },
+      "loot_goblin_ear_1_0": {
+        "item": {
+          "item_id": "loot_goblin_ear_1_0",
+          "name": "Goblin Ear",
+          "description": "Goblin Ear lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "loot_goblin_ear_1_2": {
+        "item": {
+          "item_id": "loot_goblin_ear_1_2",
+          "name": "Goblin Ear",
+          "description": "Goblin Ear lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "old_trap": {
+        "item": {
+          "item_id": "old_trap",
+          "name": "Old Hunting Trap",
+          "description": "A rusty hunting trap lies partially hidden among the leaves.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "mystical_herb": {
+        "item": {
+          "item_id": "mystical_herb",
+          "name": "Mystical Herb",
+          "description": "A rare herb with magical properties grows at the base of the largest tree.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "mystical_herb_1": {
+        "item": {
+          "item_id": "mystical_herb",
+          "name": "Mystical Herb",
+          "description": "A rare herb with magical properties grows at the base of the largest tree.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "old_trap_1": {
+        "item": {
+          "item_id": "old_trap",
+          "name": "Old Hunting Trap",
+          "description": "A rusty hunting trap lies partially hidden among the leaves.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "loot_goblin_ear_1_0_1": {
+        "item": {
+          "item_id": "loot_goblin_ear_1_0",
+          "name": "Goblin Ear",
+          "description": "Goblin Ear lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "loot_goblin_ear_1_3": {
+        "item": {
+          "item_id": "loot_goblin_ear_1_3",
+          "name": "Goblin Ear",
+          "description": "Goblin Ear lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "loot_rusty_dagger_1_2": {
+        "item": {
+          "item_id": "loot_rusty_dagger_1_2",
+          "name": "Rusty Dagger",
+          "description": "Rusty Dagger lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
       },
       "herbal_remedy": {
         "item": {
@@ -117,6 +467,8 @@
             "wisdom": 0,
             "charisma": 0
           },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null,
           "usage_time": 2.0,
           "stackable": true,
           "hp_restore": 5,
@@ -126,7 +478,198 @@
         "quantity": 1,
         "equipped": false
       },
-      "rusty_dagger": {
+      "loot_rusty_dagger_1_2_1": {
+        "item": {
+          "item_id": "loot_rusty_dagger_1_2",
+          "name": "Rusty Dagger",
+          "description": "Rusty Dagger lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "loot_goblin_ear_1_0_2": {
+        "item": {
+          "item_id": "loot_goblin_ear_1_0",
+          "name": "Goblin Ear",
+          "description": "Goblin Ear lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "hidden_stash": {
+        "item": {
+          "item_id": "hidden_stash",
+          "name": "Hidden Stash",
+          "description": "A small cache hidden behind a fallen log contains supplies.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "loot_goblin_ear_1_3_1": {
+        "item": {
+          "item_id": "loot_goblin_ear_1_3",
+          "name": "Goblin Ear",
+          "description": "Goblin Ear lies here.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "steel_dagger": {
+        "item": {
+          "item_id": "steel_dagger",
+          "name": "Steel Dagger",
+          "description": "A finely crafted steel dagger with a razor-sharp edge. Perfectly balanced for quick, precise strikes.",
+          "item_type": "weapon",
+          "weight": 1.5,
+          "value": 40,
+          "rarity": "uncommon",
+          "class_restrictions": [
+            "rogue"
+          ],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null,
+          "damage_dice": "1d4+1",
+          "attack_speed": 1.8,
+          "attacks_per_turn": 2,
+          "crit_range": 19,
+          "attack_bonus": 1,
+          "damage_bonus": 0
+        },
+        "quantity": 1,
+        "equipped": true
+      },
+      "power_crystal": {
+        "item": {
+          "item_id": "power_crystal",
+          "name": "Power Crystal",
+          "description": "A crystal pulsing with magical energy sits in the center of the stone circle.",
+          "item_type": "accessory",
+          "weight": 0.1,
+          "value": 0,
+          "rarity": "common",
+          "class_restrictions": [],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null
+        },
+        "quantity": 1,
+        "equipped": false
+      },
+      "leather_armor": {
+        "item": {
+          "item_id": "leather_armor",
+          "name": "Leather Armor",
+          "description": "Well-crafted leather armor that provides good protection while maintaining flexibility.",
+          "item_type": "armor",
+          "weight": 10.0,
+          "value": 50,
+          "rarity": "uncommon",
+          "class_restrictions": [
+            "rogue",
+            "mystic"
+          ],
+          "level_requirement": 1,
+          "stat_bonuses": {
+            "strength": 0,
+            "dexterity": 0,
+            "constitution": 0,
+            "intelligence": 0,
+            "wisdom": 0,
+            "charisma": 0
+          },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null,
+          "ac_bonus": 2,
+          "armor_type": "light",
+          "max_dex_bonus": null,
+          "stealth_penalty": 0,
+          "movement_penalty": 0
+        },
+        "quantity": 1,
+        "equipped": true
+      },
+      "rusty_dagger_2": {
         "item": {
           "item_id": "rusty_dagger",
           "name": "Rusty Dagger",
@@ -147,6 +690,8 @@
             "wisdom": 0,
             "charisma": 0
           },
+          "condition_percentage": 100.0,
+          "alignment_restriction": null,
           "damage_dice": "1d4",
           "attack_speed": 2.0,
           "attacks_per_turn": 2,
@@ -158,32 +703,36 @@
         "equipped": false
       }
     },
-    "max_weight": 50.0
+    "max_weight": 40.0
   },
   "equipment": {
     "equipped_items": {
-      "weapon": "hand_wraps",
-      "armor": "simple_garb",
-      "accessory": null
+      "weapon": "steel_dagger",
+      "armor": "leather_armor",
+      "accessory": null,
+      "offhand": "rusty_dagger",
+      "shield": null
     },
     "applied_bonuses": {
+      "offhand": {},
       "weapon": {},
       "armor": {}
     }
   },
   "statistics": {
-    "start_time": 1754203752.760468,
+    "start_time": 1754970886.157888,
     "enemies_defeated": 0,
-    "areas_explored": 1,
+    "areas_explored": 2,
     "items_found": 0,
     "levels_gained": 0,
     "total_damage_dealt": 0,
     "total_damage_taken": 0,
-    "commands_entered": 80,
+    "commands_entered": 211,
     "times_died": 0,
     "items_equipped": 0,
     "areas_discovered": [
-      "Tutorial Cave"
+      "Tutorial Cave",
+      "Forest Path"
     ],
     "enemies_defeated_list": [],
     "items_found_list": []
@@ -252,7 +801,7 @@
     "forest_ranger": {
       "name": "Forest Ranger",
       "description": "Complete forest exploration",
-      "condition_met": false,
+      "condition_met": true,
       "hidden": false
     },
     "equipment_master": {

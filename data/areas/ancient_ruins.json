@@ -10,6 +10,8 @@
       "name": "Entrance Hall",
       "room_type": "transition",
       "lighting": "dim",
+      "scent": "wet dust, faint mineral",
+      "temperature": "cool",
       "coords": [0, 0, 0],
       "description": "Stone steps descend from the forest into a crumbling hall. Faded mosaics [depict processions] and fractured columns lean in the gloom.",
       "ambient_sound": "Distant drip of water, soft gusts stirring dust",
@@ -64,9 +66,15 @@
     "antechamber": {
       "name": "Antechamber",
       "lighting": "dim",
+      "scent": "cold stone",
+      "temperature": "chill",
       "coords": [1, 0, 0],
-      "description": "A narrow chamber with [stone benches] and [faded script] carved into the walls. The air is noticeably colder.",
+      "description": "The Antechamber\nSight: A narrow chamber carved smooth by careful hands.\nSound: A whispering draft flows from below.\nSmell: Cold stone with a hint of old ash.\nTemp: Noticeably colder than the hall.\nNotes: [stone benches], [faded script] can be examined.",
       "ambient_sound": "A whispering draft flowing from below",
+      "examinables": {
+        "stone benches": "The benches are worn where countless visitors once waited their turn.",
+        "faded script": "Ancient glyphs mention a ‘keeper below’ and ‘archives sealed by song’."
+      },
       "exits": {
         "west": { "destination": "entrance_hall" },
         "south": { "destination": "vestibule" },
@@ -109,8 +117,12 @@
     "mosaic_nook": {
       "name": "Mosaic Nook",
       "lighting": "dim",
+      "scent": "old grout, dust",
       "coords": [2, 1, 0],
-      "description": "A small alcove where a [broken mosaic] shows robed figures around a star. Tiles crunch underfoot.",
+      "description": "The Mosaic Nook\nSight: Broken tiles depict robed figures circling a seven-pointed star.\nSound: A faint tinkling when shards shift.\nSmell: Old lime grout and dust.\nTemp: A stagnant stillness.\nNotes: [broken mosaic] pieces might conceal gaps.",
+      "examinables": {
+        "broken mosaic": "The star’s eastern point is scuffed more than the others, as if someone scraped it often."
+      },
       "exits": {
         "southwest": { "destination": "antechamber" },
         "east": { "destination": "offering_room" }
@@ -173,8 +185,12 @@
     "statue_hall": {
       "name": "Statue Hall",
       "lighting": "dim",
+      "scent": "powdered stone",
       "coords": [2, 0, -1],
-      "description": "A procession of shattered statues lines the hall. One [intact plinth] bears scrape marks pointing east.",
+      "description": "Statue Hall\nSight: Shattered statues parade in ruin; only plinths remain intact.\nSound: Soft grit underfoot.\nSmell: Powdered stone.\nTemp: A steady, dry chill.\nNotes: The [intact plinth] bears mysterious scrape marks pointing east.",
+      "examinables": {
+        "intact plinth": "Scratches align east, as if a heavy base was rotated or a marker set."
+      },
       "exits": {
         "west": { "destination": "grand_crossing" },
         "east": { "destination": "fountain_court" },
@@ -206,9 +222,11 @@
     "fountain_court": {
       "name": "Fountain Court",
       "lighting": "dim",
+      "scent": "mineral water",
+      "temperature": "cool",
       "coords": [3, 0, -1],
       "room_type": "safe_zone",
-      "description": "A dry fountain dominates a small court. Faint scratches read: 'Rest here, traveler.'",
+      "description": "Fountain Court\nSight: A dry, elegant basin carved with wave motifs.\nSound: Drips echo from somewhere below.\nSmell: Mineral water lingers.\nTemp: Comfortably cool.\nNotes: Scratches read, ‘Rest here, traveler.’",
       "exits": {
         "west": { "destination": "statue_hall" },
         "down": { "destination": "cistern" }
@@ -378,9 +396,14 @@
     "archive_gate": {
       "name": "Archive Gate",
       "lighting": "dim",
+      "scent": "ozone and parchment",
+      "temperature": "cool",
       "coords": [2, 2, -1],
       "room_type": "transition",
-      "description": "A reinforced arch with rusted hinges. A [gate sigil] faintly glows when touched.",
+      "description": "Archive Gate\nSight: A reinforced arch with rusted hinges and a dull bronze seal.\nSound: A soft resonant hum behind the stone.\nSmell: Faint ozone mingled with old parchment.\nTemp: Cooler air leaks from beyond.\nNotes: A [gate sigil] faintly glows when touched.",
+      "examinables": {
+        "gate sigil": "A stylized flame and eye motif. It warms to the touch, then cools. You suspect a song once opened this."
+      },
       "exits": {
         "southwest": { "destination": "scribe_way" },
         "south": { "destination": "vault_corridor_e" },
@@ -390,9 +413,13 @@
     "ancient_library": {
       "name": "The Crumbling Archive",
       "lighting": "dim",
+      "scent": "old ink and vellum",
       "coords": [2, 3, -1],
       "room_type": "normal",
-      "description": "Collapsed shelves and scattered [journal fragments] hint at knowledge lost. The air tastes of old ink.",
+      "description": "The Crumbling Archive\nSight: Shelves lie splayed; [journal fragments] and splintered wood litter the floor.\nSound: A hollow hush like a held breath.\nSmell: Old ink and vellum.\nTemp: The air tastes dry and stale.\nNotes: Something here once tracked cross-references.",
+      "examinables": {
+        "journal fragments": "Scattered fragments mention ‘twin sentinels’ and a ‘vault song’ split in two parts."
+      },
       "exits": {
         "south": { "destination": "archive_gate" },
         "east": { "destination": "sealed_vault" }
@@ -445,7 +472,8 @@
       "lighting": "dark",
       "coords": [1, 0, -2],
       "room_type": "transition",
-      "description": "A cramped landing where deeper vault corridors begin. The temperature drops noticeably.",
+      "description": "A cramped landing where deeper vault corridors begin. The temperature drops noticeably.
+      ",
       "exits": {
         "up": { "destination": "grand_crossing" },
         "east": { "destination": "vault_corridor_e" },
