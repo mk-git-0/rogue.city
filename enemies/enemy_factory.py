@@ -324,6 +324,20 @@ class EnemyFactory:
         
         # Apply overrides
         self._apply_stat_overrides(enemy, overrides)
+
+        # Chance to spawn an elite variant with 2x stats and better loot
+        try:
+            import random
+            if random.randint(1, 100) <= 5:  # 5% chance
+                enemy.name = f"glowing {enemy.name}"
+                enemy.level = max(1, int(enemy.level * 1.5))
+                enemy.max_hp = int(enemy.max_hp * 2)
+                enemy.current_hp = enemy.max_hp
+                enemy.attack_bonus += 2
+                # Improve loot chances by adding an extra tiered drop placeholder
+                enemy.loot_table.append({'name': 'rare', 'type': 'tier', 'chance': 100, 'quantity': 1})
+        except Exception:
+            pass
         
         return enemy
         

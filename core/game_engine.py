@@ -2083,6 +2083,14 @@ class GameEngine:
 
         hp_gain = 1 + con_mod
         mana_gain = 1 + max(wis_mod, int_mod)
+        # Encumbrance reduces rest effectiveness
+        try:
+            if hasattr(player, 'inventory_system') and player.inventory_system.is_encumbered():
+                enc_pen = player.inventory_system.get_encumbrance_penalty()  # 0.0 to 0.5
+                hp_gain = max(1, int(hp_gain * (1.0 - enc_pen)))
+                mana_gain = max(0, int(mana_gain * (1.0 - enc_pen)))
+        except Exception:
+            pass
 
         try:
             room = self.current_area.get_room(self.current_room) if self.current_area else None
@@ -2115,6 +2123,8 @@ class GameEngine:
             if hasattr(player, 'max_mana') and hasattr(player, 'current_mana') and player.max_mana > 0:
                 mana_part = f"Mana {player.current_mana}/{player.max_mana}"
             parts = [hp_part] + ([mana_part] if mana_part else [])
+            if hasattr(player, 'inventory_system') and player.inventory_system.is_encumbered():
+                parts.append("Encumbered")
             self.ui_manager.log_system("Rest tick: " + ", ".join(parts))
         except Exception:
             pass
