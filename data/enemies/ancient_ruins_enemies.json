@@ -1,0 +1,211 @@
+{
+  "ruin_bat": {
+    "name": "ruin bat",
+    "enemy_type": "bat",
+    "level": 1,
+    "max_hp": 5,
+    "armor_class": 14,
+    "attack_bonus": 2,
+    "damage_dice": "1d3",
+    "attack_speed": 2.0,
+    "experience_value": 20,
+    "difficulty_rating": 1,
+    "loot_table": [
+      { "name": "Tattered Wing", "type": "misc", "chance": 50, "quantity": 1 }
+    ],
+    "gold_min": 0,
+    "gold_max": 1,
+    "ai_flags": { "aggressive": true, "intelligent": false, "pack_hunter": true },
+    "description": "A small bat adapted to the dark ruins, darting unpredictably."
+  },
+
+  "crumbling_guard": {
+    "name": "crumbling guard",
+    "enemy_type": "guard",
+    "level": 6,
+    "max_hp": 28,
+    "armor_class": 15,
+    "attack_bonus": 5,
+    "damage_dice": "1d8+2",
+    "attack_speed": 3.0,
+    "experience_value": 180,
+    "difficulty_rating": 3,
+    "loot_table": [
+      { "name": "Guard Spear", "type": "weapon", "chance": 35, "quantity": 1 },
+      { "name": "Bronze Token", "type": "misc", "chance": 60, "quantity": 1 }
+    ],
+    "gold_min": 3,
+    "gold_max": 9,
+    "ai_flags": { "aggressive": true, "intelligent": true, "pack_hunter": false },
+    "description": "A once-proud sentry animated by duty and dust, its armor flaking with age."
+  },
+
+  "hooded_cultist": {
+    "name": "hooded cultist",
+    "enemy_type": "cultist",
+    "level": 8,
+    "max_hp": 32,
+    "armor_class": 13,
+    "attack_bonus": 6,
+    "damage_dice": "1d6+3",
+    "attack_speed": 3.0,
+    "experience_value": 260,
+    "difficulty_rating": 4,
+    "loot_table": [
+      { "name": "Obsidian Charm", "type": "misc", "chance": 45, "quantity": 1 },
+      { "name": "Dark Robes", "type": "armor", "chance": 25, "quantity": 1 }
+    ],
+    "gold_min": 5,
+    "gold_max": 15,
+    "ai_flags": { "aggressive": true, "intelligent": true, "pack_hunter": true },
+    "special_abilities": ["dark_bolt", "weaken"],
+    "description": "A whispering devotee of forgotten things, eyes hidden beneath a deep hood."
+  },
+
+  "animated_armor": {
+    "name": "animated armor",
+    "enemy_type": "construct",
+    "level": 10,
+    "max_hp": 45,
+    "armor_class": 18,
+    "attack_bonus": 7,
+    "damage_dice": "1d8+4",
+    "attack_speed": 3.5,
+    "experience_value": 380,
+    "difficulty_rating": 5,
+    "loot_table": [
+      { "name": "Ancient Plate Fragment", "type": "misc", "chance": 70, "quantity": 1 }
+    ],
+    "gold_min": 0,
+    "gold_max": 5,
+    "ai_flags": { "aggressive": true, "intelligent": false, "pack_hunter": false },
+    "description": "Empty armor animated by residual wards; its joints grind with each step."
+  },
+
+  "lesser_demon": {
+    "name": "lesser demon",
+    "enemy_type": "demon",
+    "level": 14,
+    "max_hp": 70,
+    "armor_class": 16,
+    "attack_bonus": 9,
+    "damage_dice": "2d6+4",
+    "attack_speed": 3.0,
+    "experience_value": 800,
+    "difficulty_rating": 7,
+    "loot_table": [
+      { "name": "Sulfurous Ember", "type": "misc", "chance": 60, "quantity": 1 },
+      { "name": "Charred Band", "type": "misc", "chance": 30, "quantity": 1 }
+    ],
+    "gold_min": 10,
+    "gold_max": 25,
+    "ai_flags": { "aggressive": true, "intelligent": true, "pack_hunter": false },
+    "special_abilities": ["hellfire", "frighten"],
+    "description": "A snarling thing of smoke and horn that smolders in the vault’s chill air."
+  },
+
+  "stone_construct": {
+    "name": "stone construct",
+    "enemy_type": "construct",
+    "level": 15,
+    "max_hp": 85,
+    "armor_class": 17,
+    "attack_bonus": 10,
+    "damage_dice": "2d8+3",
+    "attack_speed": 3.5,
+    "experience_value": 950,
+    "difficulty_rating": 8,
+    "loot_table": [
+      { "name": "Runed Core", "type": "misc", "chance": 50, "quantity": 1 }
+    ],
+    "gold_min": 8,
+    "gold_max": 18,
+    "ai_flags": { "aggressive": true, "intelligent": false, "pack_hunter": false },
+    "description": "A hulking figure chiseled from black stone, animated by a dim, pulsing rune."
+  },
+
+  "aberrant_wisp": {
+    "name": "aberrant wisp",
+    "enemy_type": "aberration",
+    "level": 13,
+    "max_hp": 50,
+    "armor_class": 15,
+    "attack_bonus": 8,
+    "damage_dice": "1d10+2",
+    "attack_speed": 2.5,
+    "experience_value": 700,
+    "difficulty_rating": 7,
+    "loot_table": [
+      { "name": "Phantom Residue", "type": "misc", "chance": 65, "quantity": 1 }
+    ],
+    "gold_min": 6,
+    "gold_max": 14,
+    "ai_flags": { "aggressive": true, "intelligent": false, "pack_hunter": true },
+    "special_abilities": ["phase_shift"],
+    "description": "A drifting mote of wrongness that flickers between here and elsewhere."
+  },
+
+  "ancient_sentinel": {
+    "name": "ancient sentinel",
+    "enemy_type": "construct",
+    "level": 12,
+    "max_hp": 90,
+    "armor_class": 18,
+    "attack_bonus": 9,
+    "damage_dice": "2d6+4",
+    "attack_speed": 3.0,
+    "experience_value": 1200,
+    "difficulty_rating": 9,
+    "loot_table": [
+      { "name": "Sentinel Eye Gem", "type": "misc", "chance": 80, "quantity": 1 }
+    ],
+    "gold_min": 12,
+    "gold_max": 24,
+    "ai_flags": { "aggressive": true, "intelligent": true, "pack_hunter": true },
+    "special_abilities": ["guard_swap"],
+    "description": "A towering ward-construct that pivots with uncanny coordination."
+  },
+
+  "corrupted_keeper": {
+    "name": "The Corrupted Keeper",
+    "enemy_type": "guardian",
+    "level": 4,
+    "max_hp": 55,
+    "armor_class": 14,
+    "attack_bonus": 6,
+    "damage_dice": "1d10+2",
+    "attack_speed": 3.5,
+    "experience_value": 300,
+    "difficulty_rating": 4,
+    "loot_table": [
+      { "name": "Keeper's Key", "type": "misc", "chance": 90, "quantity": 1 },
+      { "name": "Polished Buckler", "type": "armor", "chance": 70, "quantity": 1 }
+    ],
+    "gold_min": 10,
+    "gold_max": 20,
+    "ai_flags": { "aggressive": true, "intelligent": false, "pack_hunter": false },
+    "description": "A defiled guardian whose purpose has been twisted by time and corruption."
+  },
+
+  "vault_guardian": {
+    "name": "The Vault Guardian",
+    "enemy_type": "construct",
+    "level": 18,
+    "max_hp": 220,
+    "armor_class": 19,
+    "attack_bonus": 12,
+    "damage_dice": "2d10+5",
+    "attack_speed": 3.5,
+    "experience_value": 3000,
+    "difficulty_rating": 12,
+    "loot_table": [
+      { "name": "Warded Core", "type": "misc", "chance": 100, "quantity": 1 },
+      { "name": "Guardian's Aegis", "type": "armor", "chance": 50, "quantity": 1 }
+    ],
+    "gold_min": 50,
+    "gold_max": 120,
+    "ai_flags": { "aggressive": true, "intelligent": true, "pack_hunter": false },
+    "special_abilities": ["phase_shift", "enrage"],
+    "description": "A multi-phase sentinel of the vault, its core reconfigures as wards fail."
+  }
+}

@@ -229,7 +229,7 @@
       "description": "Fountain Court\nSight: A dry, elegant basin carved with wave motifs.\nSound: Drips echo from somewhere below.\nSmell: Mineral water lingers.\nTemp: Comfortably cool.\nNotes: Scratches read, ‘Rest here, traveler.’",
       "exits": {
         "west": { "destination": "statue_hall" },
-        "down": { "destination": "cistern" }
+        "down": { "destination": "cistern", "hidden": true }
       }
     },
     "scribe_way": {
@@ -406,7 +406,7 @@
       },
       "exits": {
         "southwest": { "destination": "scribe_way" },
-        "south": { "destination": "vault_corridor_e" },
+        "south": { "destination": "vault_corridor_e", "hidden": true },
         "north": { "destination": "ancient_library" }
       }
     },
@@ -464,7 +464,20 @@
       "description": "A tangle of fallen walls and dead ends. You can navigate with care, but it loops upon itself.",
       "exits": {
         "east": { "destination": "vault_corridor_w" },
-        "south": { "destination": "undercroft" }
+        "south": { "destination": "undercroft" },
+        "north": { "destination": "secret_cache", "hidden": true }
+      }
+    },
+    "secret_cache": {
+      "name": "Secret Cache",
+      "lighting": "dark",
+      "coords": [-1, 1, -2],
+      "description": "A tucked-away recess containing dust-free stone and disturbed grit.",
+      "items": {
+        "ancient_token": { "name": "ancient token", "description": "A small bronze token stamped with a seven-pointed star.", "can_take": true, "quantity": 1 }
+      },
+      "exits": {
+        "south": { "destination": "collapsed_maze" }
       }
     },
     "lower_landing": {
@@ -544,7 +557,8 @@
       "exits": {
         "west": { "destination": "obsidian_nexus" },
         "north": { "destination": "vault_corridor_e" },
-        "east": { "destination": "warded_quadrant" }
+        "east": { "destination": "warded_quadrant" },
+        "south": { "destination": "demon_seal", "hidden": true }
       }
     },
     "crystal_spine": {
