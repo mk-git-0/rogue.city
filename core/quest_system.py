@@ -134,7 +134,16 @@ class QuestSystem:
                 
                 for quest_id, data in quest_data.items():
                     self.quest_definitions[quest_id] = Quest(quest_id, data)
-                    
+                # Load Ruins questline in addition
+                ruins_file = os.path.join('data', 'quests', 'ruins_questline.json')
+                if os.path.exists(ruins_file):
+                    try:
+                        with open(ruins_file, 'r') as rf:
+                            ruins_data = json.load(rf)
+                        for quest_id, data in ruins_data.items():
+                            self.quest_definitions[quest_id] = Quest(quest_id, data)
+                    except Exception:
+                        pass
                 print(f"Loaded {len(self.quest_definitions)} quest definitions")
             except (json.JSONDecodeError, FileNotFoundError) as e:
                 print(f"Error loading quest data: {e}")

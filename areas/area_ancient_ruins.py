@@ -234,4 +234,13 @@ class AncientRuinsArea(BaseArea):
             messages.append("Objective: Investigate the disturbance deeper in the Entrance Hall zone.")
         if room_id == 'ancient_library':
             messages.append("Objective: The Keeper's Journal fragments may be scattered here.")
+        # Auto-offer Ruins Q1 if available
+        try:
+            if character and hasattr(character, 'quest_manager') and character.quest_manager:
+                qm = character.quest_manager
+                available = [q.quest_id for q in qm.get_available_quests()]
+                if room_id == 'entrance_hall' and 'ruins_q1_investigate' in available:
+                    messages.append("A quest is available: 'Investigate the Disturbance'. Use 'accept Investigate the Disturbance' to begin.")
+        except Exception:
+            pass
         return messages

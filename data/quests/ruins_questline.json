@@ -1,0 +1,58 @@
+{
+  "ruins_q1_investigate": {
+    "name": "Investigate the Disturbance",
+    "description": "Rellan the Quartermaster heard unsettling echoes below. Investigate the Entrance Hall and report back.",
+    "quest_giver": "ruins_quartermaster",
+    "alignment_requirement": "any",
+    "level_requirement": 1,
+    "prerequisites": [],
+    "steps": [
+      {"step": 1, "objective": "Search the Entrance Hall", "description": "Use SEARCH in the Entrance Hall to examine the area."},
+      {"step": 2, "objective": "Report back to Rellan", "description": "Return to the Quartermaster with your findings."}
+    ],
+    "rewards": {"experience": 150, "gold": 10, "items": []}
+  },
+  "ruins_q2_keepers_journal": {
+    "name": "The Keeper's Journal",
+    "description": "Collect the three journal fragments scattered through the ruins.",
+    "quest_giver": "ruins_quartermaster",
+    "alignment_requirement": "any",
+    "level_requirement": 1,
+    "prerequisites": ["ruins_q1_investigate"],
+    "steps": [
+      {"step": 1, "objective": "Find a fragment in the Fountain Court", "description": "Search around the dry basin."},
+      {"step": 2, "objective": "Find a fragment in the Cross-Reference Hall", "description": "Examine catalogue remains."},
+      {"step": 3, "objective": "Find a fragment in the Warded Quadrant", "description": "Investigate the wards for imprints."},
+      {"step": 4, "objective": "Assemble the journal at the Archive Gate", "description": "Bring the fragments to the Archive Gate."}
+    ],
+    "rewards": {"experience": 500, "gold": 25, "items": []}
+  },
+  "ruins_q3_cleanse": {
+    "name": "Cleanse the Chambers",
+    "description": "Defeat the threats sustaining corruption in the ruins.",
+    "quest_giver": "ruins_quartermaster",
+    "alignment_requirement": "any",
+    "level_requirement": 2,
+    "prerequisites": ["ruins_q2_keepers_journal"],
+    "steps": [
+      {"step": 1, "objective": "Defeat the Corrupted Keeper", "description": "Confront the entity at the Grand Crossing."},
+      {"step": 2, "objective": "Defeat the Twin Sentinels", "description": "Break their coordination in the Central Chambers."},
+      {"step": 3, "objective": "Disrupt the Demon’s Seal", "description": "Banish the demonic presence in the Deep Vaults."}
+    ],
+    "rewards": {"experience": 1200, "gold": 60, "items": []}
+  },
+  "ruins_q4_seal_vault": {
+    "name": "Seal the Vault",
+    "description": "Confront the Vault Guardian and choose how to seal the Vault.",
+    "quest_giver": "ruins_quartermaster",
+    "alignment_requirement": "any",
+    "level_requirement": 3,
+    "prerequisites": ["ruins_q3_cleanse"],
+    "steps": [
+      {"step": 1, "objective": "Enter the Sealed Vault", "description": "Descend to the final chamber."},
+      {"step": 2, "objective": "Defeat or Reconfigure the Guardian", "description": "Fight or reconfigure the warding core."},
+      {"step": 3, "objective": "Seal the Vault", "description": "Choose: cleanse, repurpose, or harness the Vault."}
+    ],
+    "rewards": {"experience": 2500, "gold": 150, "items": []}
+  }
+}
