@@ -77,6 +77,17 @@ class AncientRuinsArea(BaseArea):
             for key, value in room_data.get("examinables", {}).items():
                 room.examinables[key.lower()] = value
 
+            # Enemies
+            for enemy_id, enemy in room_data.get("enemies", {}).items():
+                room.add_enemy(
+                    enemy_id=enemy_id,
+                    enemy_type=enemy.get("enemy_type", enemy_id),
+                    quantity=enemy.get("quantity", 1),
+                    encounter_name=enemy.get("encounter_name", enemy.get("enemy_type", enemy_id)),
+                    respawn=enemy.get("respawn", False),
+                    respawn_delay=enemy.get("respawn_delay", 0),
+                )
+
             # Enemies (none yet in Session 1)
             self.add_room(room)
 

@@ -20,6 +20,9 @@
         "east": { "destination": "antechamber" },
         "south": { "destination": "shattered_portico" },
         "down": { "destination": "collapsed_ramp" }
+      },
+      "enemies": {
+        "bat_swarm": { "enemy_type": "ruin_bat", "quantity": 2, "respawn": true, "respawn_delay": 0, "encounter_name": "ruin bats" }
       }
     },
     "shattered_portico": {
@@ -126,6 +129,9 @@
       "exits": {
         "southwest": { "destination": "antechamber" },
         "east": { "destination": "offering_room" }
+      },
+      "enemies": {
+        "bats": { "enemy_type": "ruin_bat", "quantity": 3, "respawn": true, "respawn_delay": 0, "encounter_name": "fluttering bats" }
       }
     },
     "offering_room": {
@@ -147,6 +153,9 @@
         "north": { "destination": "offering_room" },
         "west": { "destination": "cracked_gallery" },
         "south": { "destination": "inscription_way" }
+      },
+      "enemies": {
+        "rats": { "enemy_type": "rat_swarm", "quantity": 1, "respawn": true, "respawn_delay": 0, "encounter_name": "rats" }
       }
     },
     "inscription_way": {
@@ -180,6 +189,9 @@
         "north": { "destination": "scribe_way" },
         "south": { "destination": "drain_tunnel" },
         "down": { "destination": "lower_landing" }
+      },
+      "enemies": {
+        "keeper_boss": { "enemy_type": "corrupted_keeper", "quantity": 1, "respawn": true, "respawn_delay": 5, "encounter_name": "The Corrupted Keeper" }
       }
     },
     "statue_hall": {
@@ -297,6 +309,9 @@
         "south": { "destination": "workshop" },
         "west": { "destination": "statue_hall" },
         "east": { "destination": "barracks" }
+      },
+      "enemies": {
+        "guards": { "enemy_type": "crumbling_guard", "quantity": 2, "respawn": true, "respawn_delay": 5 }
       }
     },
     "barracks": {
@@ -307,6 +322,9 @@
       "exits": {
         "west": { "destination": "training_circle" },
         "east": { "destination": "hall_of_chains" }
+      },
+      "enemies": {
+        "animated": { "enemy_type": "animated_armor", "quantity": 1, "respawn": true, "respawn_delay": 5 }
       }
     },
     "hall_of_chains": {
@@ -339,6 +357,9 @@
         "west": { "destination": "choir_loft" },
         "south": { "destination": "kiln" },
         "east": { "destination": "scriptorium" }
+      },
+      "enemies": {
+        "cultists": { "enemy_type": "hooded_cultist", "quantity": 2, "respawn": true, "respawn_delay": 5 }
       }
     },
     "kiln": {
@@ -434,6 +455,9 @@
       "exits": {
         "west": { "destination": "ancient_library" },
         "down": { "destination": "warded_quadrant" }
+      },
+      "enemies": {
+        "boss_vault_guardian": { "enemy_type": "vault_guardian", "quantity": 1, "respawn": true, "respawn_delay": 15, "encounter_name": "The Vault Guardian" }
       }
     },
     "cistern": {
@@ -600,6 +624,9 @@
         "west": { "destination": "ring_gallery" },
         "south": { "destination": "demon_seal" },
         "east": { "destination": "deep_repository" }
+      },
+      "enemies": {
+        "construct": { "enemy_type": "stone_construct", "quantity": 1, "respawn": true, "respawn_delay": 15 }
       }
     },
     "demon_seal": {
@@ -610,6 +637,9 @@
       "exits": {
         "north": { "destination": "warded_quadrant" },
         "east": { "destination": "sentinel_watch" }
+      },
+      "enemies": {
+        "demon": { "enemy_type": "lesser_demon", "quantity": 1, "respawn": true, "respawn_delay": 15 }
       }
     },
     "deep_repository": {
@@ -630,6 +660,9 @@
       "exits": {
         "west": { "destination": "deep_repository" },
         "south": { "destination": "undercroft" }
+      },
+      "enemies": {
+        "aberrant": { "enemy_type": "aberrant_wisp", "quantity": 1, "respawn": true, "respawn_delay": 15 }
       }
     },
     "undercroft": {
