@@ -16,7 +16,49 @@
       "exits": {
         "north": { "destination": "deep_forest", "destination_area": "forest_path", "description": "back to the forest" },
         "east": { "destination": "antechamber" },
+        "south": { "destination": "shattered_portico" },
         "down": { "destination": "collapsed_ramp" }
+      }
+    },
+    "shattered_portico": {
+      "name": "Shattered Portico",
+      "lighting": "dim",
+      "coords": [0, -1, 0],
+      "description": "Broken lintels and [fallen cornices] litter the floor, framing a view back toward the steps.",
+      "exits": {
+        "north": { "destination": "entrance_hall" },
+        "east": { "destination": "vestibule" }
+      }
+    },
+    "vestibule": {
+      "name": "Vestibule",
+      "lighting": "dim",
+      "coords": [1, -1, 0],
+      "description": "A small anteroom with [ceremonial hooks] along the wall.",
+      "exits": {
+        "west": { "destination": "shattered_portico" },
+        "north": { "destination": "antechamber" },
+        "east": { "destination": "threshold_gate" }
+      }
+    },
+    "threshold_gate": {
+      "name": "Threshold Gate",
+      "lighting": "dim",
+      "coords": [2, -1, 0],
+      "description": "A stout archway of fitted stones. Scratches form a crude tally.",
+      "exits": {
+        "west": { "destination": "vestibule" },
+        "north": { "destination": "watch_alcove" }
+      }
+    },
+    "watch_alcove": {
+      "name": "Watch Alcove",
+      "lighting": "dim",
+      "coords": [2, 0, 0],
+      "description": "A narrow lookout with slits gazing onto the hall. Dusty [arrow racks] remain.",
+      "exits": {
+        "south": { "destination": "threshold_gate" },
+        "west": { "destination": "antechamber" }
       }
     },
     "antechamber": {
@@ -27,8 +69,41 @@
       "ambient_sound": "A whispering draft flowing from below",
       "exits": {
         "west": { "destination": "entrance_hall" },
+        "south": { "destination": "vestibule" },
         "down": { "destination": "grand_crossing" },
-        "northeast": { "destination": "mosaic_nook" }
+        "northeast": { "destination": "mosaic_nook" },
+        "east": { "destination": "cracked_gallery" }
+      }
+    },
+    "cracked_gallery": {
+      "name": "Cracked Gallery",
+      "lighting": "dim",
+      "coords": [2, 0, 0],
+      "description": "Hairline fractures spider across the ceiling. A [crumbled relief] spans the wall.",
+      "exits": {
+        "west": { "destination": "antechamber" },
+        "east": { "destination": "reliquary" },
+        "north": { "destination": "mosaic_nook" }
+      }
+    },
+    "reliquary": {
+      "name": "Small Reliquary",
+      "lighting": "dim",
+      "coords": [3, 0, 0],
+      "description": "A niche with empty reliquary brackets and [wax drippings] hardened on stone.",
+      "exits": {
+        "west": { "destination": "cracked_gallery" },
+        "south": { "destination": "supply_niche" }
+      }
+    },
+    "supply_niche": {
+      "name": "Supply Niche",
+      "lighting": "dim",
+      "coords": [3, -1, 0],
+      "description": "Broken crates and [rotted rope] suggest past expeditions.",
+      "exits": {
+        "north": { "destination": "reliquary" },
+        "west": { "destination": "vestibule" }
       }
     },
     "mosaic_nook": {
@@ -37,7 +112,39 @@
       "coords": [2, 1, 0],
       "description": "A small alcove where a [broken mosaic] shows robed figures around a star. Tiles crunch underfoot.",
       "exits": {
-        "southwest": { "destination": "antechamber" }
+        "southwest": { "destination": "antechamber" },
+        "east": { "destination": "offering_room" }
+      }
+    },
+    "offering_room": {
+      "name": "Offering Room",
+      "lighting": "dim",
+      "coords": [3, 1, 0],
+      "description": "A low table bears [scorch marks]. The floor is swept clean.",
+      "exits": {
+        "west": { "destination": "mosaic_nook" },
+        "south": { "destination": "echo_chamber" }
+      }
+    },
+    "echo_chamber": {
+      "name": "Echo Chamber",
+      "lighting": "dim",
+      "coords": [3, 0, -0],
+      "description": "Whispers rebound in unsettling patterns. A [cracked bowl] lies overturned.",
+      "exits": {
+        "north": { "destination": "offering_room" },
+        "west": { "destination": "cracked_gallery" },
+        "south": { "destination": "inscription_way" }
+      }
+    },
+    "inscription_way": {
+      "name": "Inscription Way",
+      "lighting": "dim",
+      "coords": [3, -1, 1],
+      "description": "Lines of chiseled text, mostly illegible, end at a missing slab.",
+      "exits": {
+        "north": { "destination": "echo_chamber" },
+        "west": { "destination": "vestibule" }
       }
     },
     "collapsed_ramp": {
@@ -71,7 +178,29 @@
       "exits": {
         "west": { "destination": "grand_crossing" },
         "east": { "destination": "fountain_court" },
-        "southeast": { "destination": "service_stairs" }
+        "southeast": { "destination": "service_stairs" },
+        "northeast": { "destination": "gallery_loop_e" },
+        "northwest": { "destination": "gallery_loop_w" }
+      }
+    },
+    "gallery_loop_w": {
+      "name": "Gallery Loop (West)",
+      "lighting": "dim",
+      "coords": [1, 1, -1],
+      "description": "An arched gallery looping back on itself. Traces of [torch soot] streak the stone.",
+      "exits": {
+        "southeast": { "destination": "statue_hall" },
+        "northeast": { "destination": "scribe_way" }
+      }
+    },
+    "gallery_loop_e": {
+      "name": "Gallery Loop (East)",
+      "lighting": "dim",
+      "coords": [3, 1, -1],
+      "description": "A parallel gallery with broken niches. Footprints circle here.",
+      "exits": {
+        "southwest": { "destination": "statue_hall" },
+        "northwest": { "destination": "scribe_way" }
       }
     },
     "fountain_court": {
@@ -93,7 +222,9 @@
       "exits": {
         "south": { "destination": "grand_crossing" },
         "northeast": { "destination": "archive_gate" },
-        "northwest": { "destination": "ledge_overlook" }
+        "northwest": { "destination": "ledge_overlook" },
+        "southeast": { "destination": "gallery_loop_e" },
+        "southwest": { "destination": "gallery_loop_w" }
       }
     },
     "drain_tunnel": {
@@ -103,7 +234,8 @@
       "description": "A cramped passage with slick stone and trickling water. A faint breeze suggests other routes ahead.",
       "exits": {
         "north": { "destination": "grand_crossing" },
-        "southeast": { "destination": "service_stairs" }
+        "southeast": { "destination": "service_stairs" },
+        "south": { "destination": "sump_tunnel" }
       }
     },
     "service_stairs": {
@@ -114,40 +246,133 @@
       "exits": {
         "northwest": { "destination": "statue_hall" },
         "up": { "destination": "statue_hall" },
-        "down": { "destination": "lower_landing" }
+        "down": { "destination": "lower_landing" },
+        "northeast": { "destination": "armory" }
       }
     },
-    "lower_landing": {
-      "name": "Lower Landing",
-      "lighting": "dark",
-      "coords": [1, 0, -2],
-      "room_type": "transition",
-      "description": "A cramped landing where deeper vault corridors begin. The temperature drops noticeably.",
+    "armory": {
+      "name": "Old Armory",
+      "lighting": "dim",
+      "coords": [3, -1, -1],
+      "description": "Empty racks and [rusted fittings] line the walls.",
       "exits": {
-        "up": { "destination": "grand_crossing" },
-        "east": { "destination": "vault_corridor_e" },
-        "west": { "destination": "vault_corridor_w" }
+        "southwest": { "destination": "service_stairs" },
+        "east": { "destination": "workshop" }
       }
     },
-    "vault_corridor_e": {
-      "name": "Vault Corridor (East)",
-      "lighting": "dark",
-      "coords": [2, 0, -2],
-      "description": "A long corridor with sealed doors bearing [glyph seals].", 
+    "workshop": {
+      "name": "Workshop",
+      "lighting": "dim",
+      "coords": [4, -1, -1],
+      "description": "Stone benches and [broken tools] lie abandoned.",
       "exits": {
-        "west": { "destination": "lower_landing" },
-        "east": { "destination": "sealed_vault" },
-        "northeast": { "destination": "archive_gate" }
+        "west": { "destination": "armory" },
+        "north": { "destination": "training_circle" }
       }
     },
-    "vault_corridor_w": {
-      "name": "Vault Corridor (West)",
-      "lighting": "dark",
-      "coords": [0, 0, -2],
-      "description": "Broken niches and toppled urns line the passage.",
+    "training_circle": {
+      "name": "Training Circle",
+      "lighting": "dim",
+      "coords": [4, 0, -1],
+      "description": "Scuffed stone testifies to long-drilled forms.",
       "exits": {
-        "east": { "destination": "lower_landing" },
-        "west": { "destination": "collapsed_maze" }
+        "south": { "destination": "workshop" },
+        "west": { "destination": "statue_hall" },
+        "east": { "destination": "barracks" }
+      }
+    },
+    "barracks": {
+      "name": "Barracks",
+      "lighting": "dim",
+      "coords": [5, 0, -1],
+      "description": "Collapsed bunks and [mildewed bedding] remain.",
+      "exits": {
+        "west": { "destination": "training_circle" },
+        "east": { "destination": "hall_of_chains" }
+      }
+    },
+    "hall_of_chains": {
+      "name": "Hall of Chains",
+      "lighting": "dim",
+      "coords": [6, 0, -1],
+      "description": "Hooks and suspended links sway almost imperceptibly.",
+      "exits": {
+        "west": { "destination": "barracks" },
+        "north": { "destination": "choir_loft" },
+        "east": { "destination": "kiln" }
+      }
+    },
+    "choir_loft": {
+      "name": "Choir Loft",
+      "lighting": "dim",
+      "coords": [6, 1, -1],
+      "description": "A balcony over unseen space; the acoustics here are uncanny.",
+      "exits": {
+        "south": { "destination": "hall_of_chains" },
+        "east": { "destination": "cross_ref" }
+      }
+    },
+    "cross_ref": {
+      "name": "Cross-Reference Hall",
+      "lighting": "dim",
+      "coords": [7, 1, -1],
+      "description": "Shelving stubs with [index pegs] form a network of references.",
+      "exits": {
+        "west": { "destination": "choir_loft" },
+        "south": { "destination": "kiln" },
+        "east": { "destination": "scriptorium" }
+      }
+    },
+    "kiln": {
+      "name": "Ceramic Kiln",
+      "lighting": "dim",
+      "coords": [7, 0, -1],
+      "description": "A cold kiln with cracked dome; soot stains the vent.",
+      "exits": {
+        "west": { "destination": "hall_of_chains" },
+        "north": { "destination": "cross_ref" },
+        "east": { "destination": "automata_bay" }
+      }
+    },
+    "automata_bay": {
+      "name": "Automata Bay",
+      "lighting": "dim",
+      "coords": [8, 0, -1],
+      "description": "Stone plinths bear [gear scarring]; a place for constructs.",
+      "exits": {
+        "west": { "destination": "kiln" },
+        "north": { "destination": "scriptorium" }
+      }
+    },
+    "scriptorium": {
+      "name": "Scriptorium",
+      "lighting": "dim",
+      "coords": [8, 1, -1],
+      "description": "Writing desks lie overturned; [inkstones] dry and cracked.",
+      "exits": {
+        "west": { "destination": "cross_ref" },
+        "south": { "destination": "automata_bay" },
+        "east": { "destination": "curator_quarters" }
+      }
+    },
+    "curator_quarters": {
+      "name": "Curator's Quarters",
+      "lighting": "dim",
+      "coords": [9, 1, -1],
+      "description": "Sparse furnishings and a locked [strongbox stand] remain.",
+      "exits": {
+        "west": { "destination": "scriptorium" },
+        "south": { "destination": "treasury_antechamber" }
+      }
+    },
+    "treasury_antechamber": {
+      "name": "Treasury Antechamber",
+      "lighting": "dim",
+      "coords": [9, 0, -1],
+      "description": "A heavy threshold suggests wealth once stored beyond.",
+      "exits": {
+        "north": { "destination": "curator_quarters" },
+        "west": { "destination": "automata_bay" }
       }
     },
     "archive_gate": {
@@ -180,7 +405,8 @@
       "room_type": "boss_room",
       "description": "A heavy door marked by a warded sigil. It feels significant.",
       "exits": {
-        "west": { "destination": "ancient_library" }
+        "west": { "destination": "ancient_library" },
+        "down": { "destination": "warded_quadrant" }
       }
     },
     "cistern": {
@@ -190,7 +416,8 @@
       "room_type": "safe_zone",
       "description": "A silent underground reservoir. The water is still. Cool air pools here.",
       "exits": {
-        "up": { "destination": "fountain_court" }
+        "up": { "destination": "fountain_court" },
+        "south": { "destination": "black_sluice" }
       }
     },
     "ledge_overlook": {
@@ -199,7 +426,8 @@
       "coords": [0, 2, -1],
       "description": "A narrow ledge overlooking darkness. Somewhere below, metal clinks softly.",
       "exits": {
-        "southeast": { "destination": "scribe_way" }
+        "southeast": { "destination": "scribe_way" },
+        "down": { "destination": "pit_crossing" }
       }
     },
     "collapsed_maze": {
@@ -208,7 +436,180 @@
       "coords": [-1, 0, -2],
       "description": "A tangle of fallen walls and dead ends. You can navigate with care, but it loops upon itself.",
       "exits": {
-        "east": { "destination": "vault_corridor_w" }
+        "east": { "destination": "vault_corridor_w" },
+        "south": { "destination": "undercroft" }
+      }
+    },
+    "lower_landing": {
+      "name": "Lower Landing",
+      "lighting": "dark",
+      "coords": [1, 0, -2],
+      "room_type": "transition",
+      "description": "A cramped landing where deeper vault corridors begin. The temperature drops noticeably.",
+      "exits": {
+        "up": { "destination": "grand_crossing" },
+        "east": { "destination": "vault_corridor_e" },
+        "west": { "destination": "vault_corridor_w" },
+        "down": { "destination": "obsidian_nexus" }
+      }
+    },
+    "vault_corridor_e": {
+      "name": "Vault Corridor (East)",
+      "lighting": "dark",
+      "coords": [2, 0, -2],
+      "description": "A long corridor with sealed doors bearing [glyph seals].",
+      "exits": {
+        "west": { "destination": "lower_landing" },
+        "east": { "destination": "sealed_vault" },
+        "northeast": { "destination": "archive_gate" },
+        "south": { "destination": "ring_gallery" }
+      }
+    },
+    "vault_corridor_w": {
+      "name": "Vault Corridor (West)",
+      "lighting": "dark",
+      "coords": [0, 0, -2],
+      "description": "Broken niches and toppled urns line the passage.",
+      "exits": {
+        "east": { "destination": "lower_landing" },
+        "west": { "destination": "collapsed_maze" },
+        "south": { "destination": "lower_stair_well" }
+      }
+    },
+    "lower_stair_well": {
+      "name": "Lower Stair Well",
+      "lighting": "dark",
+      "coords": [0, -1, -2],
+      "description": "A tight stair spirals into colder air.",
+      "exits": {
+        "north": { "destination": "vault_corridor_w" },
+        "down": { "destination": "obsidian_nexus" }
+      }
+    },
+    "sump_tunnel": {
+      "name": "Sump Tunnel",
+      "lighting": "dark",
+      "coords": [1, -2, -2],
+      "description": "Water gathers in shallow pools; footing is treacherous.",
+      "exits": {
+        "north": { "destination": "drain_tunnel" },
+        "east": { "destination": "black_sluice" }
+      }
+    },
+    "obsidian_nexus": {
+      "name": "Obsidian Nexus",
+      "lighting": "dark",
+      "coords": [1, 0, -3],
+      "description": "A junction of glossy black stone reflects the faintest light.",
+      "exits": {
+        "up": { "destination": "lower_landing" },
+        "west": { "destination": "lower_stair_well" },
+        "east": { "destination": "ring_gallery" },
+        "south": { "destination": "crystal_spine" }
+      }
+    },
+    "ring_gallery": {
+      "name": "Ring Gallery",
+      "lighting": "dark",
+      "coords": [2, 0, -3],
+      "description": "A circular passage encircles a sealed core, with [anchor points] at intervals.",
+      "exits": {
+        "west": { "destination": "obsidian_nexus" },
+        "north": { "destination": "vault_corridor_e" },
+        "east": { "destination": "warded_quadrant" }
+      }
+    },
+    "crystal_spine": {
+      "name": "Crystal Spine",
+      "lighting": "dark",
+      "coords": [1, -1, -3],
+      "description": "Shards jut from the floor like vertebrae, humming softly.",
+      "exits": {
+        "north": { "destination": "obsidian_nexus" },
+        "east": { "destination": "pit_crossing" }
+      }
+    },
+    "pit_crossing": {
+      "name": "Pit Crossing",
+      "lighting": "dark",
+      "coords": [2, -1, -3],
+      "description": "A narrow span crosses a silent depth. A dropped coin never lands.",
+      "exits": {
+        "west": { "destination": "crystal_spine" },
+        "north": { "destination": "ledge_overlook" },
+        "south": { "destination": "oubliette" }
+      }
+    },
+    "oubliette": {
+      "name": "Oubliette",
+      "lighting": "dark",
+      "coords": [2, -2, -3],
+      "description": "A shaft with smooth walls; escape relies on the upper platform.",
+      "exits": {
+        "north": { "destination": "pit_crossing" }
+      }
+    },
+    "warded_quadrant": {
+      "name": "Warded Quadrant",
+      "lighting": "dark",
+      "coords": [3, 0, -3],
+      "description": "A segment of the ring glows with faint protective sigils.",
+      "exits": {
+        "west": { "destination": "ring_gallery" },
+        "south": { "destination": "demon_seal" },
+        "east": { "destination": "deep_repository" }
+      }
+    },
+    "demon_seal": {
+      "name": "Demon Seal",
+      "lighting": "dark",
+      "coords": [3, -1, -3],
+      "description": "A scorched circle and cracked [iron pins] suggest something was bound here.",
+      "exits": {
+        "north": { "destination": "warded_quadrant" },
+        "east": { "destination": "sentinel_watch" }
+      }
+    },
+    "deep_repository": {
+      "name": "Deep Repository",
+      "lighting": "dark",
+      "coords": [4, 0, -3],
+      "description": "Cold alcoves once stored precious or dangerous items.",
+      "exits": {
+        "west": { "destination": "warded_quadrant" },
+        "east": { "destination": "sentinel_watch" }
+      }
+    },
+    "sentinel_watch": {
+      "name": "Sentinel Watch",
+      "lighting": "dark",
+      "coords": [5, 0, -3],
+      "description": "A vantage point over the vault, with [murder slits] aimed inward.",
+      "exits": {
+        "west": { "destination": "deep_repository" },
+        "south": { "destination": "undercroft" }
+      }
+    },
+    "undercroft": {
+      "name": "Undercroft",
+      "lighting": "dark",
+      "coords": [5, -1, -3],
+      "description": "Low pillars create a forest of stone, damp and cold.",
+      "exits": {
+        "north": { "destination": "sentinel_watch" },
+        "west": { "destination": "collapsed_maze" },
+        "east": { "destination": "black_sluice" }
+      }
+    },
+    "black_sluice": {
+      "name": "Black Sluice",
+      "lighting": "dark",
+      "coords": [4, -1, -3],
+      "description": "An oily flow creeps through a carved channel toward the cistern.",
+      "exits": {
+        "north": { "destination": "cistern" },
+        "west": { "destination": "sump_tunnel" },
+        "east": { "destination": "undercroft" }
       }
     }
   }
