@@ -21,6 +21,18 @@
         "south": { "destination": "shattered_portico" },
         "down": { "destination": "collapsed_ramp" }
       },
+      "traps": {
+        "loose_flagstone": {
+          "name": "loose flagstone",
+          "dc_detect": 12,
+          "dc_disarm": 14,
+          "trigger": "enter",
+          "damage": "1d4",
+          "message": "A stone shifts underfoot and a dart zips from the wall!",
+          "once": true,
+          "armed": true
+        }
+      },
       "enemies": {
         "bat_swarm": { "enemy_type": "ruin_bat", "quantity": 2, "respawn": true, "respawn_delay": 0, "encounter_name": "ruin bats" }
       },
@@ -176,6 +188,18 @@
       "lighting": "dark",
       "coords": [0, 0, -1],
       "description": "A sloped passage choked with rubble. Narrow gaps allow squeezing through if you proceed carefully.",
+      "traps": {
+        "falling_scree": {
+          "name": "falling scree",
+          "dc_detect": 15,
+          "dc_disarm": 17,
+          "trigger": "enter",
+          "damage": "1d6",
+          "message": "Loose stones cascade from above!",
+          "once": true,
+          "armed": true
+        }
+      },
       "exits": {
         "up": { "destination": "entrance_hall" },
         "east": { "destination": "grand_crossing" }
@@ -186,6 +210,18 @@
       "lighting": "dark",
       "coords": [1, 0, -1],
       "description": "A wide intersection where corridors meet from all directions. A [fallen statue] lays broken across one path.",
+      "traps": {
+        "pressure_plate_darts": {
+          "name": "pressure plate",
+          "dc_detect": 16,
+          "dc_disarm": 18,
+          "trigger": "enter",
+          "damage": "1d8",
+          "message": "You step on a plate and darts shoot from hidden slits!",
+          "once": false,
+          "armed": true
+        }
+      },
       "exits": {
         "west": { "destination": "collapsed_ramp" },
         "east": { "destination": "statue_hall" },

@@ -82,6 +82,23 @@ class RoomEnemy:
         return self.encounter_name or self.enemy_type
 
 
+@dataclass
+class RoomTrap:
+    """Represents an environmental trap within a room."""
+    trap_id: str
+    name: str
+    dc_detect: int = 15
+    dc_disarm: int = 15
+    trigger: str = "enter"  # e.g., 'enter', 'move:north', 'search_fail'
+    damage: str = "1d6"      # dice notation for damage
+    message: str = "A trap is triggered!"
+    once: bool = True         # triggers once then becomes inactive
+    armed: bool = True
+    detected: bool = False
+    disarmed: bool = False
+    triggered: bool = False
+
+
 class Room:
     """Represents a single room in the world."""
     
@@ -108,6 +125,7 @@ class Room:
         self.items: Dict[str, RoomItem] = {}
         self.enemies: Dict[str, RoomEnemy] = {}
         self.examinables: Dict[str, str] = {}
+        self.traps: Dict[str, RoomTrap] = {}
         
         # State tracking
         self.visited: bool = False
@@ -185,6 +203,21 @@ class Room:
             **kwargs
         )
         self.enemies[enemy_id] = enemy
+
+    def add_trap(self, trap_id: str, **kwargs) -> None:
+        """Add a trap to this room."""
+        trap = RoomTrap(
+            trap_id=trap_id,
+            name=kwargs.get('name', trap_id.replace('_', ' ')),
+            dc_detect=kwargs.get('dc_detect', 15),
+            dc_disarm=kwargs.get('dc_disarm', kwargs.get('dc_detect', 15)),
+            trigger=kwargs.get('trigger', 'enter'),
+            damage=kwargs.get('damage', '1d6'),
+            message=kwargs.get('message', 'A trap is triggered!'),
+            once=kwargs.get('once', True),
+            armed=kwargs.get('armed', True),
+        )
+        self.traps[trap_id] = trap
         
     def get_active_enemies(self) -> List[RoomEnemy]:
         """Get all active (non-defeated) enemies."""
@@ -238,6 +271,12 @@ class Room:
             desc_lines.append(f"Exits: {', '.join(exit_names)}")
         else:
             desc_lines.append("There are no obvious exits.")
+
+        # If any traps have been detected, subtly hint their presence
+        detected_traps = [t for t in self.traps.values() if t.detected and not t.disarmed]
+        if detected_traps:
+            names = ', '.join(t.name for t in detected_traps)
+            desc_lines.append(f"You spot potential hazards here: {names}.")
             
         return "\n".join(desc_lines)
         
@@ -263,6 +302,22 @@ class Room:
                     'can_take': item.can_take
                 }
                 for item_id, item in self.items.items()
+            },
+            'traps': {
+                trap_id: {
+                    'name': trap.name,
+                    'dc_detect': trap.dc_detect,
+                    'dc_disarm': trap.dc_disarm,
+                    'trigger': trap.trigger,
+                    'damage': trap.damage,
+                    'message': trap.message,
+                    'once': trap.once,
+                    'armed': trap.armed,
+                    'detected': trap.detected,
+                    'disarmed': trap.disarmed,
+                    'triggered': trap.triggered,
+                }
+                for trap_id, trap in self.traps.items()
             }
         }
         
@@ -284,6 +339,18 @@ class Room:
         for item_id, item_data in saved_items.items():
             if item_id in self.items:
                 self.items[item_id].quantity = item_data.get('quantity', 1)
+
+        # Restore traps
+        saved_traps = data.get('traps', {})
+        for trap_id, trap_data in saved_traps.items():
+            if trap_id not in self.traps:
+                self.add_trap(trap_id, **trap_data)
+            # Update state fields
+            trap = self.traps[trap_id]
+            trap.armed = trap_data.get('armed', trap.armed)
+            trap.detected = trap_data.get('detected', trap.detected)
+            trap.disarmed = trap_data.get('disarmed', trap.disarmed)
+            trap.triggered = trap_data.get('triggered', trap.triggered)
 
 
 class BaseArea(ABC):

@@ -1194,6 +1194,12 @@ class GameEngine:
             
             # Trigger area events
             if hasattr(self.current_area, 'on_room_enter'):
+                # Bind engine onto area for callbacks if not already
+                try:
+                    if not hasattr(self.current_area, 'game_engine'):
+                        self.current_area.game_engine = self
+                except Exception:
+                    pass
                 messages = self.current_area.on_room_enter(self.current_room, self.current_character)
                 for message in messages:
                     self.ui_manager.log_info(message)

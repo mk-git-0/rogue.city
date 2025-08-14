@@ -101,6 +101,20 @@ class AncientRuinsArea(BaseArea):
                     respawn_delay=enemy.get("respawn_delay", 0),
                 )
 
+            # Traps
+            for trap_id, trap in room_data.get("traps", {}).items():
+                room.add_trap(
+                    trap_id=trap_id,
+                    name=trap.get("name", trap_id.replace('_', ' ')),
+                    dc_detect=trap.get("dc_detect", 15),
+                    dc_disarm=trap.get("dc_disarm", trap.get("dc_detect", 15)),
+                    trigger=trap.get("trigger", "enter"),
+                    damage=trap.get("damage", "1d6"),
+                    message=trap.get("message", "A trap is triggered!"),
+                    once=trap.get("once", True),
+                    armed=trap.get("armed", True),
+                )
+
             # Enemies (none yet in Session 1)
             self.add_room(room)
 
@@ -297,17 +311,54 @@ class AncientRuinsArea(BaseArea):
         # Chest respawn check
         try:
             now = time.time()
-            to_respawn = []
             for item_id, item in list(room.items.items()):
-                # If chest missing but cooldown passed, re-add
                 if 'chest' in item_id and item.quantity <= 0:
                     next_at = self._chest_respawns.get(item_id, 0)
                     if now >= next_at:
                         item.quantity = 1
-                        messages.append("You hear a click as an ancient mechanism resets a chest." )
-            return messages
+                        messages.append("You hear a click as an ancient mechanism resets a chest.")
         except Exception:
-            return messages
+            pass
+
+        # Trap auto-detection (passive) and triggering
+        try:
+            if hasattr(self, 'game_engine') and self.game_engine and hasattr(self.game_engine, 'dice_system'):
+                dice = self.game_engine.dice_system
+            else:
+                dice = None
+            for trap in list(room.traps.values()):
+                if not trap.armed or trap.disarmed or (trap.once and trap.triggered):
+                    continue
+                # Passive detection hint for trained classes
+                if character:
+                    from core.skill_system import SkillSystem, SkillType, SkillDifficulty
+                    if not hasattr(self.game_engine, 'skill_system'):
+                        self.game_engine.skill_system = SkillSystem(self.game_engine.dice_system, self.game_engine.ui_manager)
+                    ss = self.game_engine.skill_system
+                    # Attempt auto-detect with half DC as soft hint
+                    success, total, desc = ss.make_skill_check(character, SkillType.TRAP_DETECTION, SkillDifficulty.MODERATE)
+                    if success and total >= (trap.dc_detect // 2 + 5):
+                        trap.detected = True
+                        messages.append(f"You notice signs of a {trap.name} here.")
+                # Trigger on enter
+                if trap.trigger == 'enter':
+                    # If detected and player is cautious, allow to avoid; otherwise trigger
+                    if not trap.disarmed:
+                        dmg_notation = trap.damage
+                        try:
+                            damage = self.game_engine.dice_system.roll_with_context(dmg_notation, "A trap", "damage")
+                        except Exception:
+                            damage = 1
+                        if character and hasattr(character, 'take_damage'):
+                            actual = character.take_damage(damage)
+                        else:
+                            actual = damage
+                        messages.append(f"{trap.message} You take {actual} damage.")
+                        trap.triggered = True
+                        if trap.once:
+                            trap.armed = False
+        except Exception:
+            pass
 
         # First-visit exploration bonuses
         if room_id not in self._first_visit_bonus_awarded:

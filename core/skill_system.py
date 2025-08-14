@@ -395,6 +395,68 @@ class SkillSystem:
         
         return detected_traps
     
+    def attempt_trap_disarmament(self, character, trap_name: str) -> bool:
+        """Attempt to disarm a detected trap (integrated with room traps)."""
+        if not self.can_use_skill(character, SkillType.TRAP_DISARMAMENT):
+            self.ui_manager.log_error("You don't know how to safely disarm traps.")
+            return False
+        
+        # Locate trap in current room if available
+        trap_obj = None
+        try:
+            area = getattr(character, 'current_area', None)
+            room_id = getattr(character, 'current_room', None)
+            if area and hasattr(area, 'get_room') and room_id:
+                room = area.get_room(room_id)
+                if room and hasattr(room, 'traps'):
+                    for tid, t in room.traps.items():
+                        if trap_name.lower() in tid.lower() or trap_name.lower() in t.name.lower():
+                            trap_obj = t
+                            break
+        except Exception:
+            trap_obj = None
+
+        if trap_obj and trap_obj.disarmed:
+            self.ui_manager.log_info("This trap is already disarmed.")
+            return True
+        if trap_obj and not trap_obj.armed:
+            self.ui_manager.log_info("This trap is no longer armed.")
+            return True
+
+        self.ui_manager.log_info(f"You carefully work on disarming the {trap_name}...")
+        
+        # Make skill check (hard by default; use numeric DC if trap has one)
+        success, total_roll, result_desc = self.make_skill_check(
+            character, SkillType.TRAP_DISARMAMENT, SkillDifficulty.HARD)
+        
+        if trap_obj:
+            dc_value = getattr(trap_obj, 'dc_disarm', 20)
+            success = success or (total_roll >= dc_value)
+        
+        self._track_skill_usage(character, SkillType.TRAP_DISARMAMENT)
+        
+        if success:
+            if trap_obj:
+                trap_obj.disarmed = True
+                trap_obj.armed = False
+            self.ui_manager.log_success(f"You successfully disarm the {trap_name}.")
+            return True
+        elif result_desc == "Critical Failure!":
+            self.ui_manager.log_critical(f"You accidentally trigger the {trap_name}!")
+            # Apply trap effect if we can determine it
+            try:
+                damage_notation = trap_obj.damage if trap_obj else "1d6"
+                dmg = self.dice_system.roll_with_context(damage_notation, "The trap", "damage")
+                if hasattr(character, 'take_damage'):
+                    character.take_damage(dmg)
+                self.ui_manager.log_error(f"You take {dmg} damage!")
+            except Exception:
+                pass
+            return False
+        else:
+            self.ui_manager.log_error(f"You cannot figure out how to safely disarm the {trap_name}.")
+            return False
+    
     def attempt_search(self, character, area=None, target: str = None) -> List[str]:
         """Search for hidden items, examinables, or exits using the new skill system."""
         if target:

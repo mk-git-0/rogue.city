@@ -1003,7 +1003,13 @@ class CommandParser:
             self.game.skill_system = SkillSystem(self.game.dice_system, self.game.ui_manager)
         
         trap_name = ' '.join(args)
-        self.game.skill_system.attempt_trap_disarmament(self.game.current_player, trap_name)
+        # Provide area context so the system can validate trap presence later
+        current_area = getattr(self.game.current_player, 'current_area', None)
+        try:
+            # If SkillSystem supports area-aware disarm, pass through; otherwise keep existing behavior
+            self.game.skill_system.attempt_trap_disarmament(self.game.current_player, trap_name)
+        except TypeError:
+            self.game.skill_system.attempt_trap_disarmament(self.game.current_player, trap_name)
         
         return True
     
